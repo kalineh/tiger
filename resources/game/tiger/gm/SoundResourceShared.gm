@@ -15,9 +15,9 @@ global g_fileData =
         stream = 0,
         volume = 1.00000,
     },
-    selectCard = 
+    gameOver = 
     {
-        filename = "game/tiger/snd/selectCard.ogg",
+        filename = "common/snd/missing.ogg",
         loop = 0,
         stream = 0,
         volume = 1.00000,

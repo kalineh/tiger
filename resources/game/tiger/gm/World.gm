@@ -3,8 +3,14 @@ global MakeWorld = function()
 {
 	local World = 
 	{
+        // entities
+        // players (also as entities)
+        // props
+        // effects
+        // x-scroll
+        // backgrounds
+
 		entities = table(),
-		enemyspawner = null,
 		liferow = table(),
 		deathrow = table(),
 		player = null,
@@ -13,26 +19,16 @@ global MakeWorld = function()
 		messages = table(),
 		entity_addremove_lock = false,
 		entitymap = null,		
-		freezeTurns = 0,
 
 		queryResults = array(),
 
 		enemySettings = tableDuplicate(DefaultEnemySettings),
-
-		// debug
-		showDebugGrid = false,
-		showDebugGridCoords = false,
 	};
 
 	World.Gui = function()
 	{
 		Gui.Begin("World", g_core.screenDimen.x - 400, g_core.screenDimen.y - 10 );
 
-		Gui.Separator();
-
-		.showDebugGrid = Gui.CheckBox("Show Debug Grid", .showDebugGrid );
-		.showDebugGridCoords = Gui.CheckBox("Show Debug Grid Coords", .showDebugGridCoords );
-		
 		Gui.Separator();
 
 		Gui.End();
@@ -185,27 +181,6 @@ global MakeWorld = function()
 		.cpp.EraseEntityData(entity);
 	};
 
-	World.DrawDebugGrid = function()
-	{
-		Gfx.SetLineWidth(4.0f);
-		Gfx.Color(Gfx.WHITE*0.2f, 0.05f);
-		Gfx.Enable(Gfx.BLEND);
-
-		Gfx.BeginDefaultShader();
-		.cpp.DrawGridDebug(.tilesize.x);
-		Gfx.EndDefaultShader();
-	};
-
-	World.DrawDebugGridCoords = function()
-	{
-		Gfx.Color(Gfx.BLUE);
-		Gfx.Enable(Gfx.BLEND);
-
-		Gfx.BeginDefaultShader();
-		.cpp.DrawGridDebugCoords(.tilesize.x);
-		Gfx.EndDefaultShader();
-	};
-
 	World.Update = function()
 	{
 		while( true )
@@ -213,15 +188,6 @@ global MakeWorld = function()
 			RegisterGui( .Gui, this );
 			RegisterDraw( DrawLayers.Scene, .DrawEntities, this);
 
-			if ( .showDebugGrid )
-			{
-				RegisterDraw( DrawLayers.Scene_Grid, .DrawDebugGrid, this);
-			}
-
-			if ( .showDebugGridCoords )
-			{
-				RegisterDraw( DrawLayers.Scene_Grid, .DrawDebugGridCoords, this);
-			}
 			yield();
 		}
 	};
@@ -242,7 +208,6 @@ global MakeWorld = function()
 
 		.cpp = null;
 
-		threadKill(.threadTickTurn);
 		threadKill(.threadId);
 	};
 	

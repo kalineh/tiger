@@ -6,11 +6,7 @@ global MakeGameGui = function()
 		energyColor = v3(219.0f, 234.0f, 61.0f)/255.0f,
 		fuelColor = v3(255.0f, 249.0f, 128.0f)/255.0f,
 
-		cardDimen = v2(49.0f, 71.0f),
-		cardTopDimen = v2(48.0f, 39.0f),
-
 		posOffset = v2(0.0f),
-		selectedCard = null,
 	};
 
 	GameGui.DrawMainGui = function()
@@ -125,59 +121,13 @@ global MakeGameGui = function()
 		Gfx.EndDefaultShader();
 	};
 
-	GameGui.ExecuteCard = function()
-	{
-		assert(?.selectedCard);
-		.selectedCard.ability.Execute();
-	};
-
-	GameGui.HasCardSelected = function()
-	{
-		return ?.selectedCard;
-	};
-
-	GameGui.CanSelectCard = function(id)
-	{
-		local card = .cards[id];
-		assert(?card);
-		return ?card.ability;
-	};
-
-	GameGui.SelectCard = function(id)
-	{
-		local card = .cards[id];
-		assert(?card);
-
-		.selectedCard = card;
-		card.ability.Select();
-	};
-
-	GameGui.UnselectCard = function()
-	{
-		assert(?.selectedCard);
-		.selectedCard.ability.Unselect();
-		.selectedCard = null;
-	};
-
-	GameGui._UpdateCards = function()
-	{
-		foreach( card in .cards )
-		{
-			local goal = select( card == .selectedCard, 1.0f, 0.0f );
-			card.charge = lerp( card.charge, goal, 0.2f );
-		}
-	};
-
 	GameGui.Update = function()
 	{
-		._InitCards();
-
 		while( true )
 		{	
-			._UpdateCards();
-
 			RegisterDraw( DrawLayers.Scene_UI, .DrawMainGui, this);
 			RegisterDraw( DrawLayers.Scene_UI, .DrawPlayerGui, this);
+
 			yield();
 		}
 	};
@@ -189,26 +139,10 @@ global MakeGameGui = function()
 
 	GameGui._Init = function()
 	{	
-		.cards = {};
-
 		.texMain = Texture("game/tiger/img/gameGui.png");
 		.threadId = this:thread(.Update);
 
 		.posOffset = v2(0.0f, -200.0f);
-	};
-
-	GameGui._InitCards = function()
-	{
-		local numCards = 9;
-		for( i = 0; i < numCards; i+=1 )
-		{
-			.cards[] =
-			{
-				id = i,
-				charge = 0.0f,
-				ability = null,
-			};
-		}
 	};
 
 	GameGui.Release = function()

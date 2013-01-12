@@ -17,103 +17,18 @@ global MakePlayer = function(world, coord)
 	Player.type = EntityType.Player;
 	Player.color = Gfx.WHITE;
 	Player.pending_move = v2(0.0f);
-	Player.max_fuel = PlayerDefaults.MaxFuel;
 	Player.max_health = PlayerDefaults.MaxHealth;
 	Player.max_energy = PlayerDefaults.MaxEnergy;
-	Player.fuel_consume = PlayerDefaults.FuelConsume;
-	Player.fuel_regen = PlayerDefaults.FuelRegen;
 	Player.health_regen = PlayerDefaults.HealthRegen;
 	Player.energy_regen = PlayerDefaults.EnergyRegen;
-	Player.fuel = Player.max_fuel;
 	Player.health = Player.max_health;
 	Player.energy = Player.max_energy;
-	Player.invisible = 0;
 	Player.anim = MakeSpriteAnimation(g_game.animBank, "player");
-	Player.animFire = MakeSpriteAnimation(g_game.animBank, "playerFire");
-	Player.attack_entity_notify = MakeNotify(this, "AttackEntityNotify");
 
 	Player.OnTickTurn = function()
 	{
-		// note that the player performs his entire turn before anything else moves
-		// so we don't want to block on this thread for too long
-		// for any visual effects we can spawn a new thread to run
-		// but make sure any player state that enemies will examine is updated in this thread
-
-		local fuel_consume = .fuel_consume * g_game.planet.gravity;
-		local fuel_regen = .fuel_regen;
-		.fuel = max(0.0f, .fuel - fuel_consume + fuel_regen);
-		.fuel = min(.max_fuel, .fuel + fuel_regen);
-		
 		.health = min(.max_health, .health + .health_regen);
 		.energy = min(.max_energy, .energy + .energy_regen);
-
-		if (.fuel <= 0.0f)
-		{
-			.TakeDamage(1.0f);
-			return;
-		}
-
-		if (.pending_move != v2(0.0f))
-		{
-			local dst = .coord + .pending_move;
-
-			// TODO: generalized pending actions?
-			.pending_move = v2(0.0f);
-
-			local failMoveEffect = function(dst)
-			{
-				g_game.soundBanks["game"].Play("playerMoveBlocked");
-
-				local particlePos = (dst+.coord+v2(1.0f))*0.5f * .world.tilesize;
-
-				// emit particles
-				local particles = g_game.state.particles["playerMoveBlock"];
-				particles.cpp.pos = particlePos;
-				particles.cpp.Emit(15);
-			};
-
-			local entity = .GetHitEntity(dst, this);
-			if (?entity)
-			{
-				if (entity.type == EntityType.Enemy)
-				{
-					.AttackEnemy(entity);
-					return;
-				}
-
-				if (entity.type == EntityType.Pow)
-				{
-					.RescuePow(entity);
-					return;
-				}
-
-				if (entity.type == EntityType.Player)
-				{
-					this:failMoveEffect(dst);
-					.FailMoveTo(dst);
-					return;
-				};
-			}
-
-			local valid = .CanMoveTo(dst);
-			if (!valid)
-			{
-				this:failMoveEffect(dst);
-				.FailMoveTo(dst);
-				return;
-			}
-			else
-			{
-				g_game.soundBanks["game"].Play("playerMove");
-			}
-
-			.MoveTo(dst);
-			return;
-		}
-
-		// other actions?
-
-		// waited
 	};
 
 	Player.Draw = function()
@@ -208,135 +123,6 @@ global MakePlayer = function(world, coord)
 			SPACE = { fun = function() { return .InputWait(); }, arg = null, },
 			E = { fun = function() { return .InputEscape(); }, arg = null, },
 		};
-
-		.inputs = tableDuplicate(.inputsMovement);
-
-		// abilities
-		for (i = 0; i < 9; i += 1)
-		{
-			local id = i+1;
-			.inputs[id.String()] = 
-			{ 
-				arg = i,
-				fun = function(arg) 
-				{ 
-					local cardId = arg;
-					if ( !g_game.state.gui.CanSelectCard(cardId) )
-					{
-						g_game.soundBanks["shared"].Play("error");
-						return false;
-					}
-					else
-					{
-						g_game.soundBanks["shared"].Play("selectCard");
-						g_game.state.gui.SelectCard(cardId);
-					}
-
-					// to handle double-clicks
-					yield();
-
-					while( g_game.state.gui.HasCardSelected() )
-					{
-						local card = g_game.state.gui.selectedCard;
-
-						// execute
-						if ( Input.DidKeyJustGoDown((cardId+1).String()) || Input.DidKeyJustGoDown("RETURN") || Input.DidKeyJustGoDown("KP_ENTER") )
-						{
-							if ( card.ability.CanExecute() )
-							{
-								g_game.state.gui.ExecuteCard();
-								g_game.state.gui.UnselectCard();
-								return true;
-							}
-							else
-							{
-								g_game.soundBanks["shared"].Play("error");
-								g_game.state.gui.UnselectCard();
-								return false;
-							}
-						}
-
-						// cancel?
-						else if ( Input.DidKeyJustGoDown("ESCAPE") )
-						{
-							g_game.soundBanks["shared"].Play("cancel");
-							g_game.state.gui.UnselectCard();
-							return false;
-						}
-						else // change to new card?
-						{
-							for (i = 0; i < 9; i += 1)
-							{
-								local id = i+1;
-								if ( Input.DidKeyJustGoDown(id.String()) )
-								{
-									if ( !g_game.state.gui.CanSelectCard(i) )
-									{
-										g_game.soundBanks["shared"].Play("error");
-										g_game.state.gui.UnselectCard();
-										return false;
-									}
-									else
-									{
-										g_game.state.gui.UnselectCard();
-										g_game.soundBanks["shared"].Play("selectCard");
-										g_game.state.gui.SelectCard(i);
-										cardId = i;
-										break;
-									}
-								}
-							}
-
-							// movement cancels card
-							if ( g_game.state.gui.selectedCard.ability.PlayerMoveUnselectsAbility() )
-							{
-								foreach (k and v in .inputsMovement)
-								{
-									if (Input.DidKeyJustGoDown(k))
-									{
-										g_game.state.gui.UnselectCard();
-
-										local fun = v.fun;
-										local arg = v.arg;
-										local ready = this:fun(arg);
-										return ready;
-									}
-								}
-							}
-						}
-
-						yield();
-					}
-
-					// should not get here
-					assert(false);
-					return true;
-				}
-			};
-		}
-	};
-
-	Player._InitDudes = function()
-	{
-		// TODO: why is this being called before the crew mission is ready?
-		fork {
-			yield();
-
-			// DEBUG: make fake dudes
-			//for (i = 0; i < 10; i += 1)
-			//{
-				//g_game.crewMission.dudes[i] = globals()["MakeDude_"+i](i, i*10);
-			//}
-
-			foreach (dude in g_game.crewMission.dudes)
-			{
-				foreach (bonus in dude.bonuses)
-				{
-					local apply_bonus = bonus.apply;
-					dude:apply_bonus(this);
-				}
-			}
-		}
 	};
 
 	Player._UpdateInput = function()
@@ -373,18 +159,6 @@ global MakePlayer = function(world, coord)
 		return true;
 	};
 
-	Player.InputEscape = function()
-	{
-		if (!g_game.state.escapeSeq.CanEscape() || g_game.state.escapeSeq.IsEscaping() )
-		{
-			g_game.soundBanks["shared"].Play("error");
-			return false;
-		}
-
-		g_game.state.escapeSeq.Start();
-		return true;
-	};
-
 	Player.GetDirectionalInput = function(allow_diagonal, fallback)
 	{
 		if (Input.DidKeyJustGoDown("UP")) { return v2(0.0f, +1.0f); }
@@ -413,32 +187,6 @@ global MakePlayer = function(world, coord)
 		return fallback;
 	};
 
-	Player.AttackEnemy = function(entity, damage)
-	{
-		g_game.soundBanks["game"].Play("playerAttackMelee");
-		.FailMoveTo(entity.coord);
-		entity.TakeDamage(1.0f);		
-		.attack_entity_notify.Notify(entity, damage);
-	};
-
-	Player.RescuePow = function(entity)
-	{
-		.MoveTo(entity.coord, 0.1f);
-
-		// add rescue information
-		// add score
-		// play magic sound
-		// give energy
-		// ui update
-
-		.fuel = min(.max_fuel, .fuel + .max_fuel * 0.25f);
-		.energy = min(.max_energy, .energy + .max_energy * 0.25f);
-		.health = min(.max_health, .health + .max_health * 0.25f);
-
-		entity.OnRescuePow();
-		entity.Die();
-	};
-
 	Player.OnDie = function()
 	{
 		// zoom in death
@@ -460,13 +208,6 @@ global MakePlayer = function(world, coord)
 	};
 
 	Player._InitInputs();
-	Player._InitDudes();
-
-	// DEBUG
-	//fork {
-		//yield();
-		//Player.GiveAbility(MakeAbilityDroid(Player));
-	//}
 
 	return Player;
 };

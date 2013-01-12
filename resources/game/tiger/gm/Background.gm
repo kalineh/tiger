@@ -30,16 +30,13 @@ global MakeBackground = function()
 		// bg
 		g_game.BeginScreenSpace();
 		DrawTexture(.texBG, v2(0.0f));
-
-		// need to draw white bar to handle bottom leakage
-		Gfx.Color(v3(237.0f,249.0f,250.0f)/255.0f);
-		Gfx.DrawRect(v2(0.0f), g_game.dimen*v2(1.0f,0.2f));
 		g_game.EndScreenSpace();
-		
+
+        // TODO: parallax!
 		Gfx.Enable(Gfx.BLEND);
 		Gfx.Color(Gfx.WHITE);
-		._DrawParallaxLayer( .texParallax2, 0.6f, 0.5f );
-		._DrawParallaxLayer( .texParallax1, 0.4f, 0.4f );
+		//._DrawParallaxLayer( .texParallax2, 0.6f, 0.5f );
+		//._DrawParallaxLayer( .texParallax1, 0.4f, 0.4f );
 		
 		Gfx.EndDefaultShader();
 	};
