@@ -2,10 +2,7 @@
 global PlayerDefaults =
 {
 	MaxHealth = 40.0f,
-	MaxFuel = 200.0f,
 	MaxEnergy = 20.0f,
-	FuelConsume = 1.0f,
-	FuelRegen = 0.0f,
 	HealthRegen = 0.0f,
 	EnergyRegen = 0.0f,
 };
@@ -33,10 +30,11 @@ global MakePlayer = function(world, coord)
 
 	Player.Draw = function()
 	{
-		local p = .pos * .world.tilesize;	
+        local jumpOffset = 0.0f;
+        local drawPosition = .pos + v2(0.0f, jumpOffset);
 
 		Gfx.Color(.color, .alpha);
-		.anim.Draw(p+.drawOffset);
+		.anim.Draw( drawPosition );
 
 		// low health, draw particles
 		if ( .health <= 10 )
@@ -52,17 +50,6 @@ global MakePlayer = function(world, coord)
 		}
 	};
 
-	Player.OnPostTickTurn = function()
-	{
-		local data = .world.GetTileDataSafe(.coord);
-		local burning = TileDataGetBits.Burning(data);
-
-		if (burning > 0)
-		{
-			.TakeDamage(burning * 0.5f);
-		}
-	};
-
 	Player.OnTakeDamage = function(damage)
 	{
 		g_game.soundBanks["game"].Play("playerTakeDamage");
@@ -72,35 +59,8 @@ global MakePlayer = function(world, coord)
 
 	Player.OnUpdate = function()
 	{
-		g_game.state.cam.SetTargetPos((.coord+v2(0.5f)) * .world.tilesize);
+		g_game.state.cam.SetTargetPos( .pos );
 		._UpdateInput();
-	};
-
-	Player.GiveAbility = function(ability)
-	{
-		// TODO: probably player should hold abilities internally?
-
-		// TODO: if ability already exists, give +1 powerup
-
-		local cards = g_game.state.gui.cards;
-
-		foreach (card in cards)
-		{
-			if (?card.ability && card.ability.title == ability.title)
-			{
-				card.ability.AddLevel();
-				return;
-			}
-		}
-
-		for (i = 0; i < 9; i += 1)
-		{
-			if (!?cards[i].ability)
-			{
-				cards[i].ability = ability;
-				return;
-			}
-		}
 	};
 
 	Player._InitInputs = function()
@@ -122,35 +82,30 @@ global MakePlayer = function(world, coord)
 			KP9 = { fun = function() { return .InputMove(+1.0f, +1.0f); }, arg = null },
 			SPACE = { fun = function() { return .InputWait(); }, arg = null, },
 			E = { fun = function() { return .InputEscape(); }, arg = null, },
-		};
+        };
+
+		.inputs = tableDuplicate(.inputsMovement);
 	};
 
 	Player._UpdateInput = function()
 	{
 		foreach (k and v in .inputs)
 		{
-			if (Input.DidKeyJustGoDown(k))
+			if (Input.IsKeyDown(k))
 			{
 				local fun = v.fun;
 				local arg = v.arg;
-				local ready = this:fun(arg);
 
-				// must return a true/false, null probably error
-				assert(?ready);
-
-				if (ready)
-				{
-					.world.ReadyToTickTurn();
-				}
-				break;
+				this:fun(arg);
 			}
 		}
 	};
 
 	Player.InputMove = function(x, y)
 	{		
-		.pending_move = v2(x, y);
-		return true;
+        local move = v2(x, y);
+
+		.pos += move;
 	};
 
 	Player.InputWait = function()

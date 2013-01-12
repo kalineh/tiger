@@ -52,7 +52,7 @@ global MakeBackground = function()
 
 	Background.Init = function()
 	{	
-		.texBG = Texture("game/tiger/img/gameBg.png");
+		.texBG = Texture("game/tiger/img/stage11.png");
 		.texParallax1 = Texture("game/tiger/img/parallax1.png");
 		.texParallax2 = Texture("game/tiger/img/parallax2.png");
 

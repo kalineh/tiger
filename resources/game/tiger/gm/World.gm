@@ -34,14 +34,6 @@ global MakeWorld = function()
 		Gui.End();
 	};
 
-	World._Generate = function(seed)
-	{
-		local player_spawn = v2();
-
-		.player = MakePlayer(this, player_spawn);
-		.entities[.player] = .player;
-	};
-
 	World.AddEntity = function(entity)
 	{
 		assert(.entity_addremove_lock == false);	
@@ -197,6 +189,11 @@ global MakeWorld = function()
 		.cpp = World();
 
 		.threadId = this:thread(.Update);
+
+		local player_spawn = v2();
+
+		.player = MakePlayer(this, player_spawn);
+		.entities[.player] = .player;
 	};
 
 	World.Release = function()
