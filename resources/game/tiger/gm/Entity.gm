@@ -9,17 +9,20 @@ global EntityType =
 	Pickup = 0x04,
 };
 
-global MakeEntity = function(world, coord)
+global MakeEntity = function(world, pos)
 {
 	assert(?world);
-	assert(?coord);
-	assert(?coord.x);
-	assert(?coord.y);
+	assert(?pos);
+	assert(?pos.x);
+	assert(?pos.y);
 
 	local Entity = table();
 
 	Entity.type = EntityType.None;
-	Entity.pos = coord;
+	Entity.pos = pos;
+	Entity.vel = v2(0.0f);
+	Entity.accel = v2(0.0f);
+	Entity.friction = v2(0.0f);
 	Entity.coord = coord;
 	Entity.size = v2(1.0f);
 	Entity.world = world;
@@ -158,12 +161,22 @@ global MakeEntity = function(world, coord)
 		while( true )
 		{		
 			.OnUpdate();
+            .Physics();
 			yield();
 		}
 	};
 
 	Entity.OnUpdate = function()
 	{
+	};
+
+	Entity.Physics = function()
+	{
+        .vel += .accel;
+        .pos += .vel;
+        .vel *= .friction;
+
+        .accel = v2(0.0f);
 	};
 
 	Entity.Die = function()

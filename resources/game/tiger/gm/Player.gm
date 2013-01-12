@@ -13,7 +13,6 @@ global MakePlayer = function(world, coord)
 
 	Player.type = EntityType.Player;
 	Player.color = Gfx.WHITE;
-	Player.pending_move = v2(0.0f);
 	Player.max_health = PlayerDefaults.MaxHealth;
 	Player.max_energy = PlayerDefaults.MaxEnergy;
 	Player.health_regen = PlayerDefaults.HealthRegen;
@@ -21,6 +20,8 @@ global MakePlayer = function(world, coord)
 	Player.health = Player.max_health;
 	Player.energy = Player.max_energy;
 	Player.anim = MakeSpriteAnimation(g_game.animBank, "player");
+	Player.move_input = v2();
+    Player.move_speed = v2(3.0f, 2.0f);
 
 	Player.OnTickTurn = function()
 	{
@@ -61,25 +62,14 @@ global MakePlayer = function(world, coord)
 	{
 		g_game.state.cam.SetTargetPos( .pos );
 		._UpdateInput();
+        ._UpdateMove();
 	};
 
 	Player._InitInputs = function()
 	{
 		.inputsMovement = 
 		{
-			UP = { fun = function() { return .InputMove(+0.0f, +1.0f); }, arg = null },
-			DOWN = { fun = function() { return .InputMove(+0.0f, -1.0f); }, arg = null },
-			LEFT = { fun = function() { return .InputMove(-1.0f, +0.0f); }, arg = null },
-			RIGHT = { fun = function() { return .InputMove(+1.0f, +0.0f); }, arg = null },
-			KP1 = { fun = function() { return .InputMove(-1.0f, -1.0f); }, arg = null },
-			KP2 = { fun = function() { return .InputMove(+0.0f, -1.0f); }, arg = null },
-			KP3 = { fun = function() { return .InputMove(+1.0f, -1.0f); }, arg = null },
-			KP4 = { fun = function() { return .InputMove(-1.0f, +0.0f); }, arg = null },
 			KP5 = { fun = function() { return .InputWait(); }, arg = null },
-			KP6 = { fun = function() { return .InputMove(+1.0f, +0.0f); }, arg = null },
-			KP7 = { fun = function() { return .InputMove(-1.0f, +1.0f); }, arg = null },
-			KP8 = { fun = function() { return .InputMove(+0.0f, +1.0f); }, arg = null },
-			KP9 = { fun = function() { return .InputMove(+1.0f, +1.0f); }, arg = null },
 			SPACE = { fun = function() { return .InputWait(); }, arg = null, },
 			E = { fun = function() { return .InputEscape(); }, arg = null, },
         };
@@ -89,6 +79,10 @@ global MakePlayer = function(world, coord)
 
 	Player._UpdateInput = function()
 	{
+        .move_input = .GetDirectionalInput();
+
+        print(".move:", .move_input);
+
 		foreach (k and v in .inputs)
 		{
 			if (Input.IsKeyDown(k))
@@ -100,46 +94,49 @@ global MakePlayer = function(world, coord)
 			}
 		}
 	};
+    
+    Player._UpdateMove = function()
+    {
+        local dir = .move_input;
+        local move = dir * .move_speed;
 
-	Player.InputMove = function(x, y)
-	{		
-        local move = v2(x, y);
-
-		.pos += move;
-	};
+        .accel += move;
+    };
 
 	Player.InputWait = function()
 	{
-		.pending_move = v2(0.0f);
-		return true;
 	};
 
 	Player.GetDirectionalInput = function(allow_diagonal, fallback)
 	{
-		if (Input.DidKeyJustGoDown("UP")) { return v2(0.0f, +1.0f); }
-		if (Input.DidKeyJustGoDown("DOWN")) { return v2(0.0f, -1.0f); }
-		if (Input.DidKeyJustGoDown("LEFT")) { return v2(-1.0f, 0.0f); }
-		if (Input.DidKeyJustGoDown("RIGHT")) { return v2(+1.0f, 0.0f); }
-
-		if (Input.DidKeyJustGoDown("KP8")) { return v2(0.0f, +1.0f); }
-		if (Input.DidKeyJustGoDown("KP2")) { return v2(0.0f, -1.0f); }
-		if (Input.DidKeyJustGoDown("KP4")) { return v2(-1.0f, 0.0f); }
-		if (Input.DidKeyJustGoDown("KP6")) { return v2(+1.0f, 0.0f); }
-
-		if (allow_diagonal)
-		{
-			if (Input.DidKeyJustGoDown("KP7")) { return v2(-1.0f, +1.0f); }
-			if (Input.DidKeyJustGoDown("KP9")) { return v2(+1.0f, +1.0f); }
-			if (Input.DidKeyJustGoDown("KP3")) { return v2(+1.0f, -1.0f); }
-			if (Input.DidKeyJustGoDown("KP1")) { return v2(-1.0f, -1.0f); }
-		}
-
 		if (!?fallback)
 		{
 			fallback = v2(0.0f);
 		}
 
-		return fallback;
+        local dir = fallback;
+
+        if (Input.IsKeyDown("UP") || Input.IsKeyDown("KP8") || Input.IsKeyDown("KP7") || Input.IsKeyDown("KP9"))
+        {
+            dir += v2(0.0f, +1.0f);
+        }
+
+        if (Input.IsKeyDown("DOWN") || Input.IsKeyDown("KP2") || Input.IsKeyDown("KP1") || Input.IsKeyDown("KP3"))
+        {
+            dir += v2(0.0f, -1.0f);
+        }
+
+		if (Input.IsKeyDown("LEFT") || Input.IsKeyDown("KP4") || Input.IsKeyDown("KP7") || Input.IsKeyDown("KP1"))
+        {
+            dir += v2(-1.0f, 0.0f);
+        }
+        
+		if (Input.IsKeyDown("RIGHT") || Input.IsKeyDown("KP6") || Input.IsKeyDown("KP9") || Input.IsKeyDown("KP3"))
+        {
+            dir += v2(+1.0f, 0.0f);
+        }
+
+		return dir;
 	};
 
 	Player.OnDie = function()

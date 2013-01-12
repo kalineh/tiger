@@ -841,6 +841,35 @@ static int GM_CDECL gmfNormalize(gmThread * a_thread)
 	return GM_EXCEPTION;
 }
 
+static int GM_CDECL gmfSafeNormalize(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	if ( GM_IS_PARAM_VEC2(0) )
+	{
+		GM_VEC2_PARAM(val,0);
+        const float lensq = lengthSqr(val);
+        if (lensq > 1.e-6f)
+    		a_thread->PushVec2( val / lensq );
+        else
+    		a_thread->PushVec2( v2(0.0f) );
+		return GM_OK;
+	}
+
+	else if ( GM_IS_PARAM_VEC3(0) )
+	{
+		GM_VEC3_PARAM(val,0);
+        const float lensq = lengthSqr(val);
+        if (lensq > 1.e-6f)
+    		a_thread->PushVec3( val / lensq );
+        else
+    		a_thread->PushVec3( v3(0.0f) );
+		return GM_OK;
+	}
+
+	return GM_EXCEPTION;
+}
+
 static int GM_CDECL gmfLength(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -856,6 +885,35 @@ static int GM_CDECL gmfLength(gmThread * a_thread)
 	{
 		GM_VEC3_PARAM(val,0);
 		a_thread->PushFloat( length(val) );
+		return GM_OK;
+	}
+
+	return GM_EXCEPTION;
+}
+
+static int GM_CDECL gmfSafeLength(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	if ( GM_IS_PARAM_VEC2(0) )
+	{
+		GM_VEC2_PARAM(val,0);
+        const float lensq = lengthSqr(val);
+        if (lensq > 1.e-6f)
+    		a_thread->PushFloat( sqrtf(lensq ) );
+        else
+    		a_thread->PushFloat( 0.0f );
+		return GM_OK;
+	}
+
+	else if ( GM_IS_PARAM_VEC3(0) )
+	{
+		GM_VEC3_PARAM(val,0);
+        const float lensq = lengthSqr(val);
+        if (lensq > 1.e-6f)
+    		a_thread->PushFloat( sqrtf(lensq) );
+        else
+    		a_thread->PushFloat( 0.0f );
 		return GM_OK;
 	}
 
@@ -1480,8 +1538,10 @@ static gmFunctionEntry s_mathLib[] =
   {"dot", gmfDot},
   {"distance", gmfDistance},
   {"length", gmfLength},
+  {"safe_length", gmfSafeLength},
   {"lengthSqr", gmfLengthSqr},
   {"normalize", gmfNormalize},
+  {"safe_normalize", gmfSafeNormalize},
   {"saturate", gmfSaturate},
   {"cross", gmfCross},
   {"hermite", gmfHermite},
