@@ -1,0 +1,72 @@
+global MakeBackground = function()
+{
+	local Background = 
+	{
+
+	};
+
+	Background._DrawParallaxLayer = function(tex, xParallax, yParallax)
+	{
+		local camera = g_game.state.cam;
+		local camPos = g_game.state.cam.CalcPosClamped();
+
+		local camPosParallax = camPos * v2( xParallax, yParallax );
+		local x = fmod(camPosParallax.x, g_game.dimen.x);
+		local y = fmod(camPosParallax.y, g_game.dimen.y);
+
+		camera.DrawBegin();
+		local i;
+		for ( i = -1; i <= 1; i+= 1 )
+		{
+			DrawTexture(tex, camPosParallax + v2(i*tex.Dimen().x,0.0f) );
+		}
+		camera.DrawEnd();
+	};
+
+	Background.Draw = function()
+	{
+		Gfx.BeginDefaultShader();
+
+		// bg
+		g_game.BeginScreenSpace();
+		DrawTexture(.texBG, v2(0.0f));
+
+		// need to draw white bar to handle bottom leakage
+		Gfx.Color(v3(237.0f,249.0f,250.0f)/255.0f);
+		Gfx.DrawRect(v2(0.0f), g_game.dimen*v2(1.0f,0.2f));
+		g_game.EndScreenSpace();
+		
+		Gfx.Enable(Gfx.BLEND);
+		Gfx.Color(Gfx.WHITE);
+		._DrawParallaxLayer( .texParallax2, 0.6f, 0.5f );
+		._DrawParallaxLayer( .texParallax1, 0.4f, 0.4f );
+		
+		Gfx.EndDefaultShader();
+	};
+
+	Background.Update = function()
+	{
+		while( true )
+		{	
+			RegisterDraw( DrawLayers.Scene_BG, .Draw, this);
+			yield();
+		}
+	};
+
+	Background.Init = function()
+	{	
+		.texBG = Texture("game/tiger/img/gameBg.png");
+		.texParallax1 = Texture("game/tiger/img/parallax1.png");
+		.texParallax2 = Texture("game/tiger/img/parallax2.png");
+
+		.threadId = this:thread(.Update);
+	};
+
+	Background.Release = function()
+	{
+		threadKill(.threadId);
+	};
+	
+	Background.Init();
+	return Background;
+};

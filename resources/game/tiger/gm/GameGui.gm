@@ -1,0 +1,221 @@
+global MakeGameGui = function()
+{
+	local GameGui = 
+	{
+		healthColor = v3(237.0f, 20.0f, 91.0f)/255.0f,
+		energyColor = v3(219.0f, 234.0f, 61.0f)/255.0f,
+		fuelColor = v3(255.0f, 249.0f, 128.0f)/255.0f,
+
+		cardDimen = v2(49.0f, 71.0f),
+		cardTopDimen = v2(48.0f, 39.0f),
+
+		posOffset = v2(0.0f),
+		selectedCard = null,
+	};
+
+	GameGui.DrawMainGui = function()
+	{
+		local world = g_game.state.world;
+		local player = world.player;
+		local texDimen = v2(262.0f, 135.0f);
+
+		local border = 10.0f;
+		local padding = 3.0f;
+		local pos = v2(0.0f)+.posOffset;
+		local dimen = texDimen + v2(padding*2.0f);
+
+		g_game.BeginScreenSpace();
+		Gfx.BeginDefaultShader();
+
+		// background
+		Gfx.Color(Gfx.BLACK);
+		Gfx.DrawRectRounded(pos - v2(border), dimen+v2(border*1.5f, border*2.0f), 5.0f);
+
+		// inside
+		Gfx.Color(v3(133.0f,93.0f,123.0f)/255.0f);
+		Gfx.DrawRect(pos,dimen);
+
+		// texture
+		.texMain.Bind(0);
+		Gfx.Color(Gfx.WHITE);
+		Gfx.DrawRectTexCoords(pos,.texMain.Dimen());
+		.texMain.Unbind();
+		
+		local font = g_game.fonts["zekton_20"];
+		
+		// health text
+		//local healthTextDominator = "/" + player.max_health.Int();
+		//local healthText = (max(0,player.health.Int())).String();
+		//local healthTextPos = pos + v2(262.0f, 155.0f);
+		//Gfx.Color(Gfx.WHITE);
+		//font.Print(healthTextDominator, healthTextPos - font.GetDimen(healthTextDominator) );
+		//if ( player.health.Int() <= 5 ) { Gfx.Color(v3(1.0f,0.3f,0.3f)); }
+		//font.Print(healthText, healthTextPos-font.GetDimen(healthTextDominator)-v2(font.GetWidth(healthText), 0.0f) );
+
+		// energy text
+		//Gfx.Color(select( player.energy<5.0f, Gfx.RED, Gfx.WHITE) );
+		//local scienceText = player.energy.Int().String();
+		//local scienceTextPos = pos + v2(262.0f, 118.0f);
+		//font.Print(scienceText, scienceTextPos - font.GetDimen(scienceText) );
+
+		// health bar
+		//local barPos = pos+v2(141.0f, 101.0f);
+		//local barDimen = v2(119.0f,10.0f);
+		//local barPercent = saturate(player.health/player.max_health);
+		//Gfx.Color(.healthColor);
+		//Gfx.DrawRect(barPos, v2(barDimen.x*barPercent,barDimen.y));
+
+		// energy bar
+		//local barPos = pos+v2(141.0f, 69.0f);
+		//local barDimen = v2(119.0f,5.0f);
+		//local barPercent =  saturate(player.energy/player.max_energy);
+		//Gfx.Color(.energyColor);
+		//Gfx.DrawRect(barPos, v2(barDimen.x*barPercent,barDimen.y));
+
+		Gfx.EndDefaultShader();
+
+		g_game.EndScreenSpace();
+	};
+
+	GameGui.DrawPlayerGui = function()
+	{
+		// TODO: don't show if player is dead
+        return;
+
+		local world = g_game.state.world;
+		local player = world.player;
+
+		// no need to draw when dead
+		if (player.health <= 0.0f)
+		{
+			return;
+		}
+
+		Gfx.BeginDefaultShader();
+
+		local barBgDimen = v2(53.0f,16.0f);
+		local barBgPos = player.GetCenterWorld() - v2(barBgDimen.x*0.5f, 50.0f );
+		barBgPos = floor(barBgPos);
+
+		// bg
+		Gfx.Color(Gfx.BLACK);
+		Gfx.DrawRectRounded(barBgPos, barBgDimen, 3.0f);
+
+		local border = 2.0f;
+		local barHeight = 5.0f;
+		local barGray = v3(0.2f);
+		local barDimen = v2(barBgDimen.x-border*2.0f, barHeight);
+
+		// health bar
+		local healthBarPos = barBgPos + v2(border, barBgDimen.y-barDimen.y-border);
+		local healthPercent = saturate(player.health/player.max_health);
+		Gfx.Color(barGray);
+		Gfx.DrawRect(healthBarPos, barDimen );
+		Gfx.Color(.healthColor);
+		Gfx.DrawRect(healthBarPos, v2(barDimen.x*healthPercent, barDimen.y) );
+
+		// energy bar		
+		local energyBarPos = barBgPos + v2(border);
+		local energyPercent = saturate(player.energy/player.max_energy);
+		Gfx.Color(barGray);
+		Gfx.DrawRect(energyBarPos, barDimen );
+		Gfx.Color(.energyColor);
+		Gfx.DrawRect(energyBarPos, v2(barDimen.x*energyPercent, barDimen.y) );
+
+		Gfx.EndDefaultShader();
+	};
+
+	GameGui.ExecuteCard = function()
+	{
+		assert(?.selectedCard);
+		.selectedCard.ability.Execute();
+	};
+
+	GameGui.HasCardSelected = function()
+	{
+		return ?.selectedCard;
+	};
+
+	GameGui.CanSelectCard = function(id)
+	{
+		local card = .cards[id];
+		assert(?card);
+		return ?card.ability;
+	};
+
+	GameGui.SelectCard = function(id)
+	{
+		local card = .cards[id];
+		assert(?card);
+
+		.selectedCard = card;
+		card.ability.Select();
+	};
+
+	GameGui.UnselectCard = function()
+	{
+		assert(?.selectedCard);
+		.selectedCard.ability.Unselect();
+		.selectedCard = null;
+	};
+
+	GameGui._UpdateCards = function()
+	{
+		foreach( card in .cards )
+		{
+			local goal = select( card == .selectedCard, 1.0f, 0.0f );
+			card.charge = lerp( card.charge, goal, 0.2f );
+		}
+	};
+
+	GameGui.Update = function()
+	{
+		._InitCards();
+
+		while( true )
+		{	
+			._UpdateCards();
+
+			RegisterDraw( DrawLayers.Scene_UI, .DrawMainGui, this);
+			RegisterDraw( DrawLayers.Scene_UI, .DrawPlayerGui, this);
+			yield();
+		}
+	};
+
+	GameGui.SlideInGui = function()
+	{
+		Tween.To(this, 1.0f, {posOffset=v2(0.0f)});
+	};
+
+	GameGui._Init = function()
+	{	
+		.cards = {};
+
+		.texMain = Texture("game/tiger/img/gameGui.png");
+		.threadId = this:thread(.Update);
+
+		.posOffset = v2(0.0f, -200.0f);
+	};
+
+	GameGui._InitCards = function()
+	{
+		local numCards = 9;
+		for( i = 0; i < numCards; i+=1 )
+		{
+			.cards[] =
+			{
+				id = i,
+				charge = 0.0f,
+				ability = null,
+			};
+		}
+	};
+
+	GameGui.Release = function()
+	{
+		threadKill(.threadId);
+	};
+	
+	GameGui._Init();
+	return GameGui;
+};

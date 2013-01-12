@@ -1,0 +1,450 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Final|Win32">
+      <Configuration>Final</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>FunkEngine</ProjectName>
+    <ProjectGuid>{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}</ProjectGuid>
+    <RootNamespace>Eddie3d</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\lib\opencl\inc;$(SolutionDir)\..\src\lib;$(SolutionDir)\..\lib\devil\include;$(SolutionDir)\..\lib\fmod\include;$(SolutionDir)\..\lib\glew\include;$(SolutionDir)\..\lib\sdl\include;$(SolutionDir)\..\lib\slm\include;$(SolutionDir)\..\lib\leap\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;glu32.lib;glut32.lib;opengl32.lib;fmodex_vc.lib;SDL.lib;SDLmain.lib;DevIL.lib;ILU.lib;ILUT.lib;Leap.lib;OpenCL.lib;oclUtils32D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\src\math;$(SolutionDir)\..\lib\fmod\lib;$(SolutionDir)\..\lib\devil\lib;$(SolutionDir)\..\lib\sdl\lib;$(SolutionDir)\..\lib\glew\lib;$(SolutionDir)\..\lib\leap\lib;$(SolutionDir)\..\lib\opencl\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\lib\devil\include;$(SolutionDir)\..\src\lib;$(SolutionDir)\..\lib\fmod\include;$(SolutionDir)\..\lib\glew\include;$(SolutionDir)\..\lib\sdl\include;$(SolutionDir)\..\lib\slm\include;$(SolutionDir)\..\lib\opencl\inc;$(SolutionDir)\..\lib\leap\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;glu32.lib;glut32.lib;opengl32.lib;fmodex_vc.lib;SDL.lib;SDLmain.lib;DevIL.lib;ILU.lib;ILUT.lib;Leap.lib;OpenCL.lib;oclUtils32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\src\math;$(SolutionDir)\..\lib\devil\lib;$(SolutionDir)\..\lib\fmod\lib;$(SolutionDir)\..\lib\sdl\lib;$(SolutionDir)\..\lib\glew\lib;$(SolutionDir)\..\lib\leap\lib;$(SolutionDir)\..\lib\opencl\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\lib\devil\include;$(SolutionDir)\..\src\lib;$(SolutionDir)\..\lib\fmod\include;$(SolutionDir)\..\lib\glew\include;$(SolutionDir)\..\lib\sdl\include;$(SolutionDir)\..\lib\slm\include;$(SolutionDir)\..\lib\leap\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;FNK_FINAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;glu32.lib;glut32.lib;opengl32.lib;fmodex_vc.lib;SDL.lib;SDLmain.lib;DevIL.lib;ILU.lib;ILUT.lib;Leap.lib;OpenCL.lib;oclUtils32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\src\math;$(SolutionDir)\..\lib\devil\lib;$(SolutionDir)\..\lib\fmod\lib;$(SolutionDir)\..\lib\sdl\lib;$(SolutionDir)\..\lib\glew\lib;$(SolutionDir)\..\lib\leap\lib;$(SolutionDir)\..\lib\opencl\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\AppReflection.cpp" />
+    <ClCompile Include="..\..\src\Core.cpp" />
+    <ClCompile Include="..\..\src\lib\common\BaseEntityGroup.cpp" />
+    <ClCompile Include="..\..\src\lib\common\Debug.cpp" />
+    <ClCompile Include="..\..\src\lib\common\IniReader.cpp" />
+    <ClCompile Include="..\..\src\lib\common\Input.cpp" />
+    <ClCompile Include="..\..\src\lib\common\Timer.cpp" />
+    <ClCompile Include="..\..\src\lib\common\Util.cpp" />
+    <ClCompile Include="..\..\src\lib\common\Window.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Cam2d.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Cam3d.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\CamBase.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\CLKernel.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\CLManager.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\DrawPrimitives.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Fbo.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Font.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\FragShader.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Glutil.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\GpuTimer.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Ibo.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\LineGraph.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\ObjLoader.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Particles2D.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Renderer.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\ShaderProgram.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Texture.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\TextureManager.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\Vbo.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\VertexAttribute.cpp" />
+    <ClCompile Include="..\..\src\lib\gfx\VertexShader.cpp" />
+    <ClCompile Include="..\..\src\lib\math\ColorUtil.cpp" />
+    <ClCompile Include="..\..\src\lib\math\CubicSpline2d.cpp" />
+    <ClCompile Include="..\..\src\lib\math\CurlNoise.cpp" />
+    <ClCompile Include="..\..\src\lib\math\matrix.cpp" />
+    <ClCompile Include="..\..\src\lib\math\Perlin.cpp" />
+    <ClCompile Include="..\..\src\lib\math\Perlin2d.cpp" />
+    <ClCompile Include="..\..\src\lib\math\Util.cpp" />
+    <ClCompile Include="..\..\src\lib\math\v2.cpp" />
+    <ClCompile Include="..\..\src\lib\physics\Verlet2DBody.cpp" />
+    <ClCompile Include="..\..\src\lib\sound\MicrophoneRecorder.cpp" />
+    <ClCompile Include="..\..\src\lib\sound\Sound.cpp" />
+    <ClCompile Include="..\..\src\lib\sound\SoundMngr.cpp" />
+    <ClCompile Include="..\..\src\lib\sound\SoundRecorder.cpp" />
+    <ClCompile Include="..\..\src\lib\sound\SpectrumHandler.cpp" />
+    <ClCompile Include="..\..\src\lib\imgui\Imgui.cpp" />
+    <ClCompile Include="..\..\src\lib\imgui\ImguiGM.cpp" />
+    <ClCompile Include="..\..\src\lib\imgui\ImguiManager.cpp" />
+    <ClCompile Include="..\..\src\lib\imgui\ImguiWindow.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmDebuggerFunk.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmDebugLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmGfxLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmInputLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmUtilEx.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmWindowLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmArrayLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmArraySimple.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmByteCode.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmByteCodeGen.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmCall.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmCodeGen.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmCodeGenHooks.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmCodeTree.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmCrc.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmDebug.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmFunctionObject.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmGCRoot.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmGCRootUtil.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmHash.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmHelpers.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmIncGC.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmLibHooks.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmListDouble.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmLog.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMachine.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMachineLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMathLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMem.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMemChain.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMemFixed.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmMemFixedSet.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmOperators.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmParser.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmScanner.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmStream.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmStreamBuffer.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmStringLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmStringObject.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmSystemLib.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmTableObject.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmThread.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmUserObject.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmUtil.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmVariable.cpp" />
+    <ClCompile Include="..\..\src\lib\gm\gmVector3Lib.cpp" />
+    <ClCompile Include="..\..\src\lib\vm\VirtualConsole.cpp" />
+    <ClCompile Include="..\..\src\lib\vm\VirtualMachine.cpp" />
+    <ClCompile Include="..\..\src\lib\vm\VirtualMachineLibs.cpp" />
+    <ClCompile Include="..\..\src\lib\leap\LeapManager.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\tiger\gmTigerInit.cpp" />
+    <ClCompile Include="..\..\src\tiger\World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\AppReflection.h" />
+    <ClInclude Include="..\..\src\Core.h" />
+    <ClInclude Include="..\..\src\lib\common\BaseEntity.h" />
+    <ClInclude Include="..\..\src\lib\common\BaseEntityGroup.h" />
+    <ClInclude Include="..\..\src\lib\common\Debug.h" />
+    <ClInclude Include="..\..\src\lib\common\HandledObj.h" />
+    <ClInclude Include="..\..\src\lib\common\Hash.h" />
+    <ClInclude Include="..\..\src\lib\common\IniReader.h" />
+    <ClInclude Include="..\..\src\lib\common\Input.h" />
+    <ClInclude Include="..\..\src\lib\common\PtrIncludes.h" />
+    <ClInclude Include="..\..\src\lib\common\Singleton.h" />
+    <ClInclude Include="..\..\src\lib\common\StrongHandle.h" />
+    <ClInclude Include="..\..\src\lib\common\Timer.h" />
+    <ClInclude Include="..\..\src\lib\common\Util.h" />
+    <ClInclude Include="..\..\src\lib\common\WeakPtr.h" />
+    <ClInclude Include="..\..\src\lib\common\Window.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Cam2d.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Cam3d.h" />
+    <ClInclude Include="..\..\src\lib\gfx\CamBase.h" />
+    <ClInclude Include="..\..\src\lib\gfx\CLKernel.h" />
+    <ClInclude Include="..\..\src\lib\gfx\CLManager.h" />
+    <ClInclude Include="..\..\src\lib\gfx\DrawPrimitives.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Fbo.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Font.h" />
+    <ClInclude Include="..\..\src\lib\gfx\FragShader.h" />
+    <ClInclude Include="..\..\src\lib\gfx\GLutil.h" />
+    <ClInclude Include="..\..\src\lib\gfx\GpuTimer.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Ibo.h" />
+    <ClInclude Include="..\..\src\lib\gfx\LineGraph.h" />
+    <ClInclude Include="..\..\src\lib\gfx\ObjLoader.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Particles2D.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Renderer.h" />
+    <ClInclude Include="..\..\src\lib\gfx\ShaderProgram.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Texture.h" />
+    <ClInclude Include="..\..\src\lib\gfx\TextureManager.h" />
+    <ClInclude Include="..\..\src\lib\gfx\TextureParams.h" />
+    <ClInclude Include="..\..\src\lib\gfx\Vbo.h" />
+    <ClInclude Include="..\..\src\lib\gfx\VertexAttribute.h" />
+    <ClInclude Include="..\..\src\lib\gfx\VertexShader.h" />
+    <ClInclude Include="..\..\src\lib\math\ColorUtil.h" />
+    <ClInclude Include="..\..\src\lib\math\Complex.h" />
+    <ClInclude Include="..\..\src\lib\math\CubicSpline2d.h" />
+    <ClInclude Include="..\..\src\lib\math\CurlNoise.h" />
+    <ClInclude Include="..\..\src\lib\math\matrix.h" />
+    <ClInclude Include="..\..\src\lib\math\Perlin.h" />
+    <ClInclude Include="..\..\src\lib\math\Perlin2d.h" />
+    <ClInclude Include="..\..\src\lib\math\Util.h" />
+    <ClInclude Include="..\..\src\lib\math\v2.h" />
+    <ClInclude Include="..\..\src\lib\math\v2i.h" />
+    <ClInclude Include="..\..\src\lib\math\v3.h" />
+    <ClInclude Include="..\..\src\lib\math\v4.h" />
+    <ClInclude Include="..\..\src\lib\physics\Verlet2DBody.h" />
+    <ClInclude Include="..\..\src\lib\sound\MicrophoneRecorder.h" />
+    <ClInclude Include="..\..\src\lib\sound\Sound.h" />
+    <ClInclude Include="..\..\src\lib\sound\SoundMngr.h" />
+    <ClInclude Include="..\..\src\lib\sound\SoundRecorder.h" />
+    <ClInclude Include="..\..\src\lib\sound\SpectrumHandler.h" />
+    <ClInclude Include="..\..\src\lib\imgui\Imgui.h" />
+    <ClInclude Include="..\..\src\lib\imgui\ImguiGM.h" />
+    <ClInclude Include="..\..\src\lib\imgui\ImguiManager.h" />
+    <ClInclude Include="..\..\src\lib\imgui\ImguiWindow.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmBind.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmBindFuncGen.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmBindHeader.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmDebuggerFunk.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmDebugLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmGfxLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmInputLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmUtilEx.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmVector.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmWindowLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmArrayLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmArraySimple.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmByteCode.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmByteCodeGen.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmCall.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmCodeGen.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmCodeGenHooks.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmCodeTree.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmConfig.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmConfig_p.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmCrc.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmDebug.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmFunctionObject.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmGCRoot.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmGCRootUtil.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmHash.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmHelpers.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmIncGC.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmIterator.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmLibHooks.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmListDouble.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmLog.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMachine.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMachineLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMathLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMem.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMemChain.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMemFixed.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmMemFixedSet.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmOperators.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmParser.cpp.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmScanner.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmStream.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmStreamBuffer.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmStringLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmStringObject.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmSystemLib.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmTableObject.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmThread.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmUserObject.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmUtil.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmVariable.h" />
+    <ClInclude Include="..\..\src\lib\gm\gmVector3Lib.h" />
+    <ClInclude Include="..\..\src\lib\vm\VirtualConsole.h" />
+    <ClInclude Include="..\..\src\lib\vm\VirtualMachine.h" />
+    <ClInclude Include="..\..\src\lib\vm\VirtualMachineLibs.h" />
+    <ClInclude Include="..\..\src\lib\leap\LeapManager.h" />
+    <ClInclude Include="..\..\src\tiger\gmTigerInit.h" />
+    <ClInclude Include="..\..\src\tiger\World.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\resources\common\shader\bloomFinal.fp" />
+    <None Include="..\..\resources\common\shader\bloomThreshold.fp" />
+    <None Include="..\..\resources\common\shader\fboDefault.fp" />
+    <None Include="..\..\resources\common\shader\fboDefault.vp" />
+    <None Include="..\..\resources\common\shader\gaussianBlur.fp" />
+    <None Include="..\..\resources\common\shader\lensFlareBlur.fp" />
+    <None Include="..\..\resources\common\shader\particles2d.fp" />
+    <None Include="..\..\resources\common\shader\particles2d.vp" />
+    <None Include="..\..\resources\common\shader\particles2dTex.fp" />
+    <None Include="..\..\resources\common\shader\polygonHDR.fp" />
+    <None Include="..\..\resources\common\shader\polygonHDR.vp" />
+    <None Include="..\..\resources\common\gm\Core.gm" />
+    <None Include="..\..\resources\common\gm\Debug.gm" />
+    <None Include="..\..\resources\common\gm\DrawManager.gm" />
+    <None Include="..\..\resources\common\gm\Ease.gm" />
+    <None Include="..\..\resources\common\gm\Fader.gm" />
+    <None Include="..\..\resources\common\gm\Gfx.gm" />
+    <None Include="..\..\resources\common\gm\HDR.gm" />
+    <None Include="..\..\resources\common\gm\Imgui.gm" />
+    <None Include="..\..\resources\common\gm\Includes.gm" />
+    <None Include="..\..\resources\common\gm\Particles2d.gm" />
+    <None Include="..\..\resources\common\gm\ShaderBank.gm" />
+    <None Include="..\..\resources\common\gm\ShaderProgram.gm" />
+    <None Include="..\..\resources\common\gm\SoundBank.gm" />
+    <None Include="..\..\resources\common\gm\SplashScreen.gm" />
+    <None Include="..\..\resources\common\gm\SpriteAnimationBank.gm" />
+    <None Include="..\..\resources\common\gm\SysUtil.gm" />
+    <None Include="..\..\resources\common\gm\Test.gm" />
+    <None Include="..\..\resources\common\gm\ThreadGroups.gm" />
+    <None Include="..\..\resources\common\gm\Tools.gm" />
+    <None Include="..\..\resources\common\gm\Tween.gm" />
+    <None Include="..\..\resources\common\gm\TweenTask.gm" />
+    <None Include="..\..\resources\common\gm\TweenTimeline.gm" />
+    <None Include="..\..\resources\common\gm\Util.gm" />
+    <None Include="..\..\resources\game\tiger\gm\AnimationResource.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Background.gm" />
+    <None Include="..\..\resources\game\tiger\gm\DrawLayers.gm" />
+    <None Include="..\..\resources\game\tiger\gm\DrawUtil.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Enemy.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Entity.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Game.gm" />
+    <None Include="..\..\resources\game\tiger\gm\GameCamera.gm" />
+    <None Include="..\..\resources\game\tiger\gm\GameGui.gm" />
+    <None Include="..\..\resources\game\tiger\gm\GameState.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Includes.gm" />
+    <None Include="..\..\resources\game\tiger\gm\MusicPlayer.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Notify.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Player.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Projectile.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SaveData.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceGame.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceShared.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceTitle.gm" />
+    <None Include="..\..\resources\game\tiger\gm\TEMPLATE.gm" />
+    <None Include="..\..\resources\game\tiger\gm\TitleState.gm" />
+    <None Include="..\..\resources\game\tiger\gm\UserSettings.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Util.gm" />
+    <None Include="..\..\resources\game\tiger\gm\World.gm" />
+    <None Include="..\..\resources\game\tiger\shader\bokeh.fp" />
+    <None Include="..\..\resources\game\tiger\shader\bokeh.vp" />
+    <None Include="..\..\src\lib\common\Input.inl" />
+    <None Include="..\..\src\lib\math\Complex.inl" />
+    <None Include="..\..\src\lib\math\matrix.inl" />
+    <None Include="..\..\src\lib\math\v2.inl" />
+    <None Include="..\..\src\lib\math\v2i.inl" />
+    <None Include="..\..\src\lib\math\v3.inl" />
+    <None Include="..\..\src\lib\math\v4.inl" />
+    <None Include="..\..\src\lib\gm\gmParser.y" />
+    <None Include="..\..\src\lib\gm\gmScanner.l" />
+    <None Include="..\..\resources\common\ini\main.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FunkEngine.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+    <Image Include="robot.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

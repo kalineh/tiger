@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FunkEngine", "FunkEngine\FunkEngine_VS11.vcxproj", "{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Final|Win32 = Final|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Debug|Win32.ActiveCfg = Debug|Win32
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Debug|Win32.Build.0 = Debug|Win32
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Final|Win32.ActiveCfg = Final|Win32
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Final|Win32.Build.0 = Final|Win32
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Release|Win32.ActiveCfg = Release|Win32
+		{14DF9E5B-E161-4CB2-BF96-E8C8F5CBDE42}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

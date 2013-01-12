@@ -1,0 +1,25 @@
+// generated: 2012-06-23, 02:06:11 AM
+global g_fileData =
+{
+    cancel = 
+    {
+        filename = "game/tiger/snd/cancel.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    error = 
+    {
+        filename = "game/tiger/snd/error.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    selectCard = 
+    {
+        filename = "game/tiger/snd/selectCard.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+};

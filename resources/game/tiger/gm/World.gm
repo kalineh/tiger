@@ -1,0 +1,250 @@
+
+global MakeWorld = function()
+{
+	local World = 
+	{
+		entities = table(),
+		enemyspawner = null,
+		liferow = table(),
+		deathrow = table(),
+		player = null,
+		tickready = false,
+		ticklist = table(),
+		messages = table(),
+		entity_addremove_lock = false,
+		entitymap = null,		
+		freezeTurns = 0,
+
+		queryResults = array(),
+
+		enemySettings = tableDuplicate(DefaultEnemySettings),
+
+		// debug
+		showDebugGrid = false,
+		showDebugGridCoords = false,
+	};
+
+	World.Gui = function()
+	{
+		Gui.Begin("World", g_core.screenDimen.x - 400, g_core.screenDimen.y - 10 );
+
+		Gui.Separator();
+
+		.showDebugGrid = Gui.CheckBox("Show Debug Grid", .showDebugGrid );
+		.showDebugGridCoords = Gui.CheckBox("Show Debug Grid Coords", .showDebugGridCoords );
+		
+		Gui.Separator();
+
+		Gui.End();
+	};
+
+	World._Generate = function(seed)
+	{
+		local player_spawn = v2();
+
+		.player = MakePlayer(this, player_spawn);
+		.entities[.player] = .player;
+	};
+
+	World.AddEntity = function(entity)
+	{
+		assert(.entity_addremove_lock == false);	
+		.entities[entity] = entity;
+	};
+
+	World.AddLifeRow = function(entity)
+	{
+		.liferow[entity] = entity;
+	};
+
+	World.ProcessLifeRow = function()
+	{
+		foreach (e in .liferow)
+		{
+			.entities[e] = e;
+		}
+
+		.liferow = table();
+	};
+
+
+	World.GetPlayer = function()
+	{
+		return .player;
+	};
+
+	World.FindNearestEntities = function(pos, ignore, count, predicate_obj, predicate_fun)
+	{
+		local results = table();
+
+		foreach (e in .entities)
+		{
+			if (e == ignore)
+			{
+				continue;
+			}
+
+			if (predicate_obj:predicate_fun(e))
+			{
+				results[] = e;
+			}
+		}
+
+		local comparison = {
+			pos = pos,
+			fun = function(a, b)
+			{
+				local a_dist = length(.pos - a.pos);
+				local b_dist = length(.pos - b.pos);
+				return a_dist < b_dist;
+			}
+		};
+
+		BubbleSortTable(results, comparison, comparison.fun);
+
+		local final = table();
+		foreach (e in results)
+		{
+			final[] = e;
+
+			count -= 1;
+			if (count < 0)
+			{
+				break;
+			}
+		}
+
+		return final;
+	};
+
+	World.CountEntityType = function(type, ignore)
+	{
+		local count = 0;
+
+		foreach (e in .entities)
+		{
+			if (e != ignore && e.type == type)
+			{
+				count += 1;
+			}
+		}
+
+		return count;
+	};
+
+	World.IsInBounds = function(coord)
+	{
+		return .IsInBoundsXY(coord.x, coord.y);
+	};
+
+	World.IsInBoundsXY = function(x, y)
+	{
+		if (x < 0.0f) { return false; }
+		if (y < 0.0f) { return false; }
+		if (x >= .cols.Float()) { return false; }
+		if (y >= .rows.Float()) { return false; }
+
+		return true;
+	};
+
+	World.AddDeathRow = function(entity)
+	{
+		.deathrow[] = entity;
+	};
+
+	World.ProcessDeathRow = function()
+	{
+		foreach (e in .deathrow)
+		{
+			.cpp.EraseEntityData(e);
+			.entities[e] = null;
+			e.Release();
+		}
+
+		.deathrow = table();
+	};
+
+	World.DrawEntities = function()
+	{
+		foreach (e in .entities)
+		{
+			e.Draw();
+		}
+	};
+
+	World.UpdateEntityMap = function(entity)
+	{
+		local coord = entity.coord;
+		local size = entity.size;
+		local type = entity.type;
+		.cpp.SetEntityData(coord.x.Int(), coord.y.Int(), size.x.Int(), size.y.Int(), entity, type);
+	};
+
+	World.ClearEntityMap = function(entity)
+	{
+		.cpp.EraseEntityData(entity);
+	};
+
+	World.DrawDebugGrid = function()
+	{
+		Gfx.SetLineWidth(4.0f);
+		Gfx.Color(Gfx.WHITE*0.2f, 0.05f);
+		Gfx.Enable(Gfx.BLEND);
+
+		Gfx.BeginDefaultShader();
+		.cpp.DrawGridDebug(.tilesize.x);
+		Gfx.EndDefaultShader();
+	};
+
+	World.DrawDebugGridCoords = function()
+	{
+		Gfx.Color(Gfx.BLUE);
+		Gfx.Enable(Gfx.BLEND);
+
+		Gfx.BeginDefaultShader();
+		.cpp.DrawGridDebugCoords(.tilesize.x);
+		Gfx.EndDefaultShader();
+	};
+
+	World.Update = function()
+	{
+		while( true )
+		{		
+			RegisterGui( .Gui, this );
+			RegisterDraw( DrawLayers.Scene, .DrawEntities, this);
+
+			if ( .showDebugGrid )
+			{
+				RegisterDraw( DrawLayers.Scene_Grid, .DrawDebugGrid, this);
+			}
+
+			if ( .showDebugGridCoords )
+			{
+				RegisterDraw( DrawLayers.Scene_Grid, .DrawDebugGridCoords, this);
+			}
+			yield();
+		}
+	};
+
+	World.Init = function()
+	{	
+		.cpp = World();
+
+		.threadId = this:thread(.Update);
+	};
+
+	World.Release = function()
+	{
+		foreach (e in .entities)
+		{
+			e.Release();
+		}
+
+		.cpp = null;
+
+		threadKill(.threadTickTurn);
+		threadKill(.threadId);
+	};
+	
+	return World;
+};

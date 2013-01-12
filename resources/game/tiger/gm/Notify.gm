@@ -1,0 +1,60 @@
+
+global MakeNotify = function(owner, name)
+{
+	local Notify = {
+		owner = owner,
+		name = name,
+		registry = table(),
+		removals = table(),
+	};
+
+	Notify.Register = function(obj, fun)
+	{
+		local item = { obj=obj, fun=fun };
+		.registry[item] = item;
+	};
+
+	Notify.Unregister = function(obj, fun)
+	{
+		local removals = table();
+
+		foreach (item in .registry)
+		{
+			if (item.obj == obj && item.fun == fun)
+			{
+				removals[item] = item;
+			}
+		}
+
+		foreach (item in removals)
+		{
+			.registry[item] = null;
+		}
+	};
+	
+	Notify.Notify = function(a, b, c, d, arglimit)
+	{
+		local removals = table();
+
+		assert(!?arglimit);
+
+		foreach (item in .registry)
+		{
+			local obj = item.obj;
+			local fun = item.fun;
+			local result = obj:fun(a, b, c, d);
+			assert(?result);
+			if (!result)
+			{
+				removals[item] = item;
+			}
+		}
+
+		foreach (item in removals)
+		{
+			.registry[item] = null;
+		}
+	};
+
+	return Notify;
+};

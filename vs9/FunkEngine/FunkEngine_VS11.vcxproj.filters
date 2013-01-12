@@ -1,0 +1,971 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\driver">
+      <UniqueIdentifier>{09f24b4b-72a5-4306-ab28-b8e95f994a61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\shaders">
+      <UniqueIdentifier>{b262dbfb-3305-4fc0-8ee2-e5fb39f8671b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\script">
+      <UniqueIdentifier>{ee5009ff-4d29-460f-9a79-b47bdf6bbed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib">
+      <UniqueIdentifier>{0323d66c-bccb-458f-b7d1-f04048dac528}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\common">
+      <UniqueIdentifier>{5a2560b3-f705-4327-8761-e441566a3f1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\gfx">
+      <UniqueIdentifier>{aa1274fb-2fc0-451d-9499-bca54dfe05d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\math">
+      <UniqueIdentifier>{bf5fc116-3736-4770-bc74-e1352040b652}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\physics">
+      <UniqueIdentifier>{aa8f1b9c-7995-4391-99ed-7baa835fc292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\sound">
+      <UniqueIdentifier>{cbd6ce06-9c57-45d7-9c6e-ce8726747775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\imgui">
+      <UniqueIdentifier>{3f74a660-e887-4b70-8db6-9b2d0032078a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\gm">
+      <UniqueIdentifier>{23a72bf4-c674-4f44-9ae1-5e9ca15fa279}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\gm\extension">
+      <UniqueIdentifier>{8b2ae627-4845-47b5-9ffb-f759523c0df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\gm\src">
+      <UniqueIdentifier>{77134de4-6a38-4d2e-9cc4-c4fdc7774f7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\gm\parser">
+      <UniqueIdentifier>{b2772529-742a-40de-9485-e4cdebc83cb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\vm">
+      <UniqueIdentifier>{f4ac266d-d70a-4cf2-aa2a-7bc815f6ec91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\leap">
+      <UniqueIdentifier>{398db0ae-95b6-49dc-99f9-e7b17d35ab2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="games">
+      <UniqueIdentifier>{af55c6f8-89b9-43a7-be69-38aa612c1663}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="winres">
+      <UniqueIdentifier>{40bf14b9-c638-4533-91f2-5df0ab0a7390}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="games\tiger">
+      <UniqueIdentifier>{f35ddd38-ba34-4245-9ee6-12fe80472d56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="games\tiger\gm">
+      <UniqueIdentifier>{648e379a-3593-49bd-9cda-ab9171a723b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="games\tiger\cpp">
+      <UniqueIdentifier>{2da62ea3-74c0-45c0-804d-1fcc43251bee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="games\tiger\shader">
+      <UniqueIdentifier>{f538a6b0-c9e5-48e5-9773-2ae3bb20e6e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\AppReflection.cpp">
+      <Filter>src\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Core.cpp">
+      <Filter>src\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\BaseEntityGroup.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\Debug.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\IniReader.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\Input.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\Timer.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\Util.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\common\Window.cpp">
+      <Filter>src\lib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Cam2d.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Cam3d.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\CamBase.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\CLKernel.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\CLManager.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\DrawPrimitives.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Fbo.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Font.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\FragShader.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Glutil.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\GpuTimer.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Ibo.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\LineGraph.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\ObjLoader.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Particles2D.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Renderer.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\ShaderProgram.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Texture.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\TextureManager.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\Vbo.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\VertexAttribute.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gfx\VertexShader.cpp">
+      <Filter>src\lib\gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\ColorUtil.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\CubicSpline2d.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\CurlNoise.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\matrix.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\Perlin.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\Perlin2d.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\Util.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\math\v2.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\physics\Verlet2DBody.cpp">
+      <Filter>src\lib\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\sound\MicrophoneRecorder.cpp">
+      <Filter>src\lib\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\sound\Sound.cpp">
+      <Filter>src\lib\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\sound\SoundMngr.cpp">
+      <Filter>src\lib\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\sound\SoundRecorder.cpp">
+      <Filter>src\lib\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\sound\SpectrumHandler.cpp">
+      <Filter>src\lib\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\imgui\Imgui.cpp">
+      <Filter>src\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\imgui\ImguiGM.cpp">
+      <Filter>src\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\imgui\ImguiManager.cpp">
+      <Filter>src\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\imgui\ImguiWindow.cpp">
+      <Filter>src\lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmDebuggerFunk.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmDebugLib.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmGfxLib.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmInputLib.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmUtilEx.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmWindowLib.cpp">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmArrayLib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmArraySimple.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmByteCode.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmByteCodeGen.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmCall.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmCodeGen.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmCodeGenHooks.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmCodeTree.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmCrc.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmDebug.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmFunctionObject.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmGCRoot.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmGCRootUtil.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmHash.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmHelpers.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmIncGC.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmLibHooks.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmListDouble.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmLog.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMachine.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMachineLib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMathLib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMem.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMemChain.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMemFixed.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmMemFixedSet.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmOperators.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmParser.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmScanner.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmStream.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmStreamBuffer.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmStringLib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmStringObject.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmSystemLib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmTableObject.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmThread.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmUserObject.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmUtil.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmVariable.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\gm\gmVector3Lib.cpp">
+      <Filter>src\lib\gm\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\vm\VirtualConsole.cpp">
+      <Filter>src\lib\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\vm\VirtualMachine.cpp">
+      <Filter>src\lib\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\vm\VirtualMachineLibs.cpp">
+      <Filter>src\lib\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lib\leap\LeapManager.cpp">
+      <Filter>src\lib\leap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tiger\gmTigerInit.cpp">
+      <Filter>games\tiger\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tiger\World.cpp">
+      <Filter>games\tiger\cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\AppReflection.h">
+      <Filter>src\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Core.h">
+      <Filter>src\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\BaseEntity.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\BaseEntityGroup.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Debug.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\HandledObj.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Hash.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\IniReader.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Input.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\PtrIncludes.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Singleton.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\StrongHandle.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Timer.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Util.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\WeakPtr.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\common\Window.h">
+      <Filter>src\lib\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Cam2d.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Cam3d.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\CamBase.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\CLKernel.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\CLManager.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\DrawPrimitives.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Fbo.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Font.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\FragShader.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\GLutil.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\GpuTimer.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Ibo.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\LineGraph.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\ObjLoader.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Particles2D.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Renderer.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\ShaderProgram.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Texture.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\TextureManager.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\TextureParams.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\Vbo.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\VertexAttribute.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gfx\VertexShader.h">
+      <Filter>src\lib\gfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\ColorUtil.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\Complex.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\CubicSpline2d.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\CurlNoise.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\matrix.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\Perlin.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\Perlin2d.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\Util.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\v2.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\v2i.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\v3.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\math\v4.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\physics\Verlet2DBody.h">
+      <Filter>src\lib\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\sound\MicrophoneRecorder.h">
+      <Filter>src\lib\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\sound\Sound.h">
+      <Filter>src\lib\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\sound\SoundMngr.h">
+      <Filter>src\lib\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\sound\SoundRecorder.h">
+      <Filter>src\lib\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\sound\SpectrumHandler.h">
+      <Filter>src\lib\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\imgui\Imgui.h">
+      <Filter>src\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\imgui\ImguiGM.h">
+      <Filter>src\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\imgui\ImguiManager.h">
+      <Filter>src\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\imgui\ImguiWindow.h">
+      <Filter>src\lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmBind.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmBindFuncGen.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmBindHeader.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmDebuggerFunk.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmDebugLib.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmGfxLib.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmInputLib.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmUtilEx.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmVector.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmWindowLib.h">
+      <Filter>src\lib\gm\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmArrayLib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmArraySimple.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmByteCode.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmByteCodeGen.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmCall.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmCodeGen.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmCodeGenHooks.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmCodeTree.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmConfig.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmConfig_p.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmCrc.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmDebug.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmFunctionObject.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmGCRoot.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmGCRootUtil.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmHash.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmHelpers.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmIncGC.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmIterator.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmLibHooks.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmListDouble.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmLog.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMachine.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMachineLib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMathLib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMem.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMemChain.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMemFixed.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmMemFixedSet.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmOperators.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmParser.cpp.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmScanner.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmStream.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmStreamBuffer.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmStringLib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmStringObject.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmSystemLib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmTableObject.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmThread.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmUserObject.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmUtil.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmVariable.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\gm\gmVector3Lib.h">
+      <Filter>src\lib\gm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\vm\VirtualConsole.h">
+      <Filter>src\lib\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\vm\VirtualMachine.h">
+      <Filter>src\lib\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\vm\VirtualMachineLibs.h">
+      <Filter>src\lib\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lib\leap\LeapManager.h">
+      <Filter>src\lib\leap</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>winres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tiger\gmTigerInit.h">
+      <Filter>games\tiger\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tiger\World.h">
+      <Filter>games\tiger\cpp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\resources\common\shader\bloomFinal.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\bloomThreshold.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\fboDefault.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\fboDefault.vp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\gaussianBlur.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\lensFlareBlur.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\particles2d.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\particles2d.vp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\particles2dTex.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\polygonHDR.fp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\shader\polygonHDR.vp">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Core.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Debug.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\DrawManager.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Ease.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Fader.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Gfx.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\HDR.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Imgui.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Includes.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Particles2d.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\ShaderBank.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\ShaderProgram.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\SoundBank.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\SplashScreen.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\SpriteAnimationBank.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\SysUtil.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Test.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\ThreadGroups.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Tools.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Tween.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\TweenTask.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\TweenTimeline.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\resources\common\gm\Util.gm">
+      <Filter>src\script</Filter>
+    </None>
+    <None Include="..\..\src\lib\common\Input.inl">
+      <Filter>src\lib\common</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\Complex.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\matrix.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\v2.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\v2i.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\v3.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\math\v4.inl">
+      <Filter>src\lib\math</Filter>
+    </None>
+    <None Include="..\..\src\lib\gm\gmParser.y">
+      <Filter>src\lib\gm\parser</Filter>
+    </None>
+    <None Include="..\..\src\lib\gm\gmScanner.l">
+      <Filter>src\lib\gm\parser</Filter>
+    </None>
+    <None Include="..\..\resources\common\ini\main.ini" />
+    <None Include="..\..\resources\game\tiger\gm\AnimationResource.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Background.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Enemy.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Entity.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Game.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\GameCamera.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\GameGui.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\GameState.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Includes.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\MusicPlayer.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Notify.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Player.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Projectile.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SaveData.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceGame.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceShared.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceTitle.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\TEMPLATE.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\TitleState.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\UserSettings.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Util.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\World.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\shader\bokeh.fp">
+      <Filter>games\tiger\shader</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\shader\bokeh.vp">
+      <Filter>games\tiger\shader</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\DrawLayers.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\DrawUtil.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FunkEngine.rc">
+      <Filter>winres</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico">
+      <Filter>winres</Filter>
+    </Image>
+    <Image Include="robot.ico">
+      <Filter>winres</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

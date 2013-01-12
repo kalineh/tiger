@@ -1,0 +1,49 @@
+
+global MakeProjectile = function(world, src, dst, time)
+{
+	local Projectile = 
+	{
+		world = world,
+		pos = src,
+		src = src,
+		dst = dst,
+		time = time, // null means not auto-updated/tweening
+		alive = true,
+	};
+
+	Projectile.Draw = function()
+	{
+		local size = .world.entitysize * 0.5f;
+		Gfx.Color(Gfx.WHITE);
+		Gfx.DrawCircle(.pos, (size.x + size.y) / 2.0f / 2.0f);
+	};
+
+	Projectile.Init = function()
+	{	
+		if (?.time)
+		{
+			Tween.To(this, .time, { pos=.dst, Ease=Ease.Linear, OnComplete=.Die, OnCompleteObj=this, });
+		}
+	};
+
+	Projectile.Die = function()
+	{
+		// explosion sound
+		// explosion effect
+
+		.alive = false;
+		.world.RemoveProjectile(this);
+		.Release();
+	};
+
+	Projectile.Release = function()
+	{
+	};
+	
+	Projectile.Init();
+
+	// auto-add to world!
+	world.AddProjectile(Projectile);
+
+	return Projectile;
+};

@@ -1,0 +1,200 @@
+
+global EntityType =
+{
+	MaskAll = 0xFF,
+	MaskHostile = 0x02, 
+	None = 0x00,
+	Player = 0x01,
+	Enemy = 0x02,
+	Pickup = 0x04,
+};
+
+global MakeEntity = function(world, coord)
+{
+	assert(?world);
+	assert(?coord);
+	assert(?coord.x);
+	assert(?coord.y);
+
+	local Entity = table();
+
+	Entity.type = EntityType.None;
+	Entity.pos = coord;
+	Entity.coord = coord;
+	Entity.size = v2(1.0f);
+	Entity.world = world;
+	Entity.color = Gfx.WHITE;
+	Entity.max_health = 1.0f;
+	Entity.health = 1.0f;
+	Entity.post_tick_notify = MakeNotify(Entity, "PostTickNotify");
+	Entity.take_damage_filters = table();
+	Entity.drawOffset = v2(0.0f);
+	Entity.alpha = 1.0f;
+
+	Entity.IsInsideCam = function()
+	{
+		return g_game.state.cam.CanSeeCoord(.coord) && g_game.state.cam.CanSeeCoord(.coord+.size - v2(1.0f) );
+	};
+
+	Entity.Draw = function()
+	{
+		if ( ?.anim )
+		{
+			// render only if in camera
+			if ( .IsInsideCam() )
+			{
+				Gfx.Color(.color, .alpha);
+				local p = .pos * .world.tilesize;		
+				.anim.Draw(p+.drawOffset);
+			}
+		}
+		else
+		{
+			local e = .world.entitysize * .size;
+			local t = .world.tilesize * .size;
+
+			// TODO: camera visible check
+			//if (g_game.state.cam.IsVisible(.coord * t, e) == false)
+			//{
+				//return;
+			//}
+
+			local screenpos = .pos * .world.tilesize;
+			local border = (t - e) * 0.5f;
+			local p = screenpos + border;
+			local s = e;
+			
+			Gfx.BeginDefaultShader();
+			Gfx.Color(.color);
+			Gfx.DrawRectRounded(p, s, 10.0f);
+
+			if ( this == .world.GetPlayer() )
+			{
+				Gfx.Color(Gfx.GREEN);
+			}
+			else
+			{
+				Gfx.Color(Gfx.RED*0.5f);
+			}
+
+			Gfx.SetLineWidth(3.0f);
+			
+			Gfx.DrawRectRoundedWire(p, s, 10.0f);
+			Gfx.SetLineWidth(1.0f);
+
+
+			// temp
+			Gfx.Color(.color * 0.5f);
+			Gfx.DrawRect(p + e * v2(0.2f, 0.6f), e * 0.2f);
+			Gfx.DrawRect(p + e * v2(0.6f, 0.6f), e * 0.2f);
+			Gfx.DrawRect(p + e * v2(0.2f, 0.2f), e * v2(0.6f, 0.1f));
+
+			Gfx.EndDefaultShader();
+		}
+	};
+
+	Entity.IsDead = function()
+	{
+		return .health <= 0.0f;
+	};
+
+	Entity.OnTakeDamage = function()
+	{
+	};
+
+	Entity.Shake = function( range, time )
+	{
+		fork id
+		{
+			while(true)
+			{
+				.drawOffset = v2(randfloat(-range,range), randfloat(-range,range));
+				yield();
+			}
+		}
+
+		fork
+		{
+			sleep(time);
+			threadKill(id);
+		}
+	};
+
+	Entity.TakeDamage = function(damage)
+	{
+		foreach (key and filter in .take_damage_filters)
+		{
+			damage = key:filter(damage);
+		}
+
+		if ( damage > 0.0f )
+		{
+			.OnTakeDamage(damage);
+		}
+
+		// TODO: damage type different particles
+		// TODO: damage resist/reflect different particles
+
+		// flash red
+		.color = Gfx.RED;
+		Tween.To( this, 0.3f, {color=Gfx.WHITE} );
+		DrawNotifyText( "-"+damage.Int(), .GetCenterWorld() + v2(0.0f,0.5f*.world.tilesize.x), Gfx.RED);
+
+		//g_game.state.EmitParticlesAt("entityTakeDamage", .GetCenterWorld(), 5*damage.Int());
+
+		.health -= damage;
+		if (.health <= 0.0f)
+		{
+			.Die();
+		}
+	};
+
+	Entity.TickTurn = function()
+	{
+	};
+
+	Entity.Update = function()
+	{
+		while( true )
+		{		
+			.OnUpdate();
+			yield();
+		}
+	};
+
+	Entity.OnUpdate = function()
+	{
+	};
+
+	Entity.Die = function()
+	{
+		.OnDie();
+		.world.AddDeathRow(this);
+	};
+
+	Entity.OnDie = function()
+	{
+		// animations
+		// effects
+		// sounds
+	};
+
+	Entity.Init = function()
+	{	
+		.threadId = this:thread(.Update);
+	};
+
+	Entity.Release = function()
+	{
+		if ( ?.anim ) 
+		{
+			.anim.Release();
+			.anim = null;
+		}
+
+		threadKill(.threadId);
+	};
+	
+	Entity.Init();
+	return Entity;
+};

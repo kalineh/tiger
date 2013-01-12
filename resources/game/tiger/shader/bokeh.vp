@@ -1,0 +1,30 @@
+#version 120
+
+varying vec2 uv;
+varying float alpha;
+
+uniform vec4 Misc;
+
+void main()
+{
+	float time = Misc.x;
+	float size = Misc.y;
+	float screenX = Misc.z;
+	float screenY = Misc.w;
+	
+	float index = gl_MultiTexCoord0.z;
+	uv = gl_MultiTexCoord0.xy * 2.0f - vec2(1.0f);
+	
+	//float angle = index * 3.14159f*2.0f;
+	//vec2 dir = vec2(cos(angle), sin(angle));
+	
+	vec2 centerPos = gl_Vertex.xy;
+	
+	centerPos.x = mod(centerPos.x+time*65.0f*sin(index)+size, screenX+size*2.0f) - size;
+	centerPos.y = mod(centerPos.y+time*65.0f*cos(-index*0.5f)+size, screenY+size*2.0f) - size;
+
+	vec2 pos = centerPos + uv * size;
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(pos.xy,0.0f,1.0f);
+	
+	alpha = mix( 0.1f, 1.0f, sin(time*1.33f+index*1.7)*0.5f+0.5f );
+} 
