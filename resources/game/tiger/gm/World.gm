@@ -183,7 +183,7 @@ global MakeWorld = function()
 
 		.threadId = this:thread(.Update);
 
-		local player_spawn = v2();
+		local player_spawn = v3();
 
 		.player = MakePlayer(this, player_spawn);
 		.entities[.player] = .player;

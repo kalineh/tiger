@@ -7,10 +7,47 @@ global PlayerDefaults =
 	EnergyRegen = 0.0f,
 };
 
+global MakeInput = function(f, a)
+{
+    local input = table();
+
+    assert(?f);
+    //assert(?a);
+
+    input.fun = f;
+    input.arg = a;
+
+    // TODO: better name
+    input.Check = function()
+    {
+        return .fun(.arg);
+    };
+
+	return input;
+};
+
+global PlayerControlsKeyboard =
+{
+	MoveFunction = MakeInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsKeyDown("UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsKeyDown("DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsKeyDown("LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsKeyDown("RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+	}, null),
+
+	Jump = MakeInput(Input.IsKeyDown, "X"),
+	AttackPunch = MakeInput(Input.IsKeyDown, "C"),
+	AttackKick = MakeInput(Input.IsKeyDown, "Z"),
+	Slide = MakeInput(Input.IsKeyDown, "V"),
+};
+
 global MakePlayer = function(world, coord)
 {
 	local Player = MakeEntity(world, coord);
 
+	Player.controls = PlayerControlsKeyboard;
 	Player.type = EntityType.Player;
 	Player.color = Gfx.WHITE;
 	Player.max_health = PlayerDefaults.MaxHealth;
@@ -33,19 +70,6 @@ global MakePlayer = function(world, coord)
 	Player.Draw = function()
 	{
         .BaseDraw();
-
-		// low health, draw particles
-		if ( .health <= 10 )
-		{
-			if ( randint(0,5)==0 )
-			{
-				g_game.state.EmitParticlesAt("playerTakeDamage", .GetCenterWorld(), 1);
-			}
-
-			// fire
-			Gfx.Color(Gfx.WHITE, 0.6f);
-			.animFire.Draw(p+.draw_offset + v2(-32.0f, -12.0f ) );
-		}
 	};
 
 	Player.OnTakeDamage = function(damage)
@@ -55,105 +79,154 @@ global MakePlayer = function(world, coord)
 		.Shake(3.0f, 0.2f);
 	};
 
+	Player.IsInput = function(control)
+	{
+		local f = control[0];
+		local a = control[1];
+		local active = f(a);
+		return active;
+	};
+
 	Player.OnUpdate = function()
 	{
-		g_game.state.cam.SetTargetPos( .pos );
-		._UpdateInput();
-        ._UpdateMove();
+		g_game.state.cam.SetTargetPos( v2(.pos) );
+
+        local move = .controls.MoveFunction.Check();
+
+        move *= .move_speed;
+
+        .accel += v3(move);
+
+        if (.controls.Jump.Check())
+        {
+            .TryJump();
+        }
+
+        if (.controls.AttackPunch.Check())
+        {
+            if (.IsAirborne())
+            {
+                .TryJumpAttack();
+            }
+        }
+        else
+        {
+            .TryAttack();
+        }
 	};
 
-	Player._InitInputs = function()
-	{
-		.inputsMovement = 
-		{
-			C = { fun = function() { return .InputAttack(0); }, arg = null, },
-			X = { fun = function() { return .InputJump(); }, arg = null, },
-			Y = { fun = function() { return .InputAttack(1); }, arg = null, },
-        };
-
-		.inputs = tableDuplicate(.inputsMovement);
-	};
-
-	Player._UpdateInput = function()
-	{
-        .move_input = .GetDirectionalInput();
-
-		foreach (k and v in .inputs)
-		{
-			if (Input.IsKeyDown(k))
-			{
-				local fun = v.fun;
-				local arg = v.arg;
-
-				this:fun(arg);
-			}
-		}
-	};
-    
-    Player._UpdateMove = function()
+    Player.TryJump = function()
     {
-        local dir = .move_input;
-        local move = dir * .move_speed;
-
-        .accel += move;
-    };
-
-	Player.InputAttack = function(type)
-	{
-        // anim
-        // enable punch collision
-        // update combo stuff
-	};
-
-	Player.InputJump = function(type)
-	{
-        if ( .height > 0.0f )
+        if ( threadIsAlive(.jump_thread) )
         {
             return;
         }
 
-        // TODO: multi-frame hold down, cancel for end jump
-        fork { 
-            for (i = 0; i < 8; i += 1)
+        local jump_function = function()
+        {
+            // TODO: allow cancel attack
+
+            local jump_min_frames = 8;
+            local jump_frames = 32;
+            local jump_force = 4.0f;
+            local jump_falloff = 0.2f;
+
+            for (i = 0; i < jump_frames; i += 1)
             {
-                .height_accel += 8.0f;
+                if (i >= jump_min_frames)
+                {
+                    if (.controls.Jump.Check() == false)
+                    {
+                        break;
+                    }
+                }
+
+                .accel += v3(0.0f, 0.0f, jump_force);
+
+                jump_force = max( 0.0f, jump_force - jump_falloff );
+
                 yield();
             }
-        }
-	};
 
-	Player.GetDirectionalInput = function(allow_diagonal, fallback)
-	{
-		if (!?fallback)
-		{
-			fallback = v2(0.0f);
-		}
+            while (.controls.Jump.Check() == true)
+            {
+                yield();
+            }
 
-        local dir = fallback;
+            while (.IsAirborne())
+            {
+                yield();
+            }
+        };
 
-        if (Input.IsKeyDown("UP") || Input.IsKeyDown("KP8") || Input.IsKeyDown("KP7") || Input.IsKeyDown("KP9"))
+        .jump_thread = this:thread(jump_function);
+    };
+
+    Player.CancelAttack = function()
+    {
+        // reset anim
+        // kill thread
+        assert(false);
+    };
+
+    Player.TryAttack = function(type)
+    {
+        if (threadIsAlive(.attack_thread))
         {
-            dir += v2(0.0f, +1.0f);
+            return;
         }
 
-        if (Input.IsKeyDown("DOWN") || Input.IsKeyDown("KP2") || Input.IsKeyDown("KP1") || Input.IsKeyDown("KP3"))
+        local attack_function = function(attack_type)
         {
-            dir += v2(0.0f, -1.0f);
-        }
+            // enable punch collision
 
-		if (Input.IsKeyDown("LEFT") || Input.IsKeyDown("KP4") || Input.IsKeyDown("KP7") || Input.IsKeyDown("KP1"))
+            while (.anim.IsFinished() == false)
+            {
+                yield();
+            }
+
+            // disable punch collision
+
+            //.combo_sequence[] = attack_type;
+
+            // wait for combos
+            // maybe spawn thread and sleep till combo reset
+            // drop out of attack to allow another attack
+        };
+
+        .attack_thread = this:thread(attack_function, attack_type);
+    };
+    
+    Player.TryJumpAttack = function()
+    {
+        assert(.IsAirborne());
+
+        if (threadIsAlive(.attack_thread))
         {
-            dir += v2(-1.0f, 0.0f);
+            return;
         }
-        
-		if (Input.IsKeyDown("RIGHT") || Input.IsKeyDown("KP6") || Input.IsKeyDown("KP9") || Input.IsKeyDown("KP3"))
+
+        local attack_function = function(attack_type)
         {
-            dir += v2(+1.0f, 0.0f);
-        }
+            // enable punch collision
 
-		return dir;
-	};
+            while (.anim.IsFinished() == false)
+            {
+                yield();
+            }
 
+            // disable punch collision
+
+            //.combo_sequence[] = attack_type;
+
+            // wait for combos
+            // maybe spawn thread and sleep till combo reset
+            // drop out of attack to allow another attack
+        };
+
+        .attack_thread = this:thread(attack_function, attack_type);
+    };
+    
 	Player.OnDie = function()
 	{
 		// zoom in death
@@ -173,8 +246,6 @@ global MakePlayer = function(world, coord)
 
 		this:thread(postdie);
 	};
-
-	Player._InitInputs();
 
 	return Player;
 };

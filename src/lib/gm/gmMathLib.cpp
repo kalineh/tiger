@@ -1256,6 +1256,11 @@ static int GM_CDECL gmfCreateVec2(gmThread * a_thread)
 			GM_VEC2_PARAM(vec,0);
 			a_thread->PushVec2( v2(vec) );
 		}
+        else if ( GM_IS_PARAM_VEC3(0) )
+        {
+			GM_VEC3_PARAM(vec,0);
+			a_thread->PushVec2( v2(vec.x, vec.y) );
+        }
 		else
 		{
 			GM_CHECK_FLOAT_OR_INT_PARAM( val, 0 );
