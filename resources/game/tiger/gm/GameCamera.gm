@@ -83,7 +83,7 @@ global MakeGameCamera = function()
 		.tweenZoom = Tween.To(this, 0.5f, {zoom=zoom});
 	};
 
-	GameCamera.CanSeeCoord = function( coord )
+	GameCamera.CanSeeBox = function( position, size )
 	{	
 		local newDimen = g_game.dimen/.zoom;
 		local camPos = .CalcPosClamped();
@@ -92,8 +92,8 @@ global MakeGameCamera = function()
 		local minCamPos = camPos-newDimen*0.5;
 		local maxCamPos = camPos+newDimen*0.5;
 
-		local posMin = coord * g_game.state.world.tilesize;
-		local posMax = posMin + g_game.state.world.tilesize;
+		local posMin = position;
+		local posMax = position + size;
 
 		return posMin.x <= maxCamPos.x
 			&& posMin.y <= maxCamPos.y

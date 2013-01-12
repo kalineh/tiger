@@ -21,7 +21,7 @@ global MakePlayer = function(world, coord)
 	Player.energy = Player.max_energy;
 	Player.anim = MakeSpriteAnimation(g_game.animBank, "player");
 	Player.move_input = v2();
-    Player.move_speed = v2(3.0f, 2.0f);
+    Player.move_speed = v2(4.0f, 3.0f);
 
 	Player.OnTickTurn = function()
 	{
@@ -29,13 +29,10 @@ global MakePlayer = function(world, coord)
 		.energy = min(.max_energy, .energy + .energy_regen);
 	};
 
+	Player.BaseDraw = Player.Draw;
 	Player.Draw = function()
 	{
-        local jumpOffset = 0.0f;
-        local drawPosition = .pos + v2(0.0f, jumpOffset);
-
-		Gfx.Color(.color, .alpha);
-		.anim.Draw( drawPosition );
+        .BaseDraw();
 
 		// low health, draw particles
 		if ( .health <= 10 )
@@ -47,7 +44,7 @@ global MakePlayer = function(world, coord)
 
 			// fire
 			Gfx.Color(Gfx.WHITE, 0.6f);
-			.animFire.Draw(p+.drawOffset + v2(-32.0f, -12.0f ) );
+			.animFire.Draw(p+.draw_offset + v2(-32.0f, -12.0f ) );
 		}
 	};
 
@@ -69,9 +66,9 @@ global MakePlayer = function(world, coord)
 	{
 		.inputsMovement = 
 		{
-			KP5 = { fun = function() { return .InputWait(); }, arg = null },
-			SPACE = { fun = function() { return .InputWait(); }, arg = null, },
-			E = { fun = function() { return .InputEscape(); }, arg = null, },
+			C = { fun = function() { return .InputAttack(0); }, arg = null, },
+			X = { fun = function() { return .InputJump(); }, arg = null, },
+			Y = { fun = function() { return .InputAttack(1); }, arg = null, },
         };
 
 		.inputs = tableDuplicate(.inputsMovement);
@@ -80,8 +77,6 @@ global MakePlayer = function(world, coord)
 	Player._UpdateInput = function()
 	{
         .move_input = .GetDirectionalInput();
-
-        print(".move:", .move_input);
 
 		foreach (k and v in .inputs)
 		{
@@ -103,8 +98,28 @@ global MakePlayer = function(world, coord)
         .accel += move;
     };
 
-	Player.InputWait = function()
+	Player.InputAttack = function(type)
 	{
+        // anim
+        // enable punch collision
+        // update combo stuff
+	};
+
+	Player.InputJump = function(type)
+	{
+        if ( .height > 0.0f )
+        {
+            return;
+        }
+
+        // TODO: multi-frame hold down, cancel for end jump
+        fork { 
+            for (i = 0; i < 8; i += 1)
+            {
+                .height_accel += 8.0f;
+                yield();
+            }
+        }
 	};
 
 	Player.GetDirectionalInput = function(allow_diagonal, fallback)

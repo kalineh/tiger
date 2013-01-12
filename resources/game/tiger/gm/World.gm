@@ -3,13 +3,6 @@ global MakeWorld = function()
 {
 	local World = 
 	{
-        // entities
-        // players (also as entities)
-        // props
-        // effects
-        // x-scroll
-        // backgrounds
-
 		entities = table(),
 		liferow = table(),
 		deathrow = table(),
