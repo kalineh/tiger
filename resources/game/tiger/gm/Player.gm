@@ -48,40 +48,26 @@ global PlayerControlsKeyboard =
 	Slide = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 };
 
-global ComboActions =
+global PlayerGroundAttacks =
 {
-    Punch = 0,
-    Kick = 1,
-    Block = 2,
-    Up = 3,
-    Down = 4,
-    Forward = 5,
-    Backward = 6,
-}; 
-
-global PlayerGroundCombos =
-{
-    PunchL =
+    Punch1 =
     {
-        sequence = { 0 },
         anim = "punchl",
         damage = 1.0f,
         finish = false,
         stuns = false,
     },
 
-    PunchR =
+    Punch2 =
     {
-        sequence = { 0,0 },
         anim = "punchr",
         damage = 1.0f,
         finish = false,
         stuns = false,
     },
 
-    PunchL2 =
+    Punch3 =
     {
-        sequence = { 0,0,0 },
         anim = "punchl",
         damage = 1.0f,
         finish = false,
@@ -90,7 +76,6 @@ global PlayerGroundCombos =
 
     Kick =
     {
-        sequence = { 1 },
         anim = "kick",
         damage = 2.0f,
         finish = true,
@@ -99,7 +84,6 @@ global PlayerGroundCombos =
 
     Knee =
     {
-        sequence = { 0,0,5,1 },
         anim = "knee",
         damage = 1.0f,
         finish = true,
@@ -108,7 +92,6 @@ global PlayerGroundCombos =
 
     SpinKick =
     {
-        sequence = { 0,0,0,1 },
         anim = "spinkick",
         damage = 2.0f,
         finish = true,
@@ -117,7 +100,6 @@ global PlayerGroundCombos =
 
     SweepKick =
     {
-        sequence = { 0,0,4,1 },
         anim = "sweepkick",
         damage = 2.0f,
         finish = true,
@@ -125,11 +107,59 @@ global PlayerGroundCombos =
     },
 };
 
+global ComboActions =
+{
+    Punch = 0x01,
+    Kick = 0x02,
+    Block = 0x04,
+    Up = 0x08,
+    Down = 0x10,
+    Forward = 0x20,
+    Backward = 0x40,
+}; 
+
+global PlayerGroundComboChains =
+{
+    Default = {
+        Punch1 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+    },
+
+    Punch1 = {
+        Punch2 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+    },
+
+    Punch2 = {
+        Punch3 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+        Knee = ComboActions.Kick | ComboActions.Forward,
+    },
+
+    Punch3 = {
+        SpinKick = ComboActions.Kick,
+        Punch1 = ComboActions.Punch,
+    },
+
+    Kick = {
+        Punch1 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+    },
+
+    SpinKick = {
+        Punch1 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+    },
+
+    Knee = {
+        Punch1 = ComboActions.Punch,
+    },
+};
+
 global PlayerAirCombos =
 {
     JumpKick =
     {
-        sequence = { 1 },
         anim = "jumpkick",
         damage = 2.0f,
         finish = true,
@@ -137,16 +167,19 @@ global PlayerAirCombos =
     },
 };
 
-global MakeComboSystem = function(data)
+global MakeComboSystem = function(chains, attacks)
 {
-    assert(?data);
+    assert(?chains);
+    assert(?chains.Default);
+    assert(?attacks);
 
     local combo = table();
 
     combo.data = data;
-    combo.sequence = table();
-    combo.sequence_max = 30;
-    combo.sequence_index = 0;
+    combo.chains = chains;
+    combo.attacks = attacks;;
+    combo.current = chains.Default;
+    combo.actions = table();
     combo.wait_thread = -1;
     combo.reset_thread = -1;
     combo.used_current_combo = false;
@@ -161,7 +194,7 @@ global MakeComboSystem = function(data)
             return;
         }
 
-        .sequence[tableCount(.sequence)] = action;
+        .actions[tableCount(.actions)] = action;
 
         .WaitInput(input);
         .StartResetCountdown();
@@ -171,8 +204,10 @@ global MakeComboSystem = function(data)
 
     combo.Reset = function()
     {
-        tableClear(.sequence);
+        .current = .chains.Default;
+        tableClear(.actions);
         threadKill(.wait_thread);
+        threadKill(.reset_thread);
     };
 
     combo.StartResetCountdown = function()
@@ -182,7 +217,7 @@ global MakeComboSystem = function(data)
         local reset_function = function()
         {
             sleep(0.4f);
-            tableClear(.sequence);
+            .chain = null;
         };
 
         .reset_thread = this:thread(reset_function);
@@ -190,6 +225,8 @@ global MakeComboSystem = function(data)
 
     combo.WaitInput = function(input)
     {
+        // TODO: can probably remove
+
         if (threadIsAlive(.wait_thread))
         {
             return;
@@ -213,51 +250,22 @@ global MakeComboSystem = function(data)
            return null;
         }
 
-        local best_length = 0;
-        local best_combo = null;
-
-        // best combo is not necessarily largest
-        // is one that finishes on the current input
-
-        foreach (name and data in .data)
+        foreach (next and action in .current)
         {
-            if (tableCount(.sequence) < tableCount(data.sequence))
+            // TODO: combined flag handling
+            foreach (a in .actions)
             {
-                continue;
-            }
-
-            // scan combo from each starting point of the input
-            for (j = 0; j < tableCount(.sequence); j += 1)
-            {
-                for (i = 0; i < tableCount(data.sequence); i += 1)
+                if ((action & a) == action)
                 {
-                    local current = .sequence[i+j];
-                    local desired = data.sequence[i];
-
-                    if (current != desired)
-                    {
-                        break;    
-                    }
-
-                    if (i == tableCount(data.sequence) - 1)
-                    {
-                        // use >= so that we overwrite older combos of same length
-                        if (tableCount(data.sequence) >= best_length)
-                        {
-                            best_combo = name;
-                            best_length = tableCount(data.sequence);
-                        }
-                    }
+                    .used_current_combo = true;
+                    .current = .chains[next];
+                    tableClear(.actions);
+                    return next;
                 }
             }
         }
 
-        if (?best_combo)
-        {
-            .used_current_combo = true;
-        }
-
-        return best_combo;
+        return null;
     };
 
     return combo;
@@ -320,7 +328,7 @@ global MakePlayerController = function(fighter)
             }
 
             g_dump.combo = f.ground_combo;
-            g_dump.sequence = StringTableValues(f.ground_combo.sequence);
+            g_dump.sequence = StringTableValues(f.ground_combo.actions);
 
             // TODO: jump version
             if (.controls.Punch.Press())
@@ -341,7 +349,7 @@ global MakePlayerController = function(fighter)
                 {
                     g_dump.last_combo = combo_name;
 
-                    local combo_data = PlayerGroundCombos[combo_name];
+                    local combo_data = PlayerGroundAttacks[combo_name];
 
                     f.Combo(combo_data);
                 }
@@ -369,8 +377,8 @@ global MakePlayer = function(world, coord)
 	Player.ground_friction = v3(0.8f, 0.8f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
-    Player.ground_combo = MakeComboSystem(PlayerGroundCombos);
-    Player.air_combo = MakeComboSystem(PlayerAirCombos);
+    Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
 
 	Player.BaseOnUpdate = Player.OnUpdate;
 	Player.OnUpdate = function()

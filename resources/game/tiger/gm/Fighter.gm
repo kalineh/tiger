@@ -39,8 +39,8 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.frames_air = 0;
     Fighter.action_thread = -1;
     Fighter.jump_thread = -1;
-    Fighter.ground_combo = MakeComboSystem(PlayerGroundCombos);
-    Fighter.air_combo = MakeComboSystem(PlayerAirCombos);
+    Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
 
 	Fighter.OnUpdate = function()
 	{
