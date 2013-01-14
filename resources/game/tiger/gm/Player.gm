@@ -47,6 +47,8 @@ global MakePlayer = function(world, coord)
 {
 	local Player = MakeEntity(world, coord);
 
+	Player.mass = 2.0f;
+
 	Player.controls = PlayerControlsKeyboard;
 	Player.type = EntityType.Player;
 	Player.color = Gfx.WHITE;
@@ -101,18 +103,44 @@ global MakePlayer = function(world, coord)
         {
             .TryJump();
         }
-
-        if (.controls.AttackPunch.Check())
+        else if (.controls.AttackPunch.Check())
         {
             if (.IsAirborne())
             {
                 .TryJumpAttack();
             }
+            else
+            {
+                .TryAttack();
+            }
+        }
+
+        if (!threadIsAlive(.attack_thread) &&
+            !threadIsAlive(.jump_thread))
+        {
+            local len = safe_length(.vel + .accel);
+
+            if (len <= 0.01f )
+            {
+                .anim.ChangeToNoReset("idle");
+            }
+            else
+            {
+                .anim.ChangeToNoReset("move");
+                .anim.speed = abs(.vel.x) + abs(.vel.y);
+            }
         }
         else
         {
-            .TryAttack();
+            .anim.speed = 1.0f;
         }
+
+        if (!threadIsAlive(.attack_thread))
+        {
+            if (.accel.x < 0.0f) { .anim.facing = FACING.RIGHT; }
+            if (.accel.x > 0.0f) { .anim.facing = FACING.LEFT; }
+        }
+
 	};
 
     Player.TryJump = function()
@@ -124,12 +152,14 @@ global MakePlayer = function(world, coord)
 
         local jump_function = function()
         {
+            .anim.ChangeTo("jump");
+
             // TODO: allow cancel attack
 
             local jump_min_frames = 8;
-            local jump_frames = 32;
+            local jump_frames = 18;
             local jump_force = 4.0f;
-            local jump_falloff = 0.2f;
+            local jump_falloff = 0.1f;
 
             for (i = 0; i < jump_frames; i += 1)
             {
@@ -179,6 +209,7 @@ global MakePlayer = function(world, coord)
         local attack_function = function(attack_type)
         {
             // enable punch collision
+            .anim.ChangeTo("punch");
 
             while (.anim.IsFinished() == false)
             {
@@ -186,6 +217,9 @@ global MakePlayer = function(world, coord)
             }
 
             // disable punch collision
+
+            // anim will reset in next update
+            //.anim.ChangeTo("idle");
 
             //.combo_sequence[] = attack_type;
 

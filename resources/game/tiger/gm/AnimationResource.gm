@@ -22,11 +22,32 @@ global g_fileData =
 					looping = true,
 				},
 
-				run =
+				move =
 				{
                     tileIndex = { 10,11,12,13,14, },
-					times = { 0.06f },
+					times = { 0.3f },
 					looping = true,
+				},
+
+				jump =
+				{
+                    tileIndex = { 14,15,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17, },
+					times = { 0.1f },
+					looping = false,
+				},
+
+				fall =
+				{
+                    tileIndex = { 14, },
+					times = { 0.3f },
+					looping = false,
+				},
+
+				punch =
+				{
+                    tileIndex = { 4,5,6 },
+					times = { 0.1f },
+					looping = false,
 				},
 			},
 		},

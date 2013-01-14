@@ -69,6 +69,7 @@ global MakeSpriteAnimation = function( animBank, entityName )
 		facing = FACING.LEFT,		
 		paused = false,
 		finished = false,
+        speed = 1.0f,
 	};
 
 	// anim data
@@ -103,7 +104,7 @@ global MakeSpriteAnimation = function( animBank, entityName )
 			return;
 		}
 
-		.currFrameTime += g_dt;
+		.currFrameTime += g_dt * .speed;
 
 		local currAnim = .animData.animations[.currAnimName];
 
@@ -111,14 +112,11 @@ global MakeSpriteAnimation = function( animBank, entityName )
 		local frameTime = currAnim.times[frameTimeIndex];
 		local numFrames = tableCount( currAnim.tileIndex );
 
-		// next frame?
-		if ( (currAnim.looping || .currFrameIndex < numFrames )
-			&&  .currFrameTime > frameTime )
-		{
+        if (.currFrameTime >= frameTime)
+        {
 			.currFrameTime = 0.0f;
 			.currFrameIndex = .currFrameIndex+1;
 
-			// finished
 			if ( .currFrameIndex >= numFrames )
 			{
 				if ( currAnim.looping )
@@ -128,13 +126,14 @@ global MakeSpriteAnimation = function( animBank, entityName )
 				}
 				else
 				{
+    				.currFrameIndex = min(.currFrameIndex, numFrames - 1);
 					._OnFinishAnimation();
 				}
 			}
 
 			else
 			{
-				.currFrameIndex = min(.currFrameIndex, numFrames);
+				.currFrameIndex = min(.currFrameIndex, numFrames - 1);
 				._OnEnterFrame(.currFrameIndex);
 			}
 		}
@@ -171,6 +170,17 @@ global MakeSpriteAnimation = function( animBank, entityName )
 		.currAnimName = animName;
 		.currFrameTime = 0.0f;
 		.currFrameIndex = 0;
+		.finished = false;
+	};
+
+	Animation.ChangeToNoReset = function( animName )
+	{
+        if ( animName == .currAnimName )
+        {
+            return;
+        }
+
+        return .ChangeTo( animName );
 	};
 
 	Animation.DrawFrame = function( animName, frameIndex,  pos )
