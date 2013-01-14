@@ -23,7 +23,10 @@ global MakeEntity = function(world, pos)
 	Entity.pos = pos;
 	Entity.vel = v3(0.0f);
 	Entity.accel = v3(0.0f);
-	Entity.friction = v3(0.5f, 0.5f, 0.9f);
+	Entity.air_friction = v3(1.0f, 1.0f, 0.9f);
+	Entity.ground_friction = v3(0.5f, 0.5f, 0.9f);
+	Entity.air_max_speed = v3(1.0f, 1.0f, 1.0f);
+	Entity.ground_max_speed = v3(1.0f, 1.0f, 1.0f);
     Entity.mass = 1.0f;
 	Entity.coord = coord;
 	Entity.size = v2(1.0f);
@@ -64,6 +67,11 @@ global MakeEntity = function(world, pos)
 			// render only if in camera
 			if ( .IsInsideCam() )
 			{
+                if ( ?.shadow )
+                {
+    				.shadow.Draw(draw_position - v2(0.0f, .pos.z));
+                }
+
 				Gfx.Color(.color, .alpha);
 				.anim.Draw(draw_position);
 			}
@@ -183,17 +191,34 @@ global MakeEntity = function(world, pos)
 
 	Entity.Physics = function()
 	{
+        local airborne = .IsAirborne();
+        local friction = .ground_friction;
+        local max_speed = .ground_max_speed;
+
+        if (airborne)
+        {
+            friction = .air_friction;
+            max_speed = .air_max_speed;
+        }
+
         local gravity = v3(0.0f, 0.0f, -1.0f);
 
         .accel += gravity * .mass;
         .vel += .accel;
-        .pos += .vel;
-        .vel *= .friction;
-        .accel = v3(0.0f);
 
+        .vel = v3(
+             min(abs(.vel.x), max_speed.x) * sign(.vel.x),
+             min(abs(.vel.y), max_speed.y) * sign(.vel.y),
+             min(abs(.vel.z), max_speed.z) * sign(.vel.z)
+        );
+
+        .pos += .vel;
+        .accel = v3(0.0f);
+        .vel *= friction;
+        
         .pos = v3(.pos.x, .pos.y, max(0.0f, .pos.z));
 
-        if (.IsAirborne() == false)
+        if (!airborne)
         {
             .vel *= v3(1.0f, 1.0f, 0.0f);
         }

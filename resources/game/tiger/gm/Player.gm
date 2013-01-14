@@ -43,11 +43,200 @@ global PlayerControlsKeyboard =
 	Slide = MakeInput(Input.IsKeyDown, "V"),
 };
 
+global ComboActions =
+{
+    Punch = 0,
+    Kick = 1,
+    Block = 2,
+    Up = 3,
+    Down = 4,
+    Forward = 5,
+    Backward = 6,
+}; 
+
+global PlayerGroundCombos =
+{
+    PunchL =
+    {
+        sequence = { 0 },
+        anim = "punchl",
+        damage = 1.0f,
+        finish = false,
+        stuns = false,
+    },
+
+    PunchR =
+    {
+        sequence = { 0,0 },
+        anim = "punchr",
+        damage = 1.0f,
+        finish = false,
+        stuns = false,
+    },
+
+    Kick =
+    {
+        sequence = { 1 },
+        anim = "kick",
+        damage = 2.0f,
+        finish = true,
+        stuns = false,
+    },
+
+    Knee =
+    {
+        sequence = { 0,0,5,1 },
+        anim = "knee",
+        damage = 1.0f,
+        finish = true,
+        stuns = true,
+    },
+
+    SpinKick =
+    {
+        sequence = { 0,0,0,1 },
+        anim = "spinkick",
+        damage = 2.0f,
+        finish = true,
+        stuns = false,
+    },
+
+    SweepKick =
+    {
+        sequence = { 0,0,4,1 },
+        anim = "sweepkick",
+        damage = 2.0f,
+        finish = true,
+        stuns = false,
+    },
+};
+
+global PlayerAirCombos =
+{
+    JumpKick =
+    {
+        sequence = { 1 },
+        anim = "jumpkick",
+        damage = 2.0f,
+        finish = true,
+        stuns = false,
+    },
+};
+
+global MakeComboSystem = function(data)
+{
+    assert(?data);
+
+    local combo = table();
+
+    combo.data = data;
+    combo.sequence = table();
+    combo.wait_thread = -1;
+    combo.reset_thread = -1;
+    combo.used_current_combo = false;
+
+    combo.TryAddInput = function(action, input)
+    {
+        assert(?action);
+        assert(?input);
+
+        if (threadIsAlive(.wait_thread))
+        {
+            return;
+        }
+
+        .sequence[tableCount(.sequence)] = action;
+
+        .WaitInput(input);
+        .StartResetCountdown();
+
+        .used_current_combo = false;
+    };
+
+    combo.Reset = function()
+    {
+        tableClear(.sequence);
+        threadKill(.wait_thread);
+    };
+
+    combo.StartResetCountdown = function()
+    {
+        threadKill(.reset_thread);
+
+        local reset_function = function()
+        {
+            sleep(0.5f);
+            tableClear(.sequence);
+        };
+
+        .reset_thread = this:thread(reset_function);
+    };
+
+    combo.WaitInput = function(input)
+    {
+        if (threadIsAlive(.wait_thread))
+        {
+            return;
+        }
+
+        local wait_function = function(input)
+        {
+            while (input.Check())
+            {
+                yield();
+            }
+        };
+
+        .wait_thread = this:thread(wait_function, input);
+    };
+
+    combo.GetCombo = function()
+    {
+        if (.used_current_combo)
+        {
+           return null;
+        }
+
+        foreach (name and data in .data)
+        {
+            if (tableCount(.sequence) < tableCount(data.sequence))
+            {
+                continue;
+            }
+
+            for (i = 0; i < tableCount(data.sequence); i += 1)
+            {
+                local current = .sequence[i];
+                local desired = data.sequence[i];
+
+                if (current != desired)
+                {
+                    break;    
+                }
+
+                if (i == tableCount(data.sequence) - 1)
+                {
+                    .used_current_combo = true;
+                    return name;
+                }
+            }
+        }
+
+        return null;
+    };
+
+    return combo;
+};
+
 global MakePlayer = function(world, coord)
 {
 	local Player = MakeEntity(world, coord);
 
 	Player.mass = 2.0f;
+	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
+	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
+	Player.air_friction = v3(1.0f, 1.0f, 0.9f);
+	Player.ground_friction = v3(0.5f, 0.5f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
 	Player.type = EntityType.Player;
@@ -58,9 +247,19 @@ global MakePlayer = function(world, coord)
 	Player.energy_regen = PlayerDefaults.EnergyRegen;
 	Player.health = Player.max_health;
 	Player.energy = Player.max_energy;
+	Player.shadow = MakeSpriteAnimation(g_game.animBank, "playerShadow");
 	Player.anim = MakeSpriteAnimation(g_game.animBank, "player");
 	Player.move_input = v2();
-    Player.move_speed = v2(4.0f, 3.0f);
+    Player.air_move_speed = v2(1.0f, 0.5f);
+    Player.ground_move_speed = v2(3.0f, 2.0f);
+
+    Player.attack_thread = -1;
+    Player.block_thread = -1;
+    Player.jump_thread = -1;
+    Player.jump_finish_thread = -1;
+
+    Player.ground_combo = MakeComboSystem(PlayerGroundCombos);
+    Player.air_combo = MakeComboSystem(PlayerAirCombos);
 
 	Player.OnTickTurn = function()
 	{
@@ -93,30 +292,66 @@ global MakePlayer = function(world, coord)
 	{
 		g_game.state.cam.SetTargetPos( v2(.pos) );
 
-        local move = .controls.MoveFunction.Check();
+        if (!threadIsAlive(.attack_thread))
+        {
+            local move = .controls.MoveFunction.Check();
+            local move_speed = .ground_move_speed;
 
-        move *= .move_speed;
+            if (.IsAirborne())
+            {
+                move_speed = .air_move_speed;
+            }
 
-        .accel += v3(move);
+            move *= move_speed;
+
+            .accel += v3(move);
+        }
 
         if (.controls.Jump.Check())
         {
             .TryJump();
         }
-        else if (.controls.AttackPunch.Check())
+
+        local s = "";
+        foreach ( k and v in .ground_combo.sequence )
         {
-            if (.IsAirborne())
+            s += v + ",";
+        }
+        print(s);
+
+        if (.IsAirborne())
+        {
+        }
+        else
+        {
+            if (.controls.AttackPunch.Check())
             {
-                .TryJumpAttack();
+                .ground_combo.TryAddInput(ComboActions.Punch, .controls.AttackPunch);
             }
-            else
+
+            if (.controls.AttackKick.Check())
             {
-                .TryAttack();
+                .ground_combo.TryAddInput(ComboActions.Kick, .controls.AttackKick);
+            }
+
+            local combo_name = .ground_combo.GetCombo();
+            if (?combo_name)
+            {
+                local combo_data = PlayerGroundCombos[combo_name];
+                assert(?combo_data);
+
+                .TryAttack(combo_data);
+
+                if (combo_data.finish)
+                {
+                    .ground_combo.Reset();
+                }
+
+                .ground_combo.used_current_combo = true;
             }
         }
 
-        if (!threadIsAlive(.attack_thread) &&
-            !threadIsAlive(.jump_thread))
+        if (!threadIsAlive(.attack_thread) && !threadIsAlive(.jump_thread) && !.IsAirborne())
         {
             local len = safe_length(.vel + .accel);
 
@@ -150,16 +385,28 @@ global MakePlayer = function(world, coord)
             return;
         }
 
+        if ( threadIsAlive(.jump_finish_thread) )
+        {
+            return;
+        }
+
+        // TODO: a few frames before unable to jump
+        if ( .IsAirborne() )
+        {
+            return;
+        }
+
         local jump_function = function()
         {
             .anim.ChangeTo("jump");
 
-            // TODO: allow cancel attack
-
-            local jump_min_frames = 8;
-            local jump_frames = 18;
-            local jump_force = 4.0f;
+            local jump_min_frames = 10;
+            local jump_frames = 22;
+            local jump_start = 5.0f;
+            local jump_force = 5.0f;
             local jump_falloff = 0.1f;
+
+            .vel = v3(.vel.x, .vel.y, jump_start);
 
             for (i = 0; i < jump_frames; i += 1)
             {
@@ -178,10 +425,15 @@ global MakePlayer = function(world, coord)
                 yield();
             }
 
-            while (.controls.Jump.Check() == true)
+            local jump_finish_function = function()
             {
-                yield();
-            }
+                while (.controls.Jump.Check() == true)
+                {
+                    yield();
+                }
+            };
+
+            .jump_finish_thread = this:thread(jump_finish_function);
 
             while (.IsAirborne())
             {
@@ -199,17 +451,20 @@ global MakePlayer = function(world, coord)
         assert(false);
     };
 
-    Player.TryAttack = function(type)
+    Player.TryAttack = function(combo_data)
     {
         if (threadIsAlive(.attack_thread))
         {
             return;
         }
 
-        local attack_function = function(attack_type)
+        local attack_function = function(combo_data)
         {
+            assert(?combo_data);
+
+            .anim.ChangeTo(combo_data.anim);
+
             // enable punch collision
-            .anim.ChangeTo("punch");
 
             while (.anim.IsFinished() == false)
             {
@@ -217,21 +472,12 @@ global MakePlayer = function(world, coord)
             }
 
             // disable punch collision
-
-            // anim will reset in next update
-            //.anim.ChangeTo("idle");
-
-            //.combo_sequence[] = attack_type;
-
-            // wait for combos
-            // maybe spawn thread and sleep till combo reset
-            // drop out of attack to allow another attack
         };
 
-        .attack_thread = this:thread(attack_function, attack_type);
+        .attack_thread = this:thread(attack_function, combo_data);
     };
     
-    Player.TryJumpAttack = function()
+    Player.TryJumpAttack = function(attack_type, input)
     {
         assert(.IsAirborne());
 
@@ -240,8 +486,14 @@ global MakePlayer = function(world, coord)
             return;
         }
 
-        local attack_function = function(attack_type)
+        local attack_function = function(attack_type, input)
         {
+            local data = .attack_data[attack_type];
+
+            assert(?data);
+
+            .anim.ChangeTo(data.anim);
+
             // enable punch collision
 
             while (.anim.IsFinished() == false)
@@ -258,7 +510,18 @@ global MakePlayer = function(world, coord)
             // drop out of attack to allow another attack
         };
 
-        .attack_thread = this:thread(attack_function, attack_type);
+        .attack_thread = this:thread(attack_function, attack_type, input);
+    };
+
+    Player.RestartComboThread = function()
+    {
+        threadKill( .combo_thread );
+
+        local combo_function = function()
+        {
+            sleep(0.5f);
+            tableClear( .combo_sequence );
+        };
     };
     
 	Player.OnDie = function()
