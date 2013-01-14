@@ -266,7 +266,7 @@ global MakePlayerController = function(fighter)
                 }
                 else if (.controls.Kick.Press())
                 {
-                    f.ground_combo.TryAddInput(ComboActions.Punch, .controls.Kick);
+                    f.ground_combo.TryAddInput(ComboActions.Kick, .controls.Kick);
                 }
 
                 local combo_name = f.ground_combo.GetCombo();
@@ -297,7 +297,7 @@ global MakePlayer = function(world, coord)
 	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.air_friction = v3(1.0f, 1.0f, 0.9f);
-	Player.ground_friction = v3(0.5f, 0.5f, 0.9f);
+	Player.ground_friction = v3(0.8f, 0.8f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
     Player.ground_combo = MakeComboSystem(PlayerGroundCombos);

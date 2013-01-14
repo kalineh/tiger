@@ -34,7 +34,7 @@ global MakeFighter = function(world, coord, config_name)
 	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
 	Fighter.move_input = v2();
     Fighter.air_move_speed = v2(1.0f, 0.5f);
-    Fighter.ground_move_speed = v2(3.0f, 2.0f);
+    Fighter.ground_move_speed = v2(1.0f, 0.5f);
     Fighter.frames_ground = 0;
     Fighter.frames_air = 0;
     Fighter.action_thread = -1;
@@ -98,7 +98,6 @@ global MakeFighter = function(world, coord, config_name)
                         else
                         {
                             .anim.ChangeToNoReset("move");
-                            .anim.speed = abs(.vel.x) + abs(.vel.y);
                         }
                     }
                     if (.move_input.x > 0.0f)
@@ -110,8 +109,12 @@ global MakeFighter = function(world, coord, config_name)
                         else
                         {
                             .anim.ChangeToNoReset("move");
-                            .anim.speed = abs(.vel.x) + abs(.vel.y);
                         }
+                    }
+
+                    if (.anim.currAnimName == "move")
+                    {
+                        .anim.speed = abs(.vel.x) + abs(.vel.y);
                     }
                 }
             }
@@ -139,10 +142,10 @@ global MakeFighter = function(world, coord, config_name)
             assert(?input);
 
             local jump_min_frames = 10;
-            local jump_frames = 22;
+            local jump_frames = 34;
             local jump_start = 5.0f;
             local jump_force = 5.0f;
-            local jump_falloff = 0.1f;
+            local jump_falloff = 0.12f;
 
             .vel = v3(.vel.x, .vel.y, jump_start);
 
