@@ -145,6 +145,8 @@ global MakeComboSystem = function(data)
 
     combo.data = data;
     combo.sequence = table();
+    combo.sequence_max = 30;
+    combo.sequence_index = 0;
     combo.wait_thread = -1;
     combo.reset_thread = -1;
     combo.used_current_combo = false;
@@ -214,6 +216,9 @@ global MakeComboSystem = function(data)
         local best_length = 0;
         local best_combo = null;
 
+        // best combo is not necessarily largest
+        // is one that finishes on the current input
+
         foreach (name and data in .data)
         {
             if (tableCount(.sequence) < tableCount(data.sequence))
@@ -221,22 +226,27 @@ global MakeComboSystem = function(data)
                 continue;
             }
 
-            for (i = 0; i < tableCount(data.sequence); i += 1)
+            // scan combo from each starting point of the input
+            for (j = 0; j < tableCount(.sequence); j += 1)
             {
-                local current = .sequence[i];
-                local desired = data.sequence[i];
-
-                if (current != desired)
+                for (i = 0; i < tableCount(data.sequence); i += 1)
                 {
-                    break;    
-                }
+                    local current = .sequence[i+j];
+                    local desired = data.sequence[i];
 
-                if (i == tableCount(data.sequence) - 1)
-                {
-                    if (tableCount(data.sequence) > best_length)
+                    if (current != desired)
                     {
-                        best_combo = name;
-                        best_length = tableCount(data.sequence);;
+                        break;    
+                    }
+
+                    if (i == tableCount(data.sequence) - 1)
+                    {
+                        // use >= so that we overwrite older combos of same length
+                        if (tableCount(data.sequence) >= best_length)
+                        {
+                            best_combo = name;
+                            best_length = tableCount(data.sequence);
+                        }
                     }
                 }
             }
