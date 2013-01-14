@@ -12,6 +12,7 @@ system.DoFile("game/tiger/gm/Enemy.gm");
 system.DoFile("game/tiger/gm/Projectile.gm");
 system.DoFile("game/tiger/gm/World.gm");
 system.DoFile("game/tiger/gm/DrawUtil.gm");
+system.DoFile("game/tiger/gm/Dump.gm");
 system.DoFile("game/tiger/gm/Util.gm");
 system.DoFile("game/tiger/gm/Background.gm");
 system.DoFile("game/tiger/gm/MusicPlayer.gm");

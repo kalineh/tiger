@@ -404,6 +404,7 @@
     <None Include="..\..\resources\game\tiger\gm\Background.gm" />
     <None Include="..\..\resources\game\tiger\gm\DrawLayers.gm" />
     <None Include="..\..\resources\game\tiger\gm\DrawUtil.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Dump.gm" />
     <None Include="..\..\resources\game\tiger\gm\Enemy.gm" />
     <None Include="..\..\resources\game\tiger\gm\Entity.gm" />
     <None Include="..\..\resources\game\tiger\gm\Fighter.gm" />

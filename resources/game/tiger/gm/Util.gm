@@ -55,3 +55,23 @@ global MakeDelayedCall = function(delay, fun, arg, obj)
 
 	return t;
 };
+
+global StringTableValues = function(table_)
+{
+    local s = "";
+    local i = 0;
+
+    foreach (k and v in table_)
+    {
+        s += v;
+
+        i += 1;
+
+        if (i < tableCount(table_))
+        {
+            s += ",";
+        }
+    }
+
+    return s;
+};

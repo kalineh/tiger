@@ -71,6 +71,13 @@ global g_fileData =
 					looping = false,
 				},
 
+                spinkick =
+				{
+                    tileIndex = { 20,24,25,26,27,28,20 },
+					times = { 0.1f },
+					looping = false,
+				},
+
                 jumpkick =
                 {
                     tileIndex = { 19,20,21,22 },

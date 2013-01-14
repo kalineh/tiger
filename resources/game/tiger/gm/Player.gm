@@ -79,6 +79,15 @@ global PlayerGroundCombos =
         stuns = false,
     },
 
+    PunchL2 =
+    {
+        sequence = { 0,0,0 },
+        anim = "punchl",
+        damage = 1.0f,
+        finish = false,
+        stuns = false,
+    },
+
     Kick =
     {
         sequence = { 1 },
@@ -202,6 +211,9 @@ global MakeComboSystem = function(data)
            return null;
         }
 
+        local best_length = 0;
+        local best_combo = null;
+
         foreach (name and data in .data)
         {
             if (tableCount(.sequence) < tableCount(data.sequence))
@@ -221,13 +233,21 @@ global MakeComboSystem = function(data)
 
                 if (i == tableCount(data.sequence) - 1)
                 {
-                    .used_current_combo = true;
-                    return name;
+                    if (tableCount(data.sequence) > best_length)
+                    {
+                        best_combo = name;
+                        best_length = tableCount(data.sequence);;
+                    }
                 }
             }
         }
 
-        return null;
+        if (?best_combo)
+        {
+            .used_current_combo = true;
+        }
+
+        return best_combo;
     };
 
     return combo;
@@ -258,6 +278,10 @@ global MakePlayerController = function(fighter)
                 }
             }
 
+            g_dump.combo = f.ground_combo;
+            g_dump.sequence = StringTableValues(f.ground_combo.sequence);
+
+            // TODO: jump version
             if (!threadIsAlive(f.action_thread))
             {
                 if (.controls.Punch.Press())
@@ -272,6 +296,8 @@ global MakePlayerController = function(fighter)
                 local combo_name = f.ground_combo.GetCombo();
                 if (?combo_name)
                 {
+                    g_dump.last_combo = combo_name;
+
                     local combo_data = PlayerGroundCombos[combo_name];
 
                     f.Combo(combo_data);
