@@ -186,6 +186,7 @@ global MakeWorld = function()
 		local player_spawn = v3();
 
 		.player = MakePlayer(this, player_spawn);
+        .controller = MakePlayerController(.player);
 		.entities[.player] = .player;
 	};
 

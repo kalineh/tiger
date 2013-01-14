@@ -1,0 +1,199 @@
+
+global FighterConfig =
+{
+    Player = 
+    {
+        MaxHealth = 50.0f,
+        MaxEnergy = 10.0f,
+        Animations = "player",
+    },
+
+    Thug = 
+    {
+        MaxHealth = 5.0f,
+        MaxEnergy = 0.0f,
+        Animations = "player",
+    },
+};
+
+global MakeFighter = function(world, coord, config_name)
+{
+	local Fighter = MakeEntity(world, coord);
+    local config = FighterConfig[config_name];
+
+    assert(?config_name);
+    assert(?config);
+
+	Fighter.controls = null;
+	Fighter.color = Gfx.WHITE;
+	Fighter.max_health = config.MaxHealth;
+	Fighter.max_energy = config.MaxEnergy;
+	Fighter.health = config.max_health;
+	Fighter.energy = Fighter.max_energy;
+	Fighter.shadow = MakeSpriteAnimation(g_game.animBank, config.Animations + "_shadow");
+	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
+	Fighter.move_input = v2();
+    Fighter.air_move_speed = v2(1.0f, 0.5f);
+    Fighter.ground_move_speed = v2(3.0f, 2.0f);
+    Fighter.frames_ground = 0;
+    Fighter.frames_air = 0;
+    Fighter.action_thread = -1;
+    Fighter.jump_thread = -1;
+    Fighter.ground_combo = MakeComboSystem(PlayerGroundCombos);
+    Fighter.air_combo = MakeComboSystem(PlayerAirCombos);
+
+	Fighter.OnUpdate = function()
+	{
+        local airborne = .IsAirborne();
+
+        if (airborne)
+        {
+            .frames_ground = 0;
+            .frames_air += 1;
+        }
+        else
+        {
+            .frames_ground += 1;
+            .frames_air = 0;
+        }
+
+        if (!threadIsAlive(.action_thread))
+        {
+            local move = .move_input;
+            local move_speed = .ground_move_speed;
+
+            if (.IsAirborne())
+            {
+                move_speed = .air_move_speed;
+            }
+
+            move *= move_speed;
+
+            .accel += v3(move);
+        }
+
+        .anim.speed = 1.0f;
+
+        if (!threadIsAlive(.action_thread))
+        {
+            if (.frames_ground >= 1)
+            {
+                if (.move_input.x < 0.0f) { .anim.facing = FACING.RIGHT; }
+                if (.move_input.x > 0.0f) { .anim.facing = FACING.LEFT; }
+
+                local len = safe_length(.vel + .accel);
+
+                if (len <= 0.01f )
+                {
+                    .anim.ChangeToNoReset("idle");
+                }
+                else
+                {
+                    if (.move_input.x < 0.0f)
+                    {
+                        if (.vel.x > 0.0f)
+                        {
+                            .anim.ChangeToNoReset("stop");
+                        }
+                        else
+                        {
+                            .anim.ChangeToNoReset("move");
+                            .anim.speed = abs(.vel.x) + abs(.vel.y);
+                        }
+                    }
+                    if (.move_input.x > 0.0f)
+                    {
+                        if (.vel.x < 0.0f)
+                        {
+                            .anim.ChangeToNoReset("stop");
+                        }
+                        else
+                        {
+                            .anim.ChangeToNoReset("move");
+                            .anim.speed = abs(.vel.x) + abs(.vel.y);
+                        }
+                    }
+                }
+            }
+            else // airborne
+            {
+                if (.vel.z < 0.0f)
+                {
+                    .anim.ChangeToNoReset("fall");
+                }
+                else if (.vel.z > 0.0f)
+                {
+                    .anim.ChangeToNoReset("jump");
+                }
+            }
+        }
+	};
+
+    Fighter.Jump = function(input)
+    {
+        assert(!threadIsAlive(.jump_thread));
+        assert(?input);
+
+        local jump_function = function(input)
+        {
+            assert(?input);
+
+            local jump_min_frames = 10;
+            local jump_frames = 22;
+            local jump_start = 5.0f;
+            local jump_force = 5.0f;
+            local jump_falloff = 0.1f;
+
+            .vel = v3(.vel.x, .vel.y, jump_start);
+
+            for (i = 0; i < jump_frames; i += 1)
+            {
+                if (i >= jump_min_frames)
+                {
+                    if (!input.Hold())
+                    {
+                        break;
+                    }
+                }
+
+                .accel += v3(0.0f, 0.0f, jump_force);
+
+                jump_force = max(0.0f, jump_force - jump_falloff);
+
+                yield();
+            }
+
+            while (.frames_air > 0)
+            {
+                yield();
+            }
+        };
+
+        .jump_thread = this:thread(jump_function, input);
+    };
+
+    Fighter.Combo = function(combo_data)
+    {
+        assert(!threadIsAlive(.action_thread));
+
+        local combo_function = function(combo_data)
+        {
+            assert(?combo_data);
+
+            .anim.ChangeTo(combo_data.anim);
+
+            // enable collision
+
+            while (.anim.IsFinished() == false)
+            {
+                yield();
+            }
+
+            // disable collision
+        };
+
+        .action_thread = this:thread(combo_function, combo_data);
+    };
+
+	return Fighter;
+};

@@ -3,24 +3,28 @@ global PlayerDefaults =
 {
 	MaxHealth = 40.0f,
 	MaxEnergy = 20.0f,
-	HealthRegen = 0.0f,
-	EnergyRegen = 0.0f,
 };
 
-global MakeInput = function(f, a)
+global MakeInput = function(press, hold, arg)
 {
+    assert(?press);
+    assert(?hold);
+    assert(?arg);
+
     local input = table();
 
-    assert(?f);
-    //assert(?a);
+    input.press = press;
+    input.hold = hold;
+    input.arg = arg;
 
-    input.fun = f;
-    input.arg = a;
-
-    // TODO: better name
-    input.Check = function()
+    input.Press = function()
     {
-        return .fun(.arg);
+        return .press(.arg);
+    };
+    
+    input.Hold = function()
+    {
+        return .hold(.arg);
     };
 
 	return input;
@@ -35,12 +39,13 @@ global PlayerControlsKeyboard =
 		if (Input.IsKeyDown("LEFT")) { result += v2(-1.0f, 0.0f); }
 		if (Input.IsKeyDown("RIGHT")) { result += v2(+1.0f, 0.0f); }
 		return result;
-	}, null),
+    }, function() { return null; }, {}),
 
-	Jump = MakeInput(Input.IsKeyDown, "X"),
-	AttackPunch = MakeInput(Input.IsKeyDown, "C"),
-	AttackKick = MakeInput(Input.IsKeyDown, "Z"),
-	Slide = MakeInput(Input.IsKeyDown, "V"),
+	Jump = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
+	Punch = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
+	Kick = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
+	Guard = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
+	Slide = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 };
 
 global ComboActions =
@@ -165,7 +170,7 @@ global MakeComboSystem = function(data)
 
         local reset_function = function()
         {
-            sleep(0.5f);
+            sleep(0.4f);
             tableClear(.sequence);
         };
 
@@ -181,7 +186,7 @@ global MakeComboSystem = function(data)
 
         local wait_function = function(input)
         {
-            while (input.Check())
+            while (input.Hold())
             {
                 yield();
             }
@@ -228,320 +233,82 @@ global MakeComboSystem = function(data)
     return combo;
 };
 
+global MakePlayerController = function(fighter)
+{
+    assert(?fighter);
+
+	local Controller = table();
+
+	Controller.fighter = fighter;
+	Controller.controls = PlayerControlsKeyboard;
+
+	Controller.Update = function()
+	{
+        while (true)
+        {
+            local f = .fighter;
+
+            f.move_input = .controls.MoveFunction.Press();
+
+            if (f.frames_ground > 0)
+            {
+                if (.controls.Jump.Press())
+                {
+                    f.Jump(.controls.Jump);
+                }
+            }
+
+            if (!threadIsAlive(f.action_thread))
+            {
+                if (.controls.Punch.Press())
+                {
+                    f.ground_combo.TryAddInput(ComboActions.Punch, .controls.Punch);
+                }
+                else if (.controls.Kick.Press())
+                {
+                    f.ground_combo.TryAddInput(ComboActions.Punch, .controls.Kick);
+                }
+
+                local combo_name = f.ground_combo.GetCombo();
+                if (?combo_name)
+                {
+                    local combo_data = PlayerGroundCombos[combo_name];
+
+                    f.Combo(combo_data);
+                }
+            }
+
+            yield();
+        }
+	};
+
+    Controller:thread(Controller.Update);
+
+	return Controller;
+};
+
 global MakePlayer = function(world, coord)
 {
-	local Player = MakeEntity(world, coord);
+	local Player = MakeFighter(world, coord, "Player");
 
 	Player.mass = 2.0f;
+
+    // TODO: move to config
 	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.air_friction = v3(1.0f, 1.0f, 0.9f);
 	Player.ground_friction = v3(0.5f, 0.5f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
-	Player.type = EntityType.Player;
-	Player.color = Gfx.WHITE;
-	Player.max_health = PlayerDefaults.MaxHealth;
-	Player.max_energy = PlayerDefaults.MaxEnergy;
-	Player.health_regen = PlayerDefaults.HealthRegen;
-	Player.energy_regen = PlayerDefaults.EnergyRegen;
-	Player.health = Player.max_health;
-	Player.energy = Player.max_energy;
-	Player.shadow = MakeSpriteAnimation(g_game.animBank, "playerShadow");
-	Player.anim = MakeSpriteAnimation(g_game.animBank, "player");
-	Player.move_input = v2();
-    Player.air_move_speed = v2(1.0f, 0.5f);
-    Player.ground_move_speed = v2(3.0f, 2.0f);
-
-    Player.attack_thread = -1;
-    Player.block_thread = -1;
-    Player.jump_thread = -1;
-    Player.jump_finish_thread = -1;
-
     Player.ground_combo = MakeComboSystem(PlayerGroundCombos);
     Player.air_combo = MakeComboSystem(PlayerAirCombos);
 
-	Player.OnTickTurn = function()
-	{
-		.health = min(.max_health, .health + .health_regen);
-		.energy = min(.max_energy, .energy + .energy_regen);
-	};
-
-	Player.BaseDraw = Player.Draw;
-	Player.Draw = function()
-	{
-        .BaseDraw();
-	};
-
-	Player.OnTakeDamage = function(damage)
-	{
-		g_game.soundBanks["game"].Play("playerTakeDamage");
-		g_game.state.EmitParticlesAt("playerTakeDamage", .GetCenterWorld(), 16);
-		.Shake(3.0f, 0.2f);
-	};
-
-	Player.IsInput = function(control)
-	{
-		local f = control[0];
-		local a = control[1];
-		local active = f(a);
-		return active;
-	};
-
+	Player.BaseOnUpdate = Player.OnUpdate;
 	Player.OnUpdate = function()
 	{
+        .BaseOnUpdate();
+
 		g_game.state.cam.SetTargetPos( v2(.pos) );
-
-        if (!threadIsAlive(.attack_thread))
-        {
-            local move = .controls.MoveFunction.Check();
-            local move_speed = .ground_move_speed;
-
-            if (.IsAirborne())
-            {
-                move_speed = .air_move_speed;
-            }
-
-            move *= move_speed;
-
-            .accel += v3(move);
-        }
-
-        if (.controls.Jump.Check())
-        {
-            .TryJump();
-        }
-
-        local s = "";
-        foreach ( k and v in .ground_combo.sequence )
-        {
-            s += v + ",";
-        }
-        print(s);
-
-        if (.IsAirborne())
-        {
-        }
-        else
-        {
-            if (.controls.AttackPunch.Check())
-            {
-                .ground_combo.TryAddInput(ComboActions.Punch, .controls.AttackPunch);
-            }
-
-            if (.controls.AttackKick.Check())
-            {
-                .ground_combo.TryAddInput(ComboActions.Kick, .controls.AttackKick);
-            }
-
-            local combo_name = .ground_combo.GetCombo();
-            if (?combo_name)
-            {
-                local combo_data = PlayerGroundCombos[combo_name];
-                assert(?combo_data);
-
-                .TryAttack(combo_data);
-
-                if (combo_data.finish)
-                {
-                    .ground_combo.Reset();
-                }
-
-                .ground_combo.used_current_combo = true;
-            }
-        }
-
-        if (!threadIsAlive(.attack_thread) && !threadIsAlive(.jump_thread) && !.IsAirborne())
-        {
-            local len = safe_length(.vel + .accel);
-
-            if (len <= 0.01f )
-            {
-                .anim.ChangeToNoReset("idle");
-            }
-            else
-            {
-                .anim.ChangeToNoReset("move");
-                .anim.speed = abs(.vel.x) + abs(.vel.y);
-            }
-        }
-        else
-        {
-            .anim.speed = 1.0f;
-        }
-
-        if (!threadIsAlive(.attack_thread))
-        {
-            if (.accel.x < 0.0f) { .anim.facing = FACING.RIGHT; }
-            if (.accel.x > 0.0f) { .anim.facing = FACING.LEFT; }
-        }
-
-	};
-
-    Player.TryJump = function()
-    {
-        if ( threadIsAlive(.jump_thread) )
-        {
-            return;
-        }
-
-        if ( threadIsAlive(.jump_finish_thread) )
-        {
-            return;
-        }
-
-        // TODO: a few frames before unable to jump
-        if ( .IsAirborne() )
-        {
-            return;
-        }
-
-        local jump_function = function()
-        {
-            .anim.ChangeTo("jump");
-
-            local jump_min_frames = 10;
-            local jump_frames = 22;
-            local jump_start = 5.0f;
-            local jump_force = 5.0f;
-            local jump_falloff = 0.1f;
-
-            .vel = v3(.vel.x, .vel.y, jump_start);
-
-            for (i = 0; i < jump_frames; i += 1)
-            {
-                if (i >= jump_min_frames)
-                {
-                    if (.controls.Jump.Check() == false)
-                    {
-                        break;
-                    }
-                }
-
-                .accel += v3(0.0f, 0.0f, jump_force);
-
-                jump_force = max( 0.0f, jump_force - jump_falloff );
-
-                yield();
-            }
-
-            local jump_finish_function = function()
-            {
-                while (.controls.Jump.Check() == true)
-                {
-                    yield();
-                }
-            };
-
-            .jump_finish_thread = this:thread(jump_finish_function);
-
-            while (.IsAirborne())
-            {
-                yield();
-            }
-        };
-
-        .jump_thread = this:thread(jump_function);
-    };
-
-    Player.CancelAttack = function()
-    {
-        // reset anim
-        // kill thread
-        assert(false);
-    };
-
-    Player.TryAttack = function(combo_data)
-    {
-        if (threadIsAlive(.attack_thread))
-        {
-            return;
-        }
-
-        local attack_function = function(combo_data)
-        {
-            assert(?combo_data);
-
-            .anim.ChangeTo(combo_data.anim);
-
-            // enable punch collision
-
-            while (.anim.IsFinished() == false)
-            {
-                yield();
-            }
-
-            // disable punch collision
-        };
-
-        .attack_thread = this:thread(attack_function, combo_data);
-    };
-    
-    Player.TryJumpAttack = function(attack_type, input)
-    {
-        assert(.IsAirborne());
-
-        if (threadIsAlive(.attack_thread))
-        {
-            return;
-        }
-
-        local attack_function = function(attack_type, input)
-        {
-            local data = .attack_data[attack_type];
-
-            assert(?data);
-
-            .anim.ChangeTo(data.anim);
-
-            // enable punch collision
-
-            while (.anim.IsFinished() == false)
-            {
-                yield();
-            }
-
-            // disable punch collision
-
-            //.combo_sequence[] = attack_type;
-
-            // wait for combos
-            // maybe spawn thread and sleep till combo reset
-            // drop out of attack to allow another attack
-        };
-
-        .attack_thread = this:thread(attack_function, attack_type, input);
-    };
-
-    Player.RestartComboThread = function()
-    {
-        threadKill( .combo_thread );
-
-        local combo_function = function()
-        {
-            sleep(0.5f);
-            tableClear( .combo_sequence );
-        };
-    };
-    
-	Player.OnDie = function()
-	{
-		// zoom in death
-		Tween.To(g_game.state.cam,  1.0f, {zoom=1.5});
-
-		g_game.state.OnGameOver();
-
-		// TEMPORARY: just make enemies walk around for funsies
-		local postdie = function()
-		{
-			while (true)
-			{
-				.world.ReadyToTickTurn();
-				sleep(0.5f);
-			}
-		};
-
-		this:thread(postdie);
 	};
 
 	return Player;
