@@ -64,6 +64,13 @@ global g_fileData =
 					looping = false,
 				},
 
+                knee =
+				{
+                    tileIndex = { 32,32,32 },
+					times = { 0.1f },
+					looping = false,
+				},
+
                 kick =
 				{
                     tileIndex = { 7,8,7 },

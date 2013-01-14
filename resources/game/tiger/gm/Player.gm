@@ -44,6 +44,10 @@ global PlayerControlsKeyboard =
 	Jump = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
 	Punch = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
 	Kick = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
+	Up = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "UP"),
+	Down = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "DOWN"),
+	Left = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "LEFT"),
+	Right = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
 	Guard = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
 	Slide = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 };
@@ -131,9 +135,9 @@ global PlayerGroundComboChains =
     },
 
     Punch2 = {
+        Knee = ComboActions.Kick | ComboActions.Forward,
         Punch3 = ComboActions.Punch,
         Kick = ComboActions.Kick,
-        Knee = ComboActions.Kick | ComboActions.Forward,
     },
 
     Punch3 = {
@@ -252,7 +256,6 @@ global MakeComboSystem = function(chains, attacks)
 
         foreach (next and action in .current)
         {
-            // TODO: combined flag handling
             foreach (a in .actions)
             {
                 if ((action & a) == action)
@@ -296,18 +299,14 @@ global MakePlayerController = function(fighter)
 
     Controller.ProcessComboActions = function()
     {
-        foreach (name and index in ComboActions)
+        foreach (item in .queue)
         {
-            local entry = .queue[index];
-            if (!?entry) { continue; }
-            if (!entry.valid) { continue; }
+            if (item.valid)
+            {
+                item.combo.TryAddInput(item.action, item.control);
+            }
 
-            entry.combo.TryAddInput(entry.action, entry.control);
-        }
-
-        foreach (entry in .queue)
-        {
-            entry.valid = false;
+            item.valid = false;
         }
     };
 
@@ -330,14 +329,33 @@ global MakePlayerController = function(fighter)
             g_dump.combo = f.ground_combo;
             g_dump.sequence = StringTableValues(f.ground_combo.actions);
 
+            local u = .controls.Up.Hold();
+            local d = .controls.Down.Hold();
+            local l = .controls.Left.Hold();
+            local r = .controls.Right.Hold();
+
+            if (f.anim.facing == FACING.LEFT)
+            {
+                local temp = l;
+                l = r;
+                r = temp;
+            }
+
+            local move_mask = 0x0;
+
+            if (u) { move_mask |= ComboActions.Up; }
+            if (d) { move_mask |= ComboActions.Down; }
+            if (l) { move_mask |= ComboActions.Forward; }
+            if (r) { move_mask |= ComboActions.Backward; }
+
             // TODO: jump version
             if (.controls.Punch.Press())
             {
-                .QueueComboAction(f.ground_combo, ComboActions.Punch, .controls.Punch);
+                .QueueComboAction(f.ground_combo, ComboActions.Punch | move_mask, .controls.Punch);
             }
             else if (.controls.Kick.Press())
             {
-                .QueueComboAction(f.ground_combo, ComboActions.Kick, .controls.Kick);
+                .QueueComboAction(f.ground_combo, ComboActions.Kick | move_mask, .controls.Kick);
             }
 
             if (!threadIsAlive(f.action_thread))
