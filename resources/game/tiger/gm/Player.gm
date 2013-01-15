@@ -220,8 +220,9 @@ global MakeComboSystem = function(chains, attacks)
 
         local reset_function = function()
         {
-            sleep(0.4f);
-            .chain = null;
+            sleep(0.35f);
+            // beware of reset thread kill order killing this thread
+            .Reset();
         };
 
         .reset_thread = this:thread(reset_function);
@@ -327,6 +328,7 @@ global MakePlayerController = function(fighter)
             }
 
             g_dump.combo = f.ground_combo;
+            g_dump.current = f.ground_combo.current;
             g_dump.sequence = StringTableValues(f.ground_combo.actions);
 
             local u = .controls.Up.Hold();
@@ -365,11 +367,14 @@ global MakePlayerController = function(fighter)
                 local combo_name = f.ground_combo.GetCombo();
                 if (?combo_name)
                 {
-                    g_dump.last_combo = combo_name;
-
                     local combo_data = PlayerGroundAttacks[combo_name];
 
                     f.Combo(combo_data);
+
+                    if (combo_data.finish)
+                    {
+                        f.ground_combo.Reset();
+                    }
                 }
             }
 
@@ -392,7 +397,7 @@ global MakePlayer = function(world, coord)
 	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.air_friction = v3(1.0f, 1.0f, 0.9f);
-	Player.ground_friction = v3(0.8f, 0.8f, 0.9f);
+	Player.ground_friction = v3(0.7f, 0.7f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
     Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
