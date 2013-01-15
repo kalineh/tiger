@@ -27,9 +27,19 @@ global MakeCollisionManager = function()
     {
         foreach (lhs in .items)
         {
+            if (lhs.enabled == false)
+            {
+                continue;
+            }
+
             foreach (rhs in .items)
             {
                 if (lhs == rhs)
+                {
+                    continue;
+                }
+
+                if (rhs.enabled == false)
                 {
                     continue;
                 }
@@ -62,13 +72,18 @@ global MakeCollisionManager = function()
     CollisionManager.DebugDraw = function()
     {
 		Gfx.BeginDefaultShader();
-		Gfx.Color(Gfx.WHITE);
 
 		Gfx.SetLineWidth(2.0f);
 
         foreach (item in .items)
         {
             local pos = v2(item.volume.pos.x, item.volume.pos.y + item.volume.pos.z);
+
+            Gfx.Color(Gfx.WHITE);
+            if (item.enabled == false)
+            {
+                Gfx.Color(Gfx.WHITE * 0.2f);
+            }
 
             if (item.volume.type == CollisionType.Circle)
             {
@@ -115,7 +130,7 @@ global MakeCollisionVolume = function(type, size)
 
             if (rhs.type == CollisionType.Circle)
             {
-                local ofs = .pos - rhs.pos;
+                local ofs = pos_lhs - pos_rhs;
                 local len = safe_length(ofs);
 
                 if (len < .radius + rhs.radius)
@@ -170,6 +185,7 @@ global MakeCollision = function(owner, type, size)
 	local Collision = table();
 
     Collision.owner = owner; 
+    Collision.enabled = true; 
     Collision.volume = MakeCollisionVolume(type, size);
 
     Collision.SetPosition = function(pos)
@@ -180,6 +196,11 @@ global MakeCollision = function(owner, type, size)
     Collision.SetSize = function(size)
     {
         .volume.size = size;
+    };
+
+    Collision.SetEnabled = function(enabled)
+    {
+        .enabled = enabled;
     };
 
     Collision.Collide = function(rhs)

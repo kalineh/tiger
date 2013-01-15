@@ -317,6 +317,12 @@ global MakePlayerController = function(fighter)
         {
             local f = .fighter;
 
+            if (f.IsDead())
+            {
+                yield();
+                continue;
+            }
+
             f.move_input = .controls.MoveFunction.Press();
 
             if (f.frames_ground > 0)
@@ -391,6 +397,7 @@ global MakePlayer = function(world, coord)
 {
 	local Player = MakeFighter(world, coord, "Player");
 
+    Player.type = EntityType.Player;
 	Player.mass = 2.0f;
 
     // TODO: move to config
@@ -402,6 +409,13 @@ global MakePlayer = function(world, coord)
 	Player.controls = PlayerControlsKeyboard;
     Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+
+    Player.FighterRelease = Player.Release;
+    Player.Release = function()
+    {
+        //threadKill(.
+        .FighterRelease();
+    };
 
 	Player.BaseOnPreUpdate = Player.OnPreUpdate;
 	Player.OnPreUpdate = function()

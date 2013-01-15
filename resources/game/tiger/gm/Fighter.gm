@@ -3,7 +3,7 @@ global FighterConfig =
 {
     Player = 
     {
-        MaxHealth = 50.0f,
+        MaxHealth = 10.0f,
         MaxEnergy = 10.0f,
         Animations = "player",
     },
@@ -24,11 +24,12 @@ global MakeFighter = function(world, coord, config_name)
     assert(?config_name);
     assert(?config);
 
+	Fighter.type = EntityType.Enemy;
 	Fighter.controls = null;
 	Fighter.color = Gfx.WHITE;
 	Fighter.max_health = config.MaxHealth;
 	Fighter.max_energy = config.MaxEnergy;
-	Fighter.health = config.max_health;
+	Fighter.health = Fighter.max_health;
 	Fighter.energy = Fighter.max_energy;
 	Fighter.shadow = MakeSpriteAnimation(g_game.animBank, config.Animations + "_shadow");
 	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
@@ -41,9 +42,24 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.jump_thread = -1;
     Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
-    Fighter.collision = MakeCollision(Fighter, CollisionType.Circle, 32.0f);
+    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 32.0f, "body");
+    Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f, "weapon");
 
-    world.collision_manager.Add(Fighter.collision);
+    Fighter.collision_body.SetEnabled(false);
+    Fighter.collision_weapon.SetEnabled(false);
+
+    world.collision_manager.Add(Fighter.collision_body);
+    world.collision_manager.Add(Fighter.collision_weapon);
+
+    Fighter.EntityRelease = Fighter.Release;
+    Fighter.Release = function()
+    {
+        .world.collision_manager.Remove(.collision_body);
+        .world.collision_manager.Remove(.collision_weapon);
+        threadKill(.action_thread);
+        threadKill(.jump_thread);
+        .EntityRelease();
+    };
 
 	Fighter.OnPreUpdate = function()
 	{
@@ -138,8 +154,15 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.OnPostUpdate = function()
     {
         local center = .GetAnimCenter();
+        local dir = .GetFacingDir();
 
-        .collision.SetPosition(center);
+        // TODO: facing is backwards?
+        dir *= -1.0f;
+
+        .collision_body.SetEnabled(true);
+
+        .collision_body.SetPosition(center);
+        .collision_weapon.SetPosition(center + dir * 48.0f);
     };
 
     Fighter.Jump = function(input)
@@ -195,14 +218,14 @@ global MakeFighter = function(world, coord, config_name)
 
             .anim.ChangeTo(combo_data.anim);
 
-            // enable collision
+            .collision_weapon.SetEnabled(true);
 
             while (.anim.IsFinished() == false)
             {
                 yield();
             }
 
-            // disable collision
+            .collision_weapon.SetEnabled(false);
         };
 
         .action_thread = this:thread(combo_function, combo_data);
@@ -210,10 +233,17 @@ global MakeFighter = function(world, coord, config_name)
 
     Fighter.OnCollide = function(rhs)
     {
-        local ofs = .pos - rhs.pos;
-        local push = ofs * 0.1f;
+        if (rhs.type != .type)
+        {
+            local ofs = .pos - rhs.pos;
+            local push = ofs * 0.1f;
 
-        .accel += push;
+            //.accel += push;
+            .vel = v3(0.0f, 0.0f, 0.0f);
+            .accel = v3(0.0f, 0.0f, 0.0f);
+
+            .TakeDamage(1.0f);
+        }
     };
 
 	return Fighter;

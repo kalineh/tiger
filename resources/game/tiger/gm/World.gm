@@ -10,8 +10,6 @@ global MakeWorld = function()
 		tickready = false,
 		ticklist = table(),
 		messages = table(),
-		entity_addremove_lock = false,
-		entitymap = null,		
 
 		queryResults = array(),
 
@@ -137,7 +135,6 @@ global MakeWorld = function()
 	{
 		foreach (e in .deathrow)
 		{
-			.cpp.EraseEntityData(e);
 			.entities[e] = null;
 			e.Release();
 		}
@@ -159,19 +156,6 @@ global MakeWorld = function()
         .collision_manager.DebugDraw();
 	};
 
-	World.UpdateEntityMap = function(entity)
-	{
-		local coord = entity.coord;
-		local size = entity.size;
-		local type = entity.type;
-		.cpp.SetEntityData(coord.x.Int(), coord.y.Int(), size.x.Int(), size.y.Int(), entity, type);
-	};
-
-	World.ClearEntityMap = function(entity)
-	{
-		.cpp.EraseEntityData(entity);
-	};
-
 	World.Update = function()
 	{
 		while( true )
@@ -180,7 +164,9 @@ global MakeWorld = function()
 			RegisterDraw( DrawLayers.Scene, .DrawEntities, this);
 			RegisterDraw( DrawLayers.Scene_FG, .DrawCollision, this);
 
+            .ProcessLifeRow();
             .collision_manager.Collide();
+            .ProcessDeathRow();
 
 			yield();
 		}
@@ -200,7 +186,7 @@ global MakeWorld = function()
 		.entities[.player] = .player;
 
         // TEST
-		.thug = MakeFighter(this, player_spawn + v3(50.0f, 0.0f, 0.0f), "Thug");
+		.thug = MakeFighter(this, player_spawn + v3(180.0f, 0.0f, 0.0f), "Thug");
         .entities[.thug] = .thug;
 	};
 
