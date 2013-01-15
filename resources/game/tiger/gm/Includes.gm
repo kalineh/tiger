@@ -5,6 +5,7 @@ system.DoFile("game/tiger/gm/GameGui.gm");
 system.DoFile("game/tiger/gm/GameCamera.gm");
 system.DoFile("game/tiger/gm/SaveData.gm");
 system.DoFile("game/tiger/gm/Notify.gm");
+system.DoFile("game/tiger/gm/Collision.gm");
 system.DoFile("game/tiger/gm/Entity.gm");
 system.DoFile("game/tiger/gm/Fighter.gm");
 system.DoFile("game/tiger/gm/Player.gm");

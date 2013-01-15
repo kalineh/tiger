@@ -238,7 +238,6 @@ local CreateGame = function()
 			},
 
 			escape = "game/tiger/snd/music/tiger.mp3",
-			crewSelect = "game/tiger/snd/music/crewSelect.ogg",
 			title = "game/tiger/snd/music/title.mp3",
 		};
 	};
@@ -285,15 +284,6 @@ local CreateGame = function()
 
 		.shaderBank.Release();
 		.shaderBank = null;
-
-		.crewMission.Release();
-		.crewMission = null;
-
-		.crewCollection.Release();
-		.crewCollection = null;
-
-		.dudePool.Release();
-		.dudePool = null;
 
 		.animBank.Release();
 		.animBank = null;

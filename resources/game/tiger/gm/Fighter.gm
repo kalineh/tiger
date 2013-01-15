@@ -41,8 +41,11 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.jump_thread = -1;
     Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Fighter.collision = MakeCollision(Fighter, CollisionType.Circle, 32.0f);
 
-	Fighter.OnUpdate = function()
+    world.collision_manager.Add(Fighter.collision);
+
+	Fighter.OnPreUpdate = function()
 	{
         local airborne = .IsAirborne();
 
@@ -132,6 +135,13 @@ global MakeFighter = function(world, coord, config_name)
         }
 	};
 
+    Fighter.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+
+        .collision.SetPosition(center);
+    };
+
     Fighter.Jump = function(input)
     {
         assert(!threadIsAlive(.jump_thread));
@@ -196,6 +206,14 @@ global MakeFighter = function(world, coord, config_name)
         };
 
         .action_thread = this:thread(combo_function, combo_data);
+    };
+
+    Fighter.OnCollide = function(rhs)
+    {
+        local ofs = .pos - rhs.pos;
+        local push = ofs * 0.1f;
+
+        .accel += push;
     };
 
 	return Fighter;

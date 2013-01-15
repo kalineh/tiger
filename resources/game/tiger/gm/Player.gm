@@ -403,10 +403,10 @@ global MakePlayer = function(world, coord)
     Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
 
-	Player.BaseOnUpdate = Player.OnUpdate;
-	Player.OnUpdate = function()
+	Player.BaseOnPreUpdate = Player.OnPreUpdate;
+	Player.OnPreUpdate = function()
 	{
-        .BaseOnUpdate();
+        .BaseOnPreUpdate();
 
 		g_game.state.cam.SetTargetPos( v2(.pos) );
 	};

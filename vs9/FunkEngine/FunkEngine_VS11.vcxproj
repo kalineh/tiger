@@ -402,6 +402,7 @@
     <None Include="..\..\resources\common\gm\Util.gm" />
     <None Include="..\..\resources\game\tiger\gm\AnimationResource.gm" />
     <None Include="..\..\resources\game\tiger\gm\Background.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Collision.gm" />
     <None Include="..\..\resources\game\tiger\gm\DrawLayers.gm" />
     <None Include="..\..\resources\game\tiger\gm\DrawUtil.gm" />
     <None Include="..\..\resources\game\tiger\gm\Dump.gm" />

@@ -960,6 +960,9 @@
     <None Include="..\..\resources\game\tiger\gm\Dump.gm">
       <Filter>games\tiger\gm</Filter>
     </None>
+    <None Include="..\..\resources\game\tiger\gm\Collision.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FunkEngine.rc">

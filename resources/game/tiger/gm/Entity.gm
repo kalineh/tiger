@@ -58,6 +58,16 @@ global MakeEntity = function(world, pos)
         return p + o + v2(0.0f, h);
     };
 
+    Entity.GetAnimCenter = function()
+    {
+        local anim_size = v3(0.0f);
+        if (?.anim)
+        {
+            anim_size = v3(.anim.animData.tileSize);
+        }
+        return .pos + anim_size * 0.5f;
+    };
+
 	Entity.Draw = function()
 	{
         local draw_position = .GetDrawPosition();
@@ -179,13 +189,18 @@ global MakeEntity = function(world, pos)
 	{
 		while( true )
 		{		
-			.OnUpdate();
+			.OnPreUpdate();
             .Physics();
+			.OnPostUpdate();
 			yield();
 		}
 	};
 
-	Entity.OnUpdate = function()
+	Entity.OnPreUpdate = function()
+	{
+	};
+
+	Entity.OnPostUpdate = function()
 	{
 	};
 

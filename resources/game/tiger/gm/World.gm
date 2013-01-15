@@ -153,6 +153,12 @@ global MakeWorld = function()
 		}
 	};
 
+	World.DrawCollision = function()
+	{
+        // TODO: toggle gui option
+        .collision_manager.DebugDraw();
+	};
+
 	World.UpdateEntityMap = function(entity)
 	{
 		local coord = entity.coord;
@@ -172,6 +178,9 @@ global MakeWorld = function()
 		{		
 			RegisterGui( .Gui, this );
 			RegisterDraw( DrawLayers.Scene, .DrawEntities, this);
+			RegisterDraw( DrawLayers.Scene_FG, .DrawCollision, this);
+
+            .collision_manager.Collide();
 
 			yield();
 		}
@@ -185,9 +194,14 @@ global MakeWorld = function()
 
 		local player_spawn = v3();
 
+        .collision_manager = MakeCollisionManager();
 		.player = MakePlayer(this, player_spawn);
         .controller = MakePlayerController(.player);
 		.entities[.player] = .player;
+
+        // TEST
+		.thug = MakeFighter(this, player_spawn + v3(50.0f, 0.0f, 0.0f), "Thug");
+        .entities[.thug] = .thug;
 	};
 
 	World.Release = function()
