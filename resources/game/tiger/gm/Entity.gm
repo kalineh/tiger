@@ -38,6 +38,10 @@ global MakeEntity = function(world, pos)
 	Entity.take_damage_filters = table();
 	Entity.draw_offset = v2(0.0f);
 	Entity.alpha = 1.0f;
+    Entity.update_thread = -1;
+    Entity.invincible = false;
+    Entity.invincible_thread = -1;
+	Entity.frame_count = 0;
 
 	Entity.IsInsideCam = function()
 	{
@@ -99,7 +103,22 @@ global MakeEntity = function(world, pos)
     				.shadow.Draw(draw_position - v2(0.0f, .pos.z));
                 }
 
-				Gfx.Color(.color, .alpha);
+                if (.invincible)
+                {
+                    if (.frame_count % 8 < 4)
+                    {
+        				Gfx.Color(.color, .alpha * 0.25f);
+                    }
+                    else
+                    {
+        				Gfx.Color(.color, .alpha);
+                    }
+                }
+                else
+                {
+    				Gfx.Color(.color, .alpha);
+                }
+
 				.anim.Draw(draw_position);
 			}
 		}
@@ -170,10 +189,12 @@ global MakeEntity = function(world, pos)
 
 	Entity.TakeDamage = function(damage)
 	{
-		if ( damage > 0.0f )
-		{
-			.OnTakeDamage(damage);
-		}
+        if ( .invincible )
+        {
+            return;
+        }
+
+		.OnTakeDamage(damage);
 
 		// TODO: damage type different particles
 		// TODO: damage resist/reflect different particles
@@ -185,6 +206,9 @@ global MakeEntity = function(world, pos)
 		//g_game.state.EmitParticlesAt("entityTakeDamage", .GetCenterWorld(), 5*damage.Int());
 
 		.health -= damage;
+
+        .SetInvincibleFrames(4);
+
 		if (.IsDead())
 		{
 			.Die();
@@ -203,6 +227,9 @@ global MakeEntity = function(world, pos)
 			.OnPreUpdate();
             .Physics();
 			.OnPostUpdate();
+
+            .frame_count += 1;
+
 			yield();
 		}
 	};
@@ -265,7 +292,7 @@ global MakeEntity = function(world, pos)
 
 	Entity.Init = function()
 	{	
-		.threadId = this:thread(.Update);
+		.update_thread = this:thread(.Update);
 	};
 
 	Entity.Release = function()
@@ -276,8 +303,21 @@ global MakeEntity = function(world, pos)
 			.anim = null;
 		}
 
-		threadKill(.threadId);
+		threadKill(.update_thread);
+        threadKill(.invincible_thread);
 	};
+
+    Entity.SetInvincibleFrames = function(frames)
+    {
+        local invincible_function = function(frames)
+        {
+            .invincible = true;
+            SleepFrames(frames);
+            .invincible = false;
+        };
+
+        this:thread(invincible_function, frames);
+    };
 	
 	Entity.Init();
 	return Entity;

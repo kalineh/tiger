@@ -75,3 +75,11 @@ global StringTableValues = function(table_)
 
     return s;
 };
+
+global SleepFrames = function(frames)
+{
+    for (i = 0; i < frames; i += 1)
+    {
+        yield();
+    }
+};
