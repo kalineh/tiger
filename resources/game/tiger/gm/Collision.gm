@@ -50,6 +50,7 @@ global MakeCollisionManager = function()
                 local hit = volume_lhs.Test(volume_rhs);
                 if (hit)
                 {
+                    // TODO: probably better to handle in .Release functions
                     local killed = lhs.Collide(rhs);
                     if (killed)
                     {
@@ -205,7 +206,7 @@ global MakeCollision = function(owner, type, size)
 
     Collision.Collide = function(rhs)
     {
-        local killed =  .owner.OnCollide(rhs.owner);
+        local killed =  .owner.OnCollide(this, rhs);
         return killed;
     };
 

@@ -75,10 +75,6 @@ global MakeTweenTask = function(ref, secs, data)
 			._Interpolate(t);
 
 			// OnUpdate callback
-            // TODO: update to handle this if tween is used
-            assert(!?.data.OnPreUpdate);
-            assert(!?.data.OnPostUpdate);
-            assert(false);
 			if ( ?.data.OnUpdate )
 			{
 				local obj = .data.OnUpdateObj;

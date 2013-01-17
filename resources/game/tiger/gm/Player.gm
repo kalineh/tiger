@@ -397,7 +397,7 @@ global MakePlayer = function(world, coord)
 {
 	local Player = MakeFighter(world, coord, "Player");
 
-    Player.type = EntityType.Player;
+    Player.type = "Player";
 	Player.mass = 2.0f;
 
     // TODO: move to config
@@ -424,6 +424,27 @@ global MakePlayer = function(world, coord)
 
 		g_game.state.cam.SetTargetPos( v2(.pos) );
 	};
+
+    Player.OnCollide = function(lhs, rhs)
+    {
+        if (lhs == .collision_body)
+        {
+            if (rhs == rhs.owner.collision_body || rhs == rhs.owner.collision_weapon)
+            {
+                local ofs = .pos - rhs.owner.pos;
+                local push = ofs * 0.1f;
+
+                //.accel += push;
+                .vel = v3(0.0f, 0.0f, 0.0f);
+                .accel = v3(0.0f, 0.0f, 0.0f);
+
+                .TakeDamage(1.0f);
+            }
+        }
+
+        return false;
+    };
+
 
 	return Player;
 };

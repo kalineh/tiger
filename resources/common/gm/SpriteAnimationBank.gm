@@ -230,6 +230,29 @@ global MakeSpriteAnimation = function( animBank, entityName )
 		threadKill(.threadId);
 	};
 
+    Animation.HasTag = function(tag)
+    {
+		local currAnim = .animData.animations[.currAnimName];
+        local currTags = currAnim.tags;
+        local currFrame = .currFrameIndex;
+
+        foreach (type and frames in currTags)
+        {
+            if (type == tag)
+            {
+                foreach (frame in frames)
+                {
+                    if (frame == currFrame)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    };
+
 	Animation._Init();
 	return Animation;
 };

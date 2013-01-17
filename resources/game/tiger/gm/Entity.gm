@@ -1,12 +1,12 @@
 
 global EntityType =
 {
-	MaskAll = 0xFF,
-	MaskHostile = 0x02, 
-	None = 0x00,
+    None = 0x00,
 	Player = 0x01,
-	Enemy = 0x02,
-	Pickup = 0x04,
+	PlayerWeapon = 0x02,
+	Enemy = 0x04,
+	EnemyWeapon = 0x08,
+	Pickup = 0x10,
 };
 
 global MakeEntity = function(world, pos)
@@ -19,7 +19,7 @@ global MakeEntity = function(world, pos)
 
 	local Entity = table();
 
-	Entity.type = EntityType.None;
+	Entity.type = "None";
 	Entity.pos = pos;
 	Entity.vel = v3(0.0f);
 	Entity.accel = v3(0.0f);
@@ -64,12 +64,17 @@ global MakeEntity = function(world, pos)
 
     Entity.GetAnimCenter = function()
     {
+        return .pos + .GetAnimSize() * 0.5f;
+    };
+
+    Entity.GetAnimSize = function()
+    {
         local anim_size = v3(0.0f);
         if (?.anim)
         {
             anim_size = v3(.anim.animData.tileSize);
         }
-        return .pos + anim_size * 0.5f;
+        return anim_size;
     };
 
     Entity.GetFacingDir = function()
@@ -103,6 +108,7 @@ global MakeEntity = function(world, pos)
     				.shadow.Draw(draw_position - v2(0.0f, .pos.z));
                 }
 
+                // TODO: maybe not have this...
                 if (.invincible)
                 {
                     if (.frame_count % 8 < 4)
@@ -165,7 +171,7 @@ global MakeEntity = function(world, pos)
 		return .health <= 0.0f;
 	};
 
-	Entity.OnTakeDamage = function()
+	Entity.OnTakeDamage = function(damage)
 	{
 	};
 
@@ -201,13 +207,13 @@ global MakeEntity = function(world, pos)
 
 		// flash red
 		//.color = Gfx.RED;
-		//DrawNotifyText( "-"+damage.Int(), .GetCenterWorld() + v2(0.0f,0.5f*.world.tilesize.x), Gfx.RED);
+		DrawNotifyText( "-"+damage.Int(), v2(.GetAnimCenter() + .GetAnimSize() * v3(0.0f, 0.55f, 0.0f)), Gfx.RED);
 
 		//g_game.state.EmitParticlesAt("entityTakeDamage", .GetCenterWorld(), 5*damage.Int());
 
 		.health -= damage;
 
-        .SetInvincibleFrames(4);
+        .SetInvincibleFrames(2);
 
 		if (.IsDead())
 		{

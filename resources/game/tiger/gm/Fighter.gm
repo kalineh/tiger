@@ -10,7 +10,7 @@ global FighterConfig =
 
     Thug = 
     {
-        MaxHealth = 5.0f,
+        MaxHealth = 50.0f,
         MaxEnergy = 0.0f,
         Animations = "player",
     },
@@ -24,7 +24,7 @@ global MakeFighter = function(world, coord, config_name)
     assert(?config_name);
     assert(?config);
 
-	Fighter.type = EntityType.Enemy;
+	Fighter.type = "Enemy";
 	Fighter.controls = null;
 	Fighter.color = Gfx.WHITE;
 	Fighter.max_health = config.MaxHealth;
@@ -42,8 +42,8 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.jump_thread = -1;
     Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
-    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 32.0f, "body");
-    Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f, "weapon");
+    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 32.0f);
+    Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f);
 
     Fighter.collision_body.SetEnabled(false);
     Fighter.collision_weapon.SetEnabled(false);
@@ -218,10 +218,14 @@ global MakeFighter = function(world, coord, config_name)
 
             .anim.ChangeTo(combo_data.anim);
 
-            .collision_weapon.SetEnabled(true);
-
             while (.anim.IsFinished() == false)
             {
+                local hit_tag = .anim.HasTag("hit");
+                local stun_tag = .anim.HasTag("stun");
+
+                .collision_weapon.SetEnabled(hit_tag);
+                //.collision_stun.SetEnabled(hit_tag);
+
                 yield();
             }
 
@@ -231,19 +235,24 @@ global MakeFighter = function(world, coord, config_name)
         .action_thread = this:thread(combo_function, combo_data);
     };
 
-    Fighter.OnCollide = function(rhs)
+    Fighter.OnCollide = function(lhs, rhs)
     {
-        if (rhs.type != .type)
+        if (lhs == .collision_body)
         {
-            local ofs = .pos - rhs.pos;
-            local push = ofs * 0.1f;
+            if (rhs == rhs.owner.collision_body || rhs == rhs.owner.collision_weapon)
+            {
+                local ofs = .pos - rhs.owner.pos;
+                local push = ofs * 0.1f;
 
-            //.accel += push;
-            .vel = v3(0.0f, 0.0f, 0.0f);
-            .accel = v3(0.0f, 0.0f, 0.0f);
+                //.accel += push;
+                .vel = v3(0.0f, 0.0f, 0.0f);
+                .accel = v3(0.0f, 0.0f, 0.0f);
 
-            .TakeDamage(1.0f);
+                .TakeDamage(1.0f);
+            }
         }
+
+        return false;
     };
 
 	return Fighter;
