@@ -61,6 +61,7 @@ global PlayerGroundAttacks =
         finish = false,
         stun = 0,
         push = 0.1f,
+        raise = 1.5f,
     },
 
     Punch2 =
@@ -70,6 +71,7 @@ global PlayerGroundAttacks =
         finish = false,
         stun = 0,
         push = 0.1f,
+        raise = 1.5f,
     },
 
     Punch3 =
@@ -79,6 +81,7 @@ global PlayerGroundAttacks =
         finish = false,
         stun = 0,
         push = 0.1f,
+        raise = 1.5f,
     },
 
     Kick =
@@ -87,7 +90,8 @@ global PlayerGroundAttacks =
         damage = 2.0f,
         finish = true,
         stun = 0,
-        push = 1.0f,
+        push = 0.5f,
+        raise = 10.0f,
     },
 
     Knee =
@@ -96,7 +100,8 @@ global PlayerGroundAttacks =
         damage = 1.0f,
         finish = true,
         stun = 8,
-        push = 20.0f,
+        push = 2.0f,
+        raise = 8.0f,
     },
 
     SpinKick =
@@ -106,6 +111,7 @@ global PlayerGroundAttacks =
         finish = true,
         stun = 2,
         push = 8.0f,
+        raise = 1.1f,
     },
 
     SweepKick =
@@ -115,6 +121,7 @@ global PlayerGroundAttacks =
         finish = true,
         stun = 0,
         push = 6.0f,
+        raise = 1.1f,
     },
 };
 
@@ -443,11 +450,13 @@ global MakePlayer = function(world, coord)
                 local damage = rhs.damage;
                 local stun = rhs.stun;
                 local push = rhs.push;
+                local raise = rhs.raise;
 
                 // TODO: better handling for body collision
                 if (!?damage) { damage = 1.0f; }
                 if (!?stun) { stun = 0; }
                 if (!?push) { push = 1.0f; }
+                if (!?raise) { raise = 1.0f; }
 
                 .TakeDamage(damage);
                 .Stun(stun);
@@ -456,7 +465,7 @@ global MakePlayer = function(world, coord)
                 local dir = safe_normalize(ofs * v3(1,0,0));
                 local force = dir * push;
 
-                .accel += v3(0.0f, 0.0f, push);
+                .accel += v3(0.0f, 0.0f, raise);
 
                 .Knockback(force);
             }

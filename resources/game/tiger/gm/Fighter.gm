@@ -233,6 +233,7 @@ global MakeFighter = function(world, coord, config_name)
             .collision_weapon.damage = combo_data.damage;
             .collision_weapon.stun = combo_data.stun;
             .collision_weapon.push = combo_data.push;
+            .collision_weapon.raise = combo_data.raise;
 
             while (.anim.IsFinished() == false)
             {
@@ -246,6 +247,7 @@ global MakeFighter = function(world, coord, config_name)
             .collision_weapon.damage = null;
             .collision_weapon.stun = null;
             .collision_weapon.push = null;
+            .collision_weapon.raise = null;
 
             .collision_weapon.SetEnabled(false);
         };
@@ -285,11 +287,13 @@ global MakeFighter = function(world, coord, config_name)
                 local damage = rhs.damage;
                 local stun = rhs.stun;
                 local push = rhs.push;
+                local raise = rhs.raise;
 
                 // TODO: better handling for body collision
                 if (!?damage) { damage = 1.0f; }
                 if (!?stun) { stun = 0; }
                 if (!?push) { push = 1.0f; }
+                if (!?raise) { raise = 1.0f; }
 
                 .TakeDamage(damage);
                 .Stun(stun);
@@ -298,7 +302,7 @@ global MakeFighter = function(world, coord, config_name)
                 local dir = safe_normalize(ofs * v3(1,0,0));
                 local force = dir * push;
 
-                .accel += v3(0.0f, 0.0f, push);
+                .accel += v3(0.0f, 0.0f, raise);
 
                 .Knockback(force);
             }
