@@ -32,6 +32,7 @@ global MakeFighter = function(world, coord, config_name)
 	Fighter.health = Fighter.max_health;
 	Fighter.energy = Fighter.max_energy;
 	Fighter.stun = 0;
+	Fighter.mass = 3.0f;
 	Fighter.shadow = MakeSpriteAnimation(g_game.animBank, config.Animations + "_shadow");
 	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
 	Fighter.move_input = v2();
@@ -43,8 +44,10 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.jump_thread = -1;
     Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
-    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 32.0f);
+    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 18.0f);
     Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f);
+	Fighter.air_max_speed = v3(6.0f, 4.0f, 4.0f);
+	Fighter.ground_max_speed = v3(6.0f, 4.0f, 4.0f);
 
     Fighter.collision_body.SetEnabled(false);
     Fighter.collision_weapon.SetEnabled(false);
@@ -255,6 +258,24 @@ global MakeFighter = function(world, coord, config_name)
         .stun += stun;
     };
 
+    Fighter.Knockback = function(force)
+    {
+        threadKill(.action_thread);
+
+        .vel += force;
+
+        local knockback_function = function(force)
+        {
+            for (i = 0; i < 60; i += 1)
+            {
+                //.accel += force;
+                yield();
+            }
+        };
+
+        .action_thread = this:thread(knockback_function, force);
+    };
+
     Fighter.OnCollide = function(lhs, rhs)
     {
         if (lhs == .collision_body)
@@ -274,9 +295,12 @@ global MakeFighter = function(world, coord, config_name)
                 .Stun(stun);
 
                 local ofs = .pos - rhs.owner.pos;
+                local dir = safe_normalize(ofs * v3(1,0,0));
+                local force = dir * push;
 
-                .vel = v3(0.0f, 0.0f, 0.0f);
-                .accel = ofs * push;
+                .accel += v3(0.0f, 0.0f, push);
+
+                .Knockback(force);
             }
         }
 

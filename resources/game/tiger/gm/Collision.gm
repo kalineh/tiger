@@ -104,7 +104,7 @@ global MakeCollisionManager = function()
     return CollisionManager;
 };
 
-global CollisionDepthMinimum = 8.0f;
+global CollisionDepthMinimum = 12.0f;
 
 global MakeCollisionVolume = function(type, size)
 {

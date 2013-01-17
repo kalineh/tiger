@@ -24,7 +24,7 @@ global MakeEntity = function(world, pos)
 	Entity.vel = v3(0.0f);
 	Entity.accel = v3(0.0f);
 	Entity.air_friction = v3(1.0f, 1.0f, 0.9f);
-	Entity.ground_friction = v3(0.9f, 0.9f, 0.9f);
+	Entity.ground_friction = v3(0.7f, 0.7f, 0.7f);
 	Entity.air_max_speed = v3(1.0f, 1.0f, 1.0f);
 	Entity.ground_max_speed = v3(1.0f, 1.0f, 1.0f);
     Entity.mass = 1.0f;
@@ -265,13 +265,13 @@ global MakeEntity = function(world, pos)
         .accel += gravity * .mass;
         .vel += .accel;
 
-        .vel = v3(
+        local clamped_vel = v3(
              min(abs(.vel.x), max_speed.x) * sign(.vel.x),
              min(abs(.vel.y), max_speed.y) * sign(.vel.y),
              min(abs(.vel.z), max_speed.z) * sign(.vel.z)
         );
 
-        .pos += .vel;
+        .pos += clamped_vel;
         .accel = v3(0.0f);
         .vel *= friction;
         
