@@ -850,7 +850,7 @@ static int GM_CDECL gmfSafeNormalize(gmThread * a_thread)
 		GM_VEC2_PARAM(val,0);
         const float lensq = lengthSqr(val);
         if (lensq > 1.e-6f)
-    		a_thread->PushVec2( val / lensq );
+    		a_thread->PushVec2( val / sqrtf(lensq) );
         else
     		a_thread->PushVec2( v2(0.0f) );
 		return GM_OK;
@@ -861,7 +861,7 @@ static int GM_CDECL gmfSafeNormalize(gmThread * a_thread)
 		GM_VEC3_PARAM(val,0);
         const float lensq = lengthSqr(val);
         if (lensq > 1.e-6f)
-    		a_thread->PushVec3( val / lensq );
+    		a_thread->PushVec3( val / sqrtf(lensq) );
         else
     		a_thread->PushVec3( v3(0.0f) );
 		return GM_OK;
