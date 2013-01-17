@@ -59,7 +59,8 @@ global PlayerGroundAttacks =
         anim = "punchl",
         damage = 1.0f,
         finish = false,
-        stuns = false,
+        stun = 0,
+        push = 0.0f,
     },
 
     Punch2 =
@@ -67,7 +68,8 @@ global PlayerGroundAttacks =
         anim = "punchr",
         damage = 1.0f,
         finish = false,
-        stuns = false,
+        stun = 0,
+        push = 0.0f,
     },
 
     Punch3 =
@@ -75,7 +77,8 @@ global PlayerGroundAttacks =
         anim = "punchl",
         damage = 1.0f,
         finish = false,
-        stuns = false,
+        stun = 0,
+        push = 1.0f,
     },
 
     Kick =
@@ -83,7 +86,8 @@ global PlayerGroundAttacks =
         anim = "kick",
         damage = 2.0f,
         finish = true,
-        stuns = false,
+        stun = 0,
+        push = 2.0f,
     },
 
     Knee =
@@ -91,7 +95,8 @@ global PlayerGroundAttacks =
         anim = "knee",
         damage = 1.0f,
         finish = true,
-        stuns = true,
+        stun = 8,
+        push = 0.0f,
     },
 
     SpinKick =
@@ -99,7 +104,8 @@ global PlayerGroundAttacks =
         anim = "spinkick",
         damage = 2.0f,
         finish = true,
-        stuns = false,
+        stun = 2,
+        push = 5.0f,
     },
 
     SweepKick =
@@ -107,7 +113,8 @@ global PlayerGroundAttacks =
         anim = "sweepkick",
         damage = 2.0f,
         finish = true,
-        stuns = false,
+        stun = 0,
+        push = 3.0f,
     },
 };
 
@@ -431,14 +438,24 @@ global MakePlayer = function(world, coord)
         {
             if (rhs == rhs.owner.collision_body || rhs == rhs.owner.collision_weapon)
             {
-                local ofs = .pos - rhs.owner.pos;
-                local push = ofs * 0.1f;
-
-                //.accel += push;
-                .vel = v3(0.0f, 0.0f, 0.0f);
-                .accel = v3(0.0f, 0.0f, 0.0f);
-
                 .TakeDamage(1.0f);
+
+                local damage = rhs.damage;
+                local stun = rhs.stun;
+                local push = rhs.push;
+
+                // TODO: better handling for body collision
+                if (!?damage) { damage = 1.0f; }
+                if (!?stun) { stun = 0; }
+                if (!?push) { push = 1.0f; }
+
+                .TakeDamage(damage);
+                .Stun(stun);
+
+                local ofs = .pos - rhs.owner.pos;
+
+                .vel = v3(0.0f, 0.0f, 0.0f);
+                .accel = ofs * push;
             }
         }
 
