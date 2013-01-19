@@ -341,9 +341,14 @@ global MakePlayerController = function(fighter)
 
             if (f.frames_ground > 0)
             {
-                if (.controls.Jump.Press())
+                // we may still be on the ground for a frame while jump is still active
+                // so ignore if the jump thread is still running
+                if (!threadIsAlive(.jump_thread))
                 {
-                    f.Jump(.controls.Jump);
+                    if (.controls.Jump.Press())
+                    {
+                        f.Jump(.controls.Jump);
+                    }
                 }
             }
 
@@ -412,12 +417,12 @@ global MakePlayer = function(world, coord)
 	local Player = MakeFighter(world, coord, "Player");
 
     Player.type = "Player";
-	Player.mass = 3.0f;
+	Player.mass = 1.2f;
 
     // TODO: move to config
 	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
 	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
-	Player.air_friction = v3(1.0f, 1.0f, 0.9f);
+	Player.air_friction = v3(0.97f, 1.0f, 0.9f);
 	Player.ground_friction = v3(0.7f, 0.7f, 0.9f);
 
 	Player.controls = PlayerControlsKeyboard;
@@ -445,18 +450,16 @@ global MakePlayer = function(world, coord)
         {
             if (rhs == rhs.owner.collision_body || rhs == rhs.owner.collision_weapon)
             {
-                .TakeDamage(1.0f);
-
                 local damage = rhs.damage;
                 local stun = rhs.stun;
                 local push = rhs.push;
                 local raise = rhs.raise;
 
                 // TODO: better handling for body collision
-                if (!?damage) { damage = 1.0f; }
+                if (!?damage) { damage = 0.0f; }
                 if (!?stun) { stun = 0; }
                 if (!?push) { push = 1.0f; }
-                if (!?raise) { raise = 1.0f; }
+                if (!?raise) { raise = 0.0f; }
 
                 .TakeDamage(damage);
                 .Stun(stun);

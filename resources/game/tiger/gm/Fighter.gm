@@ -37,7 +37,7 @@ global MakeFighter = function(world, coord, config_name)
 	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
 	Fighter.move_input = v2();
     Fighter.air_move_speed = v2(1.0f, 0.5f);
-    Fighter.ground_move_speed = v2(1.5f, 0.75f);
+    Fighter.ground_move_speed = v2(1.5f, 1.2f);
     Fighter.frames_ground = 0;
     Fighter.frames_air = 0;
     Fighter.action_thread = -1;
@@ -185,10 +185,10 @@ global MakeFighter = function(world, coord, config_name)
         {
             assert(?input);
 
-            local jump_min_frames = 10;
-            local jump_frames = 34;
-            local jump_start = 5.0f;
-            local jump_force = 5.0f;
+            local jump_min_frames = 6;
+            local jump_frames = 48;
+            local jump_start = 4.0f;
+            local jump_force = 4.0f;
             local jump_falloff = 0.12f;
 
             .vel = v3(.vel.x, .vel.y, jump_start);
@@ -268,7 +268,9 @@ global MakeFighter = function(world, coord, config_name)
 
         local knockback_function = function(force)
         {
-            for (i = 0; i < 60; i += 1)
+            local knockback_time = safe_length(force) * 8;
+
+            for (i = 0; i < knockback_time; i += 1)
             {
                 //.accel += force;
                 yield();

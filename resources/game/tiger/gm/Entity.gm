@@ -200,6 +200,11 @@ global MakeEntity = function(world, pos)
             return;
         }
 
+        if (damage <= 0.0f)
+        {
+            return;
+        }
+
 		.OnTakeDamage(damage);
 
 		// TODO: damage type different particles
@@ -265,13 +270,13 @@ global MakeEntity = function(world, pos)
         .accel += gravity * .mass;
         .vel += .accel;
 
-        local clamped_vel = v3(
+        .vel = v3(
              min(abs(.vel.x), max_speed.x) * sign(.vel.x),
              min(abs(.vel.y), max_speed.y) * sign(.vel.y),
              min(abs(.vel.z), max_speed.z) * sign(.vel.z)
         );
 
-        .pos += clamped_vel;
+        .pos += .vel;
         .accel = v3(0.0f);
         .vel *= friction;
         
