@@ -113,6 +113,16 @@ global g_fileData =
                     },
 				},
 
+                sweepkick =
+				{
+                    tileIndex = { 19,18,3, },
+					times = { 0.2f },
+					looping = false,
+                    tags = {
+                        hit = { 1 },
+                    },
+				},
+
                 jumpkick =
                 {
                     tileIndex = { 19,20,21,22 },

@@ -91,7 +91,7 @@ global PlayerGroundAttacks =
     {
         anim = "kick",
         damage = 2.0f,
-        finish = true,
+        finish = false,
         stun = 0,
         push = 0.5f,
         knockback = 1.0f,
@@ -117,7 +117,7 @@ global PlayerGroundAttacks =
         stun = 2,
         push = -0.1f,
         knockback = 0.0f,
-        knockup = 20.0f,
+        knockup = 2.0f,
     },
 
     SweepKick =
@@ -167,6 +167,7 @@ global PlayerGroundComboChains =
     },
 
     Kick = {
+        SweepKick = ComboActions.Kick | ComboActions.Down,
         Punch1 = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
@@ -377,6 +378,10 @@ global MakePlayerController = function(fighter)
             if (d) { move_mask |= ComboActions.Down; }
             if (l) { move_mask |= ComboActions.Forward; }
             if (r) { move_mask |= ComboActions.Backward; }
+
+            g_dump.move_mask = move_mask;
+
+            g_dump.current = f.ground_combo.current;
 
             // TODO: jump version
             if (.controls.Punch.Press())

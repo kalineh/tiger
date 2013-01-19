@@ -239,7 +239,8 @@ global MakeFighter = function(world, coord, config_name)
             .collision_weapon.damage = combo_data.damage;
             .collision_weapon.stun = combo_data.stun;
             .collision_weapon.push = combo_data.push;
-            .collision_weapon.raise = combo_data.raise;
+            .collision_weapon.knockback = combo_data.knockback;
+            .collision_weapon.knockup = combo_data.knockup;
 
             while (.anim.IsFinished() == false)
             {
@@ -253,7 +254,8 @@ global MakeFighter = function(world, coord, config_name)
             .collision_weapon.damage = null;
             .collision_weapon.stun = null;
             .collision_weapon.push = null;
-            .collision_weapon.raise = null;
+            .collision_weapon.knockback = null;
+            .collision_weapon.knockup = null;
 
             .collision_weapon.SetEnabled(false);
         };
