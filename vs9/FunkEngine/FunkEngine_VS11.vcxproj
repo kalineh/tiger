@@ -409,6 +409,7 @@
     <None Include="..\..\resources\game\tiger\gm\Enemy.gm" />
     <None Include="..\..\resources\game\tiger\gm\Entity.gm" />
     <None Include="..\..\resources\game\tiger\gm\Fighter.gm" />
+    <None Include="..\..\resources\game\tiger\gm\FighterAI.gm" />
     <None Include="..\..\resources\game\tiger\gm\Game.gm" />
     <None Include="..\..\resources\game\tiger\gm\GameCamera.gm" />
     <None Include="..\..\resources\game\tiger\gm\GameGui.gm" />

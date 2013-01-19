@@ -186,8 +186,13 @@ global MakeWorld = function()
 		.entities[.player] = .player;
 
         // TEST
-		.thug = MakeFighter(this, player_spawn + v3(180.0f, 0.0f, 0.0f), "Thug");
-        .entities[.thug] = .thug;
+        .ai = table();
+        for (i = 0; i < 4; i += 1)
+        {
+    		local thug = MakeFighter(this, player_spawn - v3(randfloat(-64.0f, 0.0f), randfloat(32.0f, 64.0f), 0.0f), "Thug");
+            .entities[thug] = thug;
+            .ai[thug] = MakeFighterAI(thug, "Thug");
+        }
 	};
 
 	World.Release = function()

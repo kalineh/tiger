@@ -1,0 +1,65 @@
+
+global MakeFighterAI = function(owner, name)
+{
+    local AI = table();
+
+    AI.owner = owner;
+    AI.name = name;
+
+    // TODO: maybe put an OnRelease callback on owner
+    AI.CheckDead = function()
+    {
+        if (.owner.IsDead())
+        {
+            // TODO: any issues with killing self-thread?
+            threadKill(.update_thread);
+        }
+    };
+
+    AI.Update = function()
+    {
+        while (true)
+        {
+            // TODO: player search
+
+            .MoveTo(.owner.pos + v3(randfloat(-256.0f, 256.0f), randfloat(-16.0f, 16.0f), 0.0f));
+            .CheckDead();
+
+            sleep(randfloat(0.0f, 2.0f));
+            .CheckDead();
+        }
+    };
+
+    AI.MoveTo = function(target)
+    {
+        local limit = 60 * 6;
+
+        while (true)
+        {
+            local ofs = target - .owner.pos;
+            local len = safe_length(ofs);
+            local dir = safe_normalize(ofs);
+            local speed = 0.1f + len * 0.1f;
+
+            .owner.move_input = v2(dir * speed);
+
+            g_dump.accel = .owner.accel;
+            g_dump.vel = .owner.vel;
+            g_dump.move_input = .owner.move_input;
+            g_dump.ofs = ofs;
+            g_dump.len = len;
+
+            if (len < 3.0f)
+            {
+                break;
+            }
+
+            yield();
+
+            .CheckDead();
+        }
+    };
+
+    AI:thread(AI.Update);
+    return AI;
+};

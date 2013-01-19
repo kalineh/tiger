@@ -10,6 +10,7 @@ system.DoFile("game/tiger/gm/Entity.gm");
 system.DoFile("game/tiger/gm/Fighter.gm");
 system.DoFile("game/tiger/gm/Player.gm");
 system.DoFile("game/tiger/gm/Enemy.gm");
+system.DoFile("game/tiger/gm/FighterAI.gm");
 system.DoFile("game/tiger/gm/Projectile.gm");
 system.DoFile("game/tiger/gm/World.gm");
 system.DoFile("game/tiger/gm/DrawUtil.gm");
