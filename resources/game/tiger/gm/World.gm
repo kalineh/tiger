@@ -172,6 +172,11 @@ global MakeWorld = function()
 		}
 	};
 
+    World.FindNearestPlayer = function(position)
+    {
+        return .player;
+    };
+
 	World.Init = function()
 	{	
 		.cpp = World();

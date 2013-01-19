@@ -115,9 +115,9 @@ global PlayerGroundAttacks =
         damage = 2.0f,
         finish = true,
         stun = 2,
-        push = 8.0f,
-        knockback = 1.0f,
-        knockup = 1.1f,
+        push = -0.1f,
+        knockback = 0.0f,
+        knockup = 20.0f,
     },
 
     SweepKick =
@@ -358,10 +358,6 @@ global MakePlayerController = function(fighter)
                     }
                 }
             }
-
-            g_dump.combo = f.ground_combo;
-            g_dump.current = f.ground_combo.current;
-            g_dump.sequence = StringTableValues(f.ground_combo.actions);
 
             local u = .controls.Up.Hold();
             local d = .controls.Down.Hold();

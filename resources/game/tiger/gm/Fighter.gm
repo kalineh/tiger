@@ -48,6 +48,8 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f);
 	Fighter.air_max_speed = v3(4.0f, 3.0f, 4.0f);
 	Fighter.ground_max_speed = v3(4.0f, 3.0f, 4.0f);
+	Fighter.notify_release = MakeNotify(this, "NotifyRelease");
+	Fighter.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
 
     Fighter.collision_body.SetEnabled(false);
     Fighter.collision_weapon.SetEnabled(false);
@@ -58,6 +60,7 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.EntityRelease = Fighter.Release;
     Fighter.Release = function()
     {
+        .notify_release.Notify();
         .world.collision_manager.Remove(.collision_body);
         .world.collision_manager.Remove(.collision_weapon);
         threadKill(.action_thread);
@@ -286,6 +289,11 @@ global MakeFighter = function(world, coord, config_name)
         };
 
         .action_thread = this:thread(knockback_function, force, dir);
+    };
+
+    Fighter.OnTakeDamage = function(damage)
+    {
+        .notify_take_damage.Notify(damage);
     };
 
     Fighter.OnCollide = function(lhs, rhs)
