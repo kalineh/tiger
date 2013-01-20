@@ -1,49 +1,34 @@
 
-global MakeProjectile = function(world, src, dst, time)
+global ProjectileHitConfig =
 {
-	local Projectile = 
-	{
-		world = world,
-		pos = src,
-		src = src,
-		dst = dst,
-		time = time, // null means not auto-updated/tweening
-		alive = true,
-	};
+    afropick = {
+        damage = 1.0f,
+        stun = 0,
+        push = 0.0f,
+        knockback = 1.0f,
+        knockup = 0.0f,
+    },
+};
 
-	Projectile.Draw = function()
-	{
-		local size = .world.entitysize * 0.5f;
-		Gfx.Color(Gfx.WHITE);
-		Gfx.DrawCircle(.pos, (size.x + size.y) / 2.0f / 2.0f);
-	};
+global MakeProjectile = function(world, type, pos, vel)
+{
+    local Projectile = MakeEntity(world, pos);
 
-	Projectile.Init = function()
-	{	
-		if (?.time)
-		{
-			Tween.To(this, .time, { pos=.dst, Ease=Ease.Linear, OnComplete=.Die, OnCompleteObj=this, });
-		}
-	};
+	Projectile.shadow = MakeSpriteAnimation(g_game.animBank, "projectile_shadow");
+	Projectile.anim = MakeSpriteAnimation(g_game.animBank, type);
 
-	Projectile.Die = function()
+	Projectile.mass = 0.1f;
+	Projectile.vel = vel;
+	Projectile.air_friction = v3(1.0f, 1.0f, 1.0f);
+	Projectile.ground_friction = v3(0.2f, 0.2f, 0.2f);
+	Projectile.air_max_speed = v3(20.0f, 20.0f, 0.0f);
+	Projectile.ground_max_speed = v3(10.0f, 10.0f, 1.0f);
+
+	Projectile.OnDie = function()
 	{
 		// explosion sound
 		// explosion effect
-
-		.alive = false;
-		.world.RemoveProjectile(this);
-		.Release();
 	};
-
-	Projectile.Release = function()
-	{
-	};
-	
-	Projectile.Init();
-
-	// auto-add to world!
-	world.AddProjectile(Projectile);
 
 	return Projectile;
 };

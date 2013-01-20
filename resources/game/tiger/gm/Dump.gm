@@ -27,5 +27,16 @@ global MakeDumpGui = function()
     return DumpGui;
 };
 
+global DumpValueThread = function(table_, key)
+{
+    fork {
+        while (true)
+        {
+            g_dump[key] = table_[key];
+            yield();
+        }
+    }
+};
+
 global g_dumpgui = MakeDumpGui();
 

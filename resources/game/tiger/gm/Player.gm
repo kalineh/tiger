@@ -44,12 +44,12 @@ global PlayerControlsKeyboard =
 	Jump = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
 	Punch = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
 	Kick = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
+	Block = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
+	Throw = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 	Up = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "UP"),
 	Down = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "DOWN"),
 	Left = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "LEFT"),
 	Right = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
-	Guard = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
-	Slide = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 };
 
 global PlayerGroundAttacks =
@@ -63,6 +63,7 @@ global PlayerGroundAttacks =
         push = 0.1f,
         knockback = 0.0f,
         knockup = 1.5f,
+        projectile = null,
     },
 
     Punch2 =
@@ -74,6 +75,7 @@ global PlayerGroundAttacks =
         push = 0.1f,
         knockback = 0.0f,
         knockup = 1.5f,
+        projectile = null,
     },
 
     Punch3 =
@@ -85,6 +87,7 @@ global PlayerGroundAttacks =
         push = 0.1f,
         knockback = 1.5f,
         knockup = 1.5f,
+        projectile = null,
     },
 
     Kick =
@@ -96,6 +99,7 @@ global PlayerGroundAttacks =
         push = 0.5f,
         knockback = 1.0f,
         knockup = 10.0f,
+        projectile = null,
     },
 
     Knee =
@@ -107,6 +111,7 @@ global PlayerGroundAttacks =
         push = 2.0f,
         knockback = 1.0f,
         knockup = 8.0f,
+        projectile = null,
     },
 
     SpinKick =
@@ -118,6 +123,7 @@ global PlayerGroundAttacks =
         push = -0.1f,
         knockback = 0.0f,
         knockup = 2.0f,
+        projectile = null,
     },
 
     SweepKick =
@@ -129,6 +135,19 @@ global PlayerGroundAttacks =
         push = 6.0f,
         knockback = 0.0f,
         knockup = 1.1f,
+        projectile = null,
+    },
+
+    AfroPick =
+    {
+        anim = "throw",
+        damage = 0.0f,
+        finish = false,
+        stun = 0,
+        push = 0.0f,
+        knockback = 0.0f,
+        knockup = 0.0f,
+        projectile = "afropick",
     },
 };
 
@@ -137,15 +156,23 @@ global ComboActions =
     Punch = 0x01,
     Kick = 0x02,
     Block = 0x04,
-    Up = 0x08,
-    Down = 0x10,
-    Forward = 0x20,
-    Backward = 0x40,
+    Throw = 0x08,
+    Up = 0x10,
+    Down = 0x20,
+    Forward = 0x40,
+    Backward = 0x80,
 }; 
 
 global PlayerGroundComboChains =
 {
     Default = {
+        AfroPick = ComboActions.Throw,
+        Punch1 = ComboActions.Punch,
+        Kick = ComboActions.Kick,
+    },
+
+    AfroPick = {
+        AfroPick = ComboActions.Throw,
         Punch1 = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
@@ -392,6 +419,14 @@ global MakePlayerController = function(fighter)
             {
                 .QueueComboAction(f.ground_combo, ComboActions.Kick | move_mask, .controls.Kick);
             }
+            else if (.controls.Throw.Press())
+            {
+                .QueueComboAction(f.ground_combo, ComboActions.Throw | move_mask, .controls.Throw);
+            }
+            //else if (.controls.Block.Press())
+            //{
+                //.QueueComboAction(f.ground_combo, ComboActions.Block | move_mask, .controls.Block);
+            //}
 
             if (!threadIsAlive(f.action_thread))
             {

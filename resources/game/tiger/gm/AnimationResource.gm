@@ -131,13 +131,61 @@ global g_fileData =
                     tags = {
                         hit = { 3 },
                     },
-                }
+                },
+
+                throw =
+                {
+                    tileIndex = { 19,19,19 },
+					times = { 0.1f, 0.01f, 0.1f },
+					looping = false,
+                    tags = {
+                        throw = { 1 },
+                    },
+                },
 			},
 		},
 
         player_shadow =
         {
 			texturePath = "player_shadow.png",
+			textureMinMagFilter = Gfx.LINEAR,
+			textureWrap = Gfx.CLAMP,
+
+			textureEffectiveSize = v2(128.0f, 128.0f),
+			tileSize = v2(128.0f),
+
+			animations = {
+                idle = {
+                    tileIndex = { 0 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
+            }
+        },
+
+        projectile_shadow =
+        {
+			texturePath = "projectile_shadow.png",
+			textureMinMagFilter = Gfx.LINEAR,
+			textureWrap = Gfx.CLAMP,
+
+			textureEffectiveSize = v2(128.0f, 128.0f),
+			tileSize = v2(128.0f),
+
+			animations = {
+                idle = {
+                    tileIndex = { 0 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
+            }
+        },
+
+        afropick =
+        {
+			texturePath = "afropick.png",
 			textureMinMagFilter = Gfx.LINEAR,
 			textureWrap = Gfx.CLAMP,
 

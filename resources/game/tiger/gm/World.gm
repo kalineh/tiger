@@ -25,6 +25,7 @@ global MakeWorld = function()
 		Gui.End();
 	};
 
+    // TODO: disallow this? only allow queue perhaps?
 	World.AddEntity = function(entity)
 	{
 		assert(.entity_addremove_lock == false);	

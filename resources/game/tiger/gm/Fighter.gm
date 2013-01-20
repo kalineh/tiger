@@ -245,8 +245,14 @@ global MakeFighter = function(world, coord, config_name)
             while (.anim.IsFinished() == false)
             {
                 local hit_tag = .anim.HasTag("hit");
+                local throw_tag = .anim.HasTag("throw");
 
                 .collision_weapon.SetEnabled(hit_tag);
+
+                if (throw_tag)
+                {
+                    .ThrowProjectile(combo_data.projectile);
+                }
 
                 yield();
             }
@@ -261,6 +267,19 @@ global MakeFighter = function(world, coord, config_name)
         };
 
         .action_thread = this:thread(combo_function, combo_data);
+    };
+
+    Fighter.ThrowProjectile = function(type)
+    {
+        assert(?type);
+        assert(?ProjectileHitConfig[type]);
+
+        local floating = v3(0.0f, 0.0f, 0.5f);
+        local pos = .GetAnimCenter() + .GetFacingDir() * -32.0f + floating;
+        local vel = .GetFacingDir() * -20.0f;
+        local projectile = MakeProjectile(.world, type, pos, vel);
+
+        .world.AddLifeRow(projectile);
     };
 
     Fighter.Stun = function(stun)
