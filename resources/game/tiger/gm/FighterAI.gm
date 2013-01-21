@@ -19,6 +19,13 @@ global MakeFighterAI = function(owner, name)
     {
         threadKill(.action_thread);
 
+        local delay_function = function()
+        {
+            sleep(0.5f);
+        };
+
+        .action_thread = this:thread(delay_function);
+
         return true;
     };
 
@@ -46,7 +53,7 @@ global MakeFighterAI = function(owner, name)
                 yield();
             }
 
-            sleep(randfloat(1.5f, 3.0f));
+            sleep(randfloat(0.5f, 1.0f));
         }
     };
 
@@ -111,6 +118,12 @@ global MakeFighterAI = function(owner, name)
 
         sleep(0.2f);
         local combo_data = PlayerGroundAttacks["Punch1"];
+        .owner.Combo(combo_data);
+        sleep(0.2f);
+        local combo_data = PlayerGroundAttacks["Punch2"];
+        .owner.Combo(combo_data);
+        sleep(0.2f);
+        local combo_data = PlayerGroundAttacks["Punch3"];
         .owner.Combo(combo_data);
         sleep(0.2f);
     };
