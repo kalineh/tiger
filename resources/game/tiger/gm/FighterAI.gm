@@ -33,7 +33,10 @@ global MakeFighterAI = function(owner, name)
 
             local action_function = function()
             {
-                .MoveToEntity(.owner.world.FindNearestPlayer());
+                local player = .owner.world.FindNearestPlayer();
+
+                .MoveToEntity(player);
+                .TryAttack(player);
             };
 
             .action_thread = this:thread(action_function);
@@ -64,7 +67,7 @@ global MakeFighterAI = function(owner, name)
             g_dump.target = target;
             g_dump.ent = entity;
 
-            if (len < 3.0f)
+            if (len < 64.0f)
             {
                 break;
             }
@@ -78,26 +81,38 @@ global MakeFighterAI = function(owner, name)
         }
     };
 
-    AI.MoveTo = function(target)
+    AI.MoveToPosition = function(position)
     {
         local limit = 60 * 6;
 
         while (true)
         {
-            local ofs = target - .owner.pos;
+            local ofs = position - .owner.pos;
             local len = safe_length(ofs);
             local dir = safe_normalize(ofs);
             local speed = 0.1f + len * 0.1f;
 
             .owner.move_input = v2(dir * speed);
 
-            if (len < 3.0f)
+            if (len < 64.0f)
             {
                 break;
             }
 
             yield();
         }
+    };
+
+    AI.TryAttack = function(entity)
+    {
+        local ofs = entity.pos - .owner.pos;
+        local len = safe_length(ofs);
+        local dir = safe_normalize(ofs);
+
+        sleep(0.2f);
+        local combo_data = PlayerGroundAttacks["Punch1"];
+        .owner.Combo(combo_data);
+        sleep(0.2f);
     };
 
     AI.update_thread = AI:thread(AI.Update);
