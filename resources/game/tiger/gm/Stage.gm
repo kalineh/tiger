@@ -1,0 +1,85 @@
+
+global StageConfig =
+{
+    Stage1 =
+    {
+        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
+        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
+        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
+        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
+        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
+        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
+    },
+};
+
+global MakeStage = function(world, name)
+{
+    assert(?world);
+    assert(?name);
+    assert(?StageConfig[name]);
+
+    local Stage = table();
+
+    Stage.world = world;
+    Stage.name = name;
+    Stage.config = StageConfig[name];
+    Stage.camera_start = v2(0.0f);
+    Stage.progress_last = -1;
+
+    Stage.Start = function()
+    {
+        .camera_start = g_game.state.cam.pos;
+    };
+
+    Stage.GetProgress = function()
+    {
+        local cam = g_game.state.cam;
+        local ofs = cam.pos - .camera_start;
+        local len = safe_length(ofs);
+
+        // TODO: camera update handling, position doesnt reflect in stage
+        return 0;
+
+        return len.Int();
+    };
+
+    Stage.Update = function()
+    {
+        local progress = .GetProgress();
+
+        foreach (entry in .config)
+        {
+            if (entry.time <= .progress_last)
+            {
+                continue;
+            }
+
+            if (entry.time > progress)
+            {
+                continue;
+            }
+
+            local fun = this["Process" + entry.type];
+            local args = entry.args;
+            assert(?fun);
+            assert(?args);
+            this:fun(args);
+        };
+
+        .progress_last = progress;
+
+        g_dump.progress = progress;
+    };
+
+    Stage.ProcessSpawnEnemy = function(args)
+    {
+        local base = g_game.state.cam.pos;
+        local pos = v3(base.x, base.y + args.y, 0.0f);
+        local enemy = MakeFighter(.world, pos, args.type);
+        local ai = MakeFighterAI(enemy, args.type);
+
+        .world.AddLifeRow(enemy);
+    };
+
+    return Stage;
+};

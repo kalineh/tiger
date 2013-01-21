@@ -165,6 +165,8 @@ global MakeWorld = function()
 			RegisterDraw( DrawLayers.Scene, .DrawEntities, this);
 			RegisterDraw( DrawLayers.Scene_FG, .DrawCollision, this);
 
+            .stage.Update();
+
             .ProcessLifeRow();
             .collision_manager.Collide();
             .ProcessDeathRow();
@@ -190,10 +192,11 @@ global MakeWorld = function()
 		.player = MakePlayer(this, player_spawn);
         .controller = MakePlayerController(.player);
 		.entities[.player] = .player;
+        .stage = MakeStage(this, "Stage1");
 
         // TEST
         .ai = table();
-        for (i = 0; i < 4; i += 1)
+        for (i = 0; i < 0; i += 1)
         {
     		local thug = MakeFighter(this, player_spawn - v3(randfloat(-64.0f, 0.0f), randfloat(32.0f, 64.0f), 0.0f), "Thug");
             .entities[thug] = thug;

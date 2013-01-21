@@ -423,6 +423,7 @@
     <None Include="..\..\resources\game\tiger\gm\SoundResourceGame.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceShared.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceTitle.gm" />
+    <None Include="..\..\resources\game\tiger\gm\Stage.gm" />
     <None Include="..\..\resources\game\tiger\gm\TEMPLATE.gm" />
     <None Include="..\..\resources\game\tiger\gm\TitleState.gm" />
     <None Include="..\..\resources\game\tiger\gm\UserSettings.gm" />
