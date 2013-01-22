@@ -139,6 +139,14 @@ global MakeSpriteAnimation = function( animBank, entityName )
 		}
 	};
 
+    Animation.WaitFinished = function()
+    {
+        while (!.IsFinished())
+        {
+            yield();
+        }
+    };
+
 	Animation.IsFinished = function()
 	{
 		return .finished;
@@ -248,9 +256,9 @@ global MakeSpriteAnimation = function( animBank, entityName )
                     }
                 }
             }
-
-            return false;
         }
+
+        return false;
     };
 
 	Animation._Init();

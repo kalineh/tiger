@@ -83,6 +83,17 @@ global g_fileData =
                     },
 				},
 
+				uppercut =
+				{
+                    tileIndex = { 2, 2, 4 },
+					times = { 0.1f, 0.1f, 0.001f },
+					looping = false,
+                    tags = {
+                        hit = { 2 },
+                        knockdown = { 2 },
+                    },
+				},
+
                 knee =
 				{
                     tileIndex = { 32,32,32 },
@@ -140,6 +151,42 @@ global g_fileData =
 					looping = false,
                     tags = {
                         throw = { 1 },
+                    },
+                },
+
+                knockdown =
+                {
+                    tileIndex = { 37 },
+                    times = { 0.1f },
+					looping = false,
+                    tags = {
+                    },
+                },
+
+                prone =
+                {
+                    tileIndex = { 38 },
+                    times = { 0.1f },
+					looping = false,
+                    tags = {
+                    },
+                },
+
+                getup =
+                {
+                    tileIndex = { 2, 3, 0 },
+                    times = { 0.2f },
+					looping = false,
+                    tags = {
+                    },
+                },
+
+                dying =
+                {
+                    tileIndex = { 39 },
+                    times = { 0.1f },
+					looping = false,
+                    tags = {
                     },
                 },
 			},

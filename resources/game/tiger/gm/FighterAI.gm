@@ -38,6 +38,20 @@ global MakeFighterAI = function(owner, name)
             //local offset = target + v3(1.0f, 0.1f) * randfloat(-12.0f, 12.0f);
             //.MoveTo(.owner.pos + offset);
 
+            if (.owner.stun > 0)
+            {
+                sleep(0.25f);
+                continue;
+            }
+
+            // TODO: use state instead of animation?
+            if (.owner.anim.currAnimName == "knockdown" ||
+                .owner.anim.currAnimName == "prone")
+            {
+                sleep(0.25f);
+                continue;
+            }
+
             local action_function = function()
             {
                 local player = .owner.world.FindNearestPlayer();
@@ -71,10 +85,7 @@ global MakeFighterAI = function(owner, name)
 
             .owner.move_input = v2(dir * speed);
 
-            g_dump.target = target;
-            g_dump.ent = entity;
-
-            if (len < 64.0f)
+            if (abs(ofs.x) < 64.0f && abs(ofs.y) < 8.0f)
             {
                 break;
             }
@@ -116,14 +127,17 @@ global MakeFighterAI = function(owner, name)
         local len = safe_length(ofs);
         local dir = safe_normalize(ofs);
 
+        //sleep(1.0f);
+        //return;
+
         sleep(0.2f);
-        local combo_data = PlayerGroundAttacks["Punch1"];
+        local combo_data = PlayerGroundAttacks["PunchL"];
         .owner.Combo(combo_data);
         sleep(0.2f);
-        local combo_data = PlayerGroundAttacks["Punch2"];
+        local combo_data = PlayerGroundAttacks["PunchR"];
         .owner.Combo(combo_data);
         sleep(0.2f);
-        local combo_data = PlayerGroundAttacks["Punch3"];
+        local combo_data = PlayerGroundAttacks["Uppercut"];
         .owner.Combo(combo_data);
         sleep(0.2f);
     };

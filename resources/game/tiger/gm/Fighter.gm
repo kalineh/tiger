@@ -46,6 +46,8 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 18.0f);
     Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f);
+    // TODO: less hacky way?
+    Fighter.collision_weapon.knockdown = false;
 	Fighter.air_max_speed = v3(4.0f, 3.0f, 4.0f);
 	Fighter.ground_max_speed = v3(4.0f, 3.0f, 4.0f);
 	Fighter.notify_release = MakeNotify(this, "NotifyRelease");
@@ -246,8 +248,11 @@ global MakeFighter = function(world, coord, config_name)
             {
                 local hit_tag = .anim.HasTag("hit");
                 local throw_tag = .anim.HasTag("throw");
+                local knockdown_tag = .anim.HasTag("knockdown");
 
+                // TODO: what if action thread is killed and these are left on?
                 .collision_weapon.SetEnabled(hit_tag);
+                .collision_weapon.knockdown = knockdown_tag;
 
                 if (throw_tag)
                 {
@@ -312,9 +317,37 @@ global MakeFighter = function(world, coord, config_name)
         .action_thread = this:thread(knockback_function, force, dir);
     };
 
+    Fighter.Knockdown = function()
+    {
+        threadKill(.action_thread);
+
+        local knockdown_function = function()
+        {
+            .anim.ChangeToNoReset("knockdown");
+
+            sleep(0.2f);
+
+            while (.frames_ground <= 0)
+            {
+                yield();
+            }
+
+            .anim.ChangeToNoReset("prone");
+            sleep(randfloat(1.5f, 2.5f));
+            .anim.ChangeToNoReset("getup");
+            .anim.WaitFinished();
+        };
+
+        .action_thread = this:thread(knockdown_function);
+    };
+
     Fighter.OnTakeDamage = function(damage)
     {
         .notify_take_damage.Notify(damage);
+
+        // TODO: anything else we need to disable here?
+        .collision_weapon.SetEnabled(false);
+        .collision_weapon.knockdown = false;
     };
 
     Fighter.OnCollide = function(lhs, rhs)
@@ -333,6 +366,7 @@ global MakeFighter = function(world, coord, config_name)
                 local push = rhs.push;
                 local knockback = rhs.knockback;
                 local knockup = rhs.knockup;
+                local knockdown = rhs.knockdown;
 
                 // TODO: better handling for body collision
                 if (!?damage) { damage = 0.0f; }
@@ -340,6 +374,7 @@ global MakeFighter = function(world, coord, config_name)
                 if (!?push) { push = 1.0f; }
                 if (!?knockback) { knockback = 0.0f; }
                 if (!?knockup) { knockup = 0.0f; }
+                if (!?knockdown) { knockdown = false; }
 
                 .TakeDamage(damage);
                 .Stun(stun);
@@ -351,6 +386,11 @@ global MakeFighter = function(world, coord, config_name)
                 .accel += v3(force.x, force.y, knockup);
 
                 .Knockback(knockback, dir);
+
+                if (knockdown)
+                {
+                    .Knockdown();
+                }
             }
         }
 

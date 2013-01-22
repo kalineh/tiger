@@ -54,7 +54,7 @@ global PlayerControlsKeyboard =
 
 global PlayerGroundAttacks =
 {
-    Punch1 =
+    PunchL =
     {
         anim = "punchl",
         damage = 1.0f,
@@ -66,7 +66,7 @@ global PlayerGroundAttacks =
         projectile = null,
     },
 
-    Punch2 =
+    PunchR =
     {
         anim = "punchr",
         damage = 1.0f,
@@ -78,9 +78,9 @@ global PlayerGroundAttacks =
         projectile = null,
     },
 
-    Punch3 =
+    Uppercut =
     {
-        anim = "punchl",
+        anim = "uppercut",
         damage = 1.0f,
         finish = false,
         stun = 0,
@@ -167,45 +167,45 @@ global PlayerGroundComboChains =
 {
     Default = {
         AfroPick = ComboActions.Throw,
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
     AfroPick = {
         AfroPick = ComboActions.Throw,
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
-    Punch1 = {
-        Punch2 = ComboActions.Punch,
+    PunchL = {
+        PunchR = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
-    Punch2 = {
+    PunchR = {
         Knee = ComboActions.Kick | ComboActions.Forward,
-        Punch3 = ComboActions.Punch,
+        Uppercut = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
-    Punch3 = {
+    Uppercut = {
         SpinKick = ComboActions.Kick,
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
     },
 
     Kick = {
         SweepKick = ComboActions.Kick | ComboActions.Down,
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
     SpinKick = {
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
         Kick = ComboActions.Kick,
     },
 
     Knee = {
-        Punch1 = ComboActions.Punch,
+        PunchL = ComboActions.Punch,
     },
 };
 
@@ -484,6 +484,7 @@ global MakePlayer = function(world, coord)
 	{
         .BaseOnPreUpdate();
 
+        // TODO: get stage axis from .world.stage
 		g_game.state.cam.SetTargetPos( v2(.pos) );
 	};
 
