@@ -1,5 +1,7 @@
 system.DoFile("game/tiger/gm/DrawLayers.gm");
+system.DoFile("game/tiger/gm/IntroState.gm");
 system.DoFile("game/tiger/gm/TitleState.gm");
+//system.DoFile("game/tiger/gm/HighwayState.gm");
 system.DoFile("game/tiger/gm/GameState.gm");
 system.DoFile("game/tiger/gm/GameGui.gm");
 system.DoFile("game/tiger/gm/GameCamera.gm");

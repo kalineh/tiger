@@ -415,12 +415,15 @@
     <None Include="..\..\resources\game\tiger\gm\GameGui.gm" />
     <None Include="..\..\resources\game\tiger\gm\GameState.gm" />
     <None Include="..\..\resources\game\tiger\gm\Includes.gm" />
+    <None Include="..\..\resources\game\tiger\gm\IntroState.gm" />
     <None Include="..\..\resources\game\tiger\gm\MusicPlayer.gm" />
     <None Include="..\..\resources\game\tiger\gm\Notify.gm" />
     <None Include="..\..\resources\game\tiger\gm\Player.gm" />
     <None Include="..\..\resources\game\tiger\gm\Projectile.gm" />
     <None Include="..\..\resources\game\tiger\gm\SaveData.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceCutscene.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceGame.gm" />
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceQuotes.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceShared.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceTitle.gm" />
     <None Include="..\..\resources\game\tiger\gm\Stage.gm" />

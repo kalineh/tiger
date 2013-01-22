@@ -966,7 +966,18 @@
     <None Include="..\..\resources\game\tiger\gm\FighterAI.gm">
       <Filter>games\tiger\gm</Filter>
     </None>
-    <None Include="..\..\resources\game\tiger\gm\Stage.gm" />
+    <None Include="..\..\resources\game\tiger\gm\IntroState.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceCutscene.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\SoundResourceQuotes.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
+    <None Include="..\..\resources\game\tiger\gm\Stage.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FunkEngine.rc">

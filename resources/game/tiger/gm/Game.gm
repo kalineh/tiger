@@ -195,14 +195,17 @@ local CreateGame = function()
 	{
 		.stateFuncs = 
 		{
+			intro = MakeIntroState,
 			title = MakeTitleState,
 			game = MakeGameState,
+			//highway = MakeGameState,
 		};
 
 		.state = null;
 
 		//.GotoState("title");
 		.GotoState("game");
+		//.GotoState("intro");
 	};
 
 	Game._InitSounds = function()
@@ -211,6 +214,8 @@ local CreateGame = function()
 			game = MakeSoundBank("game/tiger/gm/SoundResourceGame.gm"),
 			shared = MakeSoundBank("game/tiger/gm/SoundResourceShared.gm"),
 			title = MakeSoundBank("game/tiger/gm/SoundResourceTitle.gm"),
+			quotes = MakeSoundBank("game/tiger/gm/SoundResourceQuotes.gm"),
+			cutscene = MakeSoundBank("game/tiger/gm/SoundResourceQuotes.gm"),
 		};
 
 		// gui options
@@ -231,14 +236,13 @@ local CreateGame = function()
 
 		.songs = 
 		{
-			game = 
-			{
-				"game/tiger/snd/music/tiger.mp3",
-				"game/tiger/snd/music/tiger.mp3",
-			},
-
-			escape = "game/tiger/snd/music/tiger.mp3",
 			title = "game/tiger/snd/music/title.mp3",
+            intro = "game/tiger/snd/music/intro.mp3",
+            highway = "game/tiger/snd/music/highway.mp3",
+            fight = "game/tiger/snd/music/fight.mp3",
+            elevator = "game/tiger/snd/music/elevator.mp3",
+			boss = "game/tiger/snd/music/boss.mp3",
+			ending = "game/tiger/snd/music/ending.mp3",
 		};
 	};
 

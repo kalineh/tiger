@@ -1,0 +1,11 @@
+// generated: 2012-06-14, 11:50:24 PM
+global g_fileData =
+{
+    sample = 
+    {
+        filename = "game/tiger/snd/cancel.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+};
