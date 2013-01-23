@@ -198,13 +198,14 @@ local CreateGame = function()
 			intro = MakeIntroState,
 			title = MakeTitleState,
 			game = MakeGameState,
-			//highway = MakeGameState,
+			highway = MakeHighwayState,
 		};
 
 		.state = null;
 
 		//.GotoState("title");
-		.GotoState("game");
+		.GotoState("highway");
+		//.GotoState("game");
 		//.GotoState("intro");
 	};
 

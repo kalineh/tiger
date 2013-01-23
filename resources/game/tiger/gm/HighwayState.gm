@@ -1,4 +1,4 @@
-global MakeGameState = function()
+global MakeHighwayState = function()
 {
 	local State = 
 	{
@@ -15,14 +15,14 @@ global MakeGameState = function()
 
 	State.Gui = function()
 	{
-		Gui.Begin("Game State", g_core.screenDimen.x*0.4f, g_core.screenDimen.y-10.0f );
+		Gui.Begin("Highway State", g_core.screenDimen.x*0.4f, g_core.screenDimen.y-10.0f );
 		
 		Gui.End();
 	};
 
 	State._Init = function()
 	{	
-		.bg = MakeBackground("Street");
+		.bg = MakeBackground("Highway");
 
 		.cam = MakeGameCamera();
 		.world = MakeWorld();

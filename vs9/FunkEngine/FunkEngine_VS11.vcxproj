@@ -414,6 +414,7 @@
     <None Include="..\..\resources\game\tiger\gm\GameCamera.gm" />
     <None Include="..\..\resources\game\tiger\gm\GameGui.gm" />
     <None Include="..\..\resources\game\tiger\gm\GameState.gm" />
+    <None Include="..\..\resources\game\tiger\gm\HighwayState.gm" />
     <None Include="..\..\resources\game\tiger\gm\Includes.gm" />
     <None Include="..\..\resources\game\tiger\gm\IntroState.gm" />
     <None Include="..\..\resources\game\tiger\gm\MusicPlayer.gm" />
