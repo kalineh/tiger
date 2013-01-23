@@ -53,7 +53,7 @@ global MakeFighter = function(world, coord, config_name)
 	Fighter.notify_release = MakeNotify(this, "NotifyRelease");
 	Fighter.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
 
-    Fighter.collision_body.SetEnabled(false);
+    Fighter.collision_body.SetEnabled(true);
     Fighter.collision_weapon.SetEnabled(false);
 
     world.collision_manager.Add(Fighter.collision_body);
@@ -68,6 +68,18 @@ global MakeFighter = function(world, coord, config_name)
         threadKill(.action_thread);
         threadKill(.jump_thread);
         .EntityRelease();
+    };
+
+    Fighter.StartActionThread = function(name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this:thread(f, a, b, c, d, e);
+    };
+
+    Fighter.StartActionThreadThis = function(this_, name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this_:thread(f, a, b, c, d, e);
     };
 
 	Fighter.OnPreUpdate = function()
@@ -178,7 +190,8 @@ global MakeFighter = function(world, coord, config_name)
         // TODO: facing is backwards?
         dir *= -1.0f;
 
-        .collision_body.SetEnabled(true);
+        // TODO: why were we setting this here?
+        //.collision_body.SetEnabled(true);
 
         .collision_body.SetPosition(center);
         .collision_weapon.SetPosition(center + dir * 48.0f);
@@ -271,7 +284,7 @@ global MakeFighter = function(world, coord, config_name)
             .collision_weapon.SetEnabled(false);
         };
 
-        .action_thread = this:thread(combo_function, combo_data);
+        .StartActionThread("Combo", combo_function, combo_data);
     };
 
     Fighter.ThrowProjectile = function(type)
@@ -314,7 +327,7 @@ global MakeFighter = function(world, coord, config_name)
             }
         };
 
-        .action_thread = this:thread(knockback_function, force, dir);
+        .StartActionThread("Knockback", knockback_function, force, dir);
     };
 
     Fighter.Knockdown = function()
@@ -333,12 +346,14 @@ global MakeFighter = function(world, coord, config_name)
             }
 
             .anim.ChangeToNoReset("prone");
+            .collision_body.SetEnabled(false);
             sleep(randfloat(1.5f, 2.5f));
             .anim.ChangeToNoReset("getup");
             .anim.WaitFinished();
+            .collision_body.SetEnabled(true);
         };
 
-        .action_thread = this:thread(knockdown_function);
+        .StartActionThread("Knockdown", knockdown_function);
     };
 
     Fighter.OnTakeDamage = function(damage)

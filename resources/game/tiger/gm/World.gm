@@ -145,6 +145,8 @@ global MakeWorld = function()
 
 	World.DrawEntities = function()
 	{
+		Gfx.Enable(Gfx.BLEND);
+
 		foreach (e in .entities)
 		{
 			e.Draw();

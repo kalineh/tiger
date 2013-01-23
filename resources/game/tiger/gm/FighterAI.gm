@@ -6,26 +6,17 @@ global MakeFighterAI = function(owner, name)
     AI.owner = owner;
     AI.name = name;
     AI.action_thread = -1;
+    AI.delay = 0;
 
     AI.NotifyOwnerRelease = function()
     {
         threadKill(.update_thread);
-        threadKill(.action_thread);
-
         return false;
     };
 
     AI.NotifyOwnerTakeDamage = function(damage)
     {
-        threadKill(.action_thread);
-
-        local delay_function = function()
-        {
-            sleep(0.5f);
-        };
-
-        .action_thread = this:thread(delay_function);
-
+        .delay = 0.5f;
         return true;
     };
 
@@ -44,6 +35,12 @@ global MakeFighterAI = function(owner, name)
                 continue;
             }
 
+            if (.delay > 0.0f)
+            {
+                sleep(.delay);
+                continue;
+            }
+
             // TODO: use state instead of animation?
             if (.owner.anim.currAnimName == "knockdown" ||
                 .owner.anim.currAnimName == "prone")
@@ -52,20 +49,17 @@ global MakeFighterAI = function(owner, name)
                 continue;
             }
 
-            local action_function = function()
+            // TODO: this kind of hides bugs
+            if (threadIsAlive(.owner.action_thread))
             {
-                local player = .owner.world.FindNearestPlayer();
-
-                .MoveToEntity(player);
-                .TryAttack(player);
-            };
-
-            .action_thread = this:thread(action_function);
-
-            while (threadIsAlive(.action_thread))
-            {
-                yield();
+                sleep(0.25f);
+                continue;
             }
+
+            local player = .owner.world.FindNearestPlayer();
+
+            .MoveToEntity(player);
+            .TryAttack(player);
 
             sleep(randfloat(0.5f, 1.0f));
         }
@@ -95,6 +89,8 @@ global MakeFighterAI = function(owner, name)
                 break;
             }
 
+            .WaitActionThread();
+
             yield();
         }
     };
@@ -121,6 +117,14 @@ global MakeFighterAI = function(owner, name)
         }
     };
 
+    AI.WaitActionThread = function()
+    {
+        while (threadIsAlive(.owner.action_thread))
+        {
+            yield();
+        }
+    };
+
     AI.TryAttack = function(entity)
     {
         local ofs = entity.pos - .owner.pos;
@@ -131,14 +135,18 @@ global MakeFighterAI = function(owner, name)
         //return;
 
         sleep(0.2f);
+        .WaitActionThread();
         local combo_data = PlayerGroundAttacks["PunchL"];
         .owner.Combo(combo_data);
-        sleep(0.2f);
+        .WaitActionThread();
         local combo_data = PlayerGroundAttacks["PunchR"];
         .owner.Combo(combo_data);
+        .WaitActionThread();
         sleep(0.2f);
+        .WaitActionThread();
         local combo_data = PlayerGroundAttacks["Uppercut"];
         .owner.Combo(combo_data);
+        .WaitActionThread();
         sleep(0.2f);
     };
 
