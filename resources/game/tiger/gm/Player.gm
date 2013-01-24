@@ -468,7 +468,6 @@ global MakePlayer = function(world, coord)
 	Player.air_friction = v3(0.97f, 1.0f, 0.9f);
 	Player.ground_friction = v3(0.7f, 0.7f, 0.9f);
 
-	Player.controls = PlayerControlsKeyboard;
     Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
 

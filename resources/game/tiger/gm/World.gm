@@ -183,7 +183,7 @@ global MakeWorld = function(stage_config)
         return .player;
     };
 
-	World.Init = function()
+	World.Init = function(player_is_car)
 	{	
 		.cpp = World();
 
@@ -191,9 +191,18 @@ global MakeWorld = function(stage_config)
 
 		local player_spawn = v3();
 
+        local player_spawn_fun = MakePlayer;
+        local player_controller_fun = MakePlayerController;
+
+        if (player_is_car)
+        {
+            player_spawn_fun = MakePlayerCar;
+            player_controller_fun = MakePlayerCarController;
+        }
+
         .collision_manager = MakeCollisionManager();
-		.player = MakePlayer(this, player_spawn);
-        .controller = MakePlayerController(.player);
+		.player = player_spawn_fun(this, player_spawn);
+        .controller = player_controller_fun(.player);
 		.entities[.player] = .player;
         .stage = MakeStage(this, .stage_config);
 

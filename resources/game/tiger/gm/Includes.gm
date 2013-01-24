@@ -12,6 +12,7 @@ system.DoFile("game/tiger/gm/Collision.gm");
 system.DoFile("game/tiger/gm/Entity.gm");
 system.DoFile("game/tiger/gm/Fighter.gm");
 system.DoFile("game/tiger/gm/Car.gm");
+system.DoFile("game/tiger/gm/PlayerCar.gm");
 system.DoFile("game/tiger/gm/Player.gm");
 system.DoFile("game/tiger/gm/Enemy.gm");
 system.DoFile("game/tiger/gm/FighterAI.gm");

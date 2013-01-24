@@ -421,6 +421,7 @@
     <None Include="..\..\resources\game\tiger\gm\MusicPlayer.gm" />
     <None Include="..\..\resources\game\tiger\gm\Notify.gm" />
     <None Include="..\..\resources\game\tiger\gm\Player.gm" />
+    <None Include="..\..\resources\game\tiger\gm\PlayerCar.gm" />
     <None Include="..\..\resources\game\tiger\gm\Projectile.gm" />
     <None Include="..\..\resources\game\tiger\gm\SaveData.gm" />
     <None Include="..\..\resources\game\tiger\gm\SoundResourceCutscene.gm" />

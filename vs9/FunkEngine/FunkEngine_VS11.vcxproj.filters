@@ -984,6 +984,9 @@
     <None Include="..\..\resources\game\tiger\gm\Car.gm">
       <Filter>games\tiger\gm</Filter>
     </None>
+    <None Include="..\..\resources\game\tiger\gm\PlayerCar.gm">
+      <Filter>games\tiger\gm</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FunkEngine.rc">

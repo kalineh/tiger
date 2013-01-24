@@ -1,0 +1,174 @@
+
+global PlayerDefaults =
+{
+	MaxHealth = 40.0f,
+	MaxEnergy = 20.0f,
+};
+
+global MakeCarInput = function(press, hold, arg)
+{
+    assert(?press);
+    assert(?hold);
+    assert(?arg);
+
+    local input = table();
+
+    input.press = press;
+    input.hold = hold;
+    input.arg = arg;
+
+    input.Press = function()
+    {
+        return .press(.arg);
+    };
+    
+    input.Hold = function()
+    {
+        return .hold(.arg);
+    };
+
+	return input;
+};
+
+global MakeCarInput = function(press, hold, arg)
+{
+    assert(?press);
+    assert(?hold);
+    assert(?arg);
+
+    local input = table();
+
+    input.press = press;
+    input.hold = hold;
+    input.arg = arg;
+
+    input.Press = function()
+    {
+        return .press(.arg);
+    };
+    
+    input.Hold = function()
+    {
+        return .hold(.arg);
+    };
+
+	return input;
+};
+
+global PlayerCarControlsKeyboard =
+{
+	MoveFunction = MakeCarInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsKeyDown("UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsKeyDown("DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsKeyDown("LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsKeyDown("RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+    }, function() { return null; }, {}),
+
+	Jump = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
+	Punch = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
+	Kick = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
+	Block = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
+	Throw = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
+	Up = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "UP"),
+	Down = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "DOWN"),
+	Left = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "LEFT"),
+	Right = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
+};
+
+global MakePlayerCarController = function(car)
+{
+    assert(?car);
+
+	local Controller = table();
+
+	Controller.car = car;
+	Controller.controls = PlayerCarControlsKeyboard;
+
+	Controller.Update = function()
+	{
+        while (true)
+        {
+            local c = .car;
+
+            if (c.IsDead())
+            {
+                yield();
+                continue;
+            }
+
+            c.move_input = .controls.MoveFunction.Press();
+
+            local u = .controls.Up.Hold();
+            local d = .controls.Down.Hold();
+            local l = .controls.Left.Hold();
+            local r = .controls.Right.Hold();
+
+            if (c.anim.facing == FACING.LEFT)
+            {
+                local temp = l;
+                l = r;
+                r = temp;
+            }
+
+            local move_mask = 0x0;
+
+            if (.controls.Punch.Press())
+            {
+            }
+            else if (.controls.Kick.Press())
+            {
+            }
+            else if (.controls.Throw.Press())
+            {
+            }
+
+            if (!threadIsAlive(c.action_thread))
+            {
+            }
+
+            yield();
+        }
+	};
+
+    Controller:thread(Controller.Update);
+
+	return Controller;
+};
+
+global MakePlayerCar = function(world, coord)
+{
+	local PlayerCar = MakeCar(world, coord, 0);
+
+    PlayerCar.type = "PlayerCar";
+	PlayerCar.mass = 1.2f;
+
+    // TODO: move to config
+	PlayerCar.air_max_speed = v3(6.0f, 4.0f, 8.0f);
+	PlayerCar.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
+	PlayerCar.air_friction = v3(0.97f, 1.0f, 0.9f);
+	PlayerCar.ground_friction = v3(0.7f, 0.7f, 0.9f);
+
+    PlayerCar.CarRelease = PlayerCar.Release;
+    PlayerCar.Release = function()
+    {
+        //threadKill(.
+        .CarRelease();
+    };
+
+	PlayerCar.BaseOnPreUpdate = PlayerCar.OnPreUpdate;
+	PlayerCar.OnPreUpdate = function()
+	{
+        .BaseOnPreUpdate();
+
+        // TODO: get stage axis from .world.stage
+        // TODO: why is this null for cars?
+        //local g = g_game;
+        //local s = g.state;
+        //local c = s.cam;
+		//g_game.state.cam.SetTargetPos( v2(.pos) );
+	};
+
+	return PlayerCar;
+};

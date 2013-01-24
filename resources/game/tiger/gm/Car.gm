@@ -96,7 +96,7 @@ global MakeCar = function(world, coord, type)
 
                 if (len <= 0.01f )
                 {
-                    .anim.ChangeToNoReset("idle");
+                    //.anim.ChangeToNoReset("idle");
                 }
                 else
                 {
@@ -104,22 +104,22 @@ global MakeCar = function(world, coord, type)
                     {
                         if (.vel.x > 0.0f)
                         {
-                            .anim.ChangeToNoReset("stop");
+                            //.anim.ChangeToNoReset("stop");
                         }
                         else
                         {
-                            .anim.ChangeToNoReset("move");
+                            //.anim.ChangeToNoReset("move");
                         }
                     }
                     if (.move_input.x > 0.0f)
                     {
                         if (.vel.x < 0.0f)
                         {
-                            .anim.ChangeToNoReset("stop");
+                            //.anim.ChangeToNoReset("stop");
                         }
                         else
                         {
-                            .anim.ChangeToNoReset("move");
+                            //.anim.ChangeToNoReset("move");
                         }
                     }
 
