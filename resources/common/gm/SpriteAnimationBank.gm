@@ -82,11 +82,11 @@ global MakeSpriteAnimation = function( animBank, entityName )
 
 	Animation._Init = function()
 	{
+		// Go idle by default!
+		.ChangeTo("idle");
+
 		fork id 
 		{
-			// Go idle by default!
-			.ChangeTo("idle");
-
 			while( true )
 			{
 				.Update();

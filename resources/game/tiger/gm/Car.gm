@@ -133,11 +133,11 @@ global MakeCar = function(world, coord, type)
             {
                 if (.vel.z < 0.0f)
                 {
-                    .anim.ChangeToNoReset("fall");
+                    //.anim.ChangeToNoReset("fall");
                 }
                 else if (.vel.z > 0.0f)
                 {
-                    .anim.ChangeToNoReset("jump");
+                    //.anim.ChangeToNoReset("jump");
                 }
             }
         }

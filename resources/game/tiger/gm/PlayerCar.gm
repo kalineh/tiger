@@ -143,6 +143,7 @@ global MakePlayerCar = function(world, coord)
 
     PlayerCar.type = "PlayerCar";
 	PlayerCar.mass = 1.2f;
+	PlayerCar.anim.ChangeTo("player");
 
     // TODO: move to config
 	PlayerCar.air_max_speed = v3(6.0f, 4.0f, 8.0f);
