@@ -1,7 +1,12 @@
 
 global StageConfig =
 {
-    Stage1 =
+    Highway =
+    {
+        { time = 0, type = "SpawnCar", args = { type = 0, ai = "Thug", y = 0.0f, } },
+        { time = 0, type = "SpawnCar", args = { type = 0, ai = "Thug", y = 40.0f, } },
+    },
+    Street =
     {
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
@@ -79,6 +84,15 @@ global MakeStage = function(world, name)
         local ai = MakeFighterAI(enemy, args.type);
 
         .world.AddLifeRow(enemy);
+    };
+
+    Stage.ProcessSpawnCar = function(args)
+    {
+        local base = g_game.state.cam.pos;
+        local pos = v3(base.x, base.y + args.y, 0.0f);
+        local car = MakeCar(.world, pos, args.type);
+
+        .world.AddLifeRow(car);
     };
 
     return Stage;

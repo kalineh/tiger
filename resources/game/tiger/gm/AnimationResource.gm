@@ -248,5 +248,37 @@ global g_fileData =
                 },
             }
         },
+
+        cars =
+        {
+			texturePath = "cars.png",
+			textureMinMagFilter = Gfx.LINEAR,
+			textureWrap = Gfx.CLAMP,
+
+			textureEffectiveSize = v2(512.0f, 512.0f),
+			tileSize = v2(256.0f, 128.0f),
+
+			animations = {
+                idle = {
+                    tileIndex = { 0 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
+                player = {
+                    tileIndex = { 0 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
+                npc0 = {
+                    tileIndex = { 1 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
+            }
+        },
+
 	},
 };

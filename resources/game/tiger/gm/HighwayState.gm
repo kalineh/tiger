@@ -25,7 +25,7 @@ global MakeHighwayState = function()
 		.bg = MakeBackground("Highway");
 
 		.cam = MakeGameCamera();
-		.world = MakeWorld();
+		.world = MakeWorld("Highway");
 		.world.Init(1234);
 		.gui = MakeGameGui();
 

@@ -1,5 +1,5 @@
 
-global MakeWorld = function()
+global MakeWorld = function(stage_config)
 {
 	local World = 
 	{
@@ -10,6 +10,7 @@ global MakeWorld = function()
 		tickready = false,
 		ticklist = table(),
 		messages = table(),
+        stage_config = stage_config,
 
 		queryResults = array(),
 
@@ -194,7 +195,7 @@ global MakeWorld = function()
 		.player = MakePlayer(this, player_spawn);
         .controller = MakePlayerController(.player);
 		.entities[.player] = .player;
-        .stage = MakeStage(this, "Stage1");
+        .stage = MakeStage(this, .stage_config);
 
         // TEST
         .ai = table();

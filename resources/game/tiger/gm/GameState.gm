@@ -25,7 +25,7 @@ global MakeGameState = function()
 		.bg = MakeBackground("Street");
 
 		.cam = MakeGameCamera();
-		.world = MakeWorld();
+		.world = MakeWorld("Street");
 		.world.Init(1234);
 		.gui = MakeGameGui();
 
