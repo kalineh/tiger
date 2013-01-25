@@ -10,6 +10,12 @@ global MakeCarAI = function(car)
 
     AI.car = car;
 
+    AI.NotifyOwnerRelease = function()
+    {
+        threadKill(.update_thread);
+        return false;
+    };
+
     AI.Update = function()
     {
         // TODO: can just do with physics and 0.0f friction
@@ -17,8 +23,8 @@ global MakeCarAI = function(car)
         {
             if (.car.lane == 0)
             {
-                .car.move_input = v2(-2.0f, 0.0f);
-                .car.anim.facing = FACING.LEFT;
+                .car.move_input = v2(-5.0f, 0.0f);
+                .car.anim.facing = FACING.RIGHT;
             }
             else 
             {
@@ -27,9 +33,17 @@ global MakeCarAI = function(car)
 
             // TODO: lane changes
 
+            if (.car.pos.x < -900.0f)
+            {
+                .car.world.AddDeathRow(.car);
+                return;
+            }
+
             yield();
         }
     };
+
+    AI.car.notify_release.Register(AI, AI.NotifyOwnerRelease);
 
     AI.update_thread = AI:thread(AI.Update);
     return AI;
@@ -45,21 +59,21 @@ global MakeCar = function(world, coord, car_type, lane)
 	Car.type = "Car";
 	Car.controls = null;
 	Car.color = Gfx.WHITE;
-	Car.max_health = 10.0f;
-	Car.max_energy = 10.0f;
+	Car.max_health = 1.0f;
+	Car.max_energy = 1.0f;
 	Car.health = Car.max_health;
 	Car.energy = Car.max_energy;
-	Car.mass = 3.0f;
+	Car.mass = 2.0f;
 	Car.anim = MakeSpriteAnimation(g_game.animBank, "cars");
 	Car.move_input = v2();
     Car.air_move_speed = v2(1.0f, 0.5f);
-    Car.ground_move_speed = v2(2.5f, 1.2f);
+    Car.ground_move_speed = v2(5.0f, 1.2f);
     Car.frames_ground = 0;
     Car.frames_air = 0;
     Car.action_thread = -1;
     Car.collision_body = MakeCollision(Car, CollisionType.Circle, 32.0f);
-	Car.air_max_speed = v3(4.0f, 3.0f, 4.0f);
-	Car.ground_max_speed = v3(4.0f, 3.0f, 4.0f);
+	Car.air_max_speed = v3(8.0f, 3.0f, 4.0f);
+	Car.ground_max_speed = v3(8.0f, 3.0f, 4.0f);
 	Car.notify_release = MakeNotify(this, "NotifyRelease");
 	Car.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
     Car.constant_speed = v2();
@@ -79,7 +93,6 @@ global MakeCar = function(world, coord, car_type, lane)
         .notify_release.Notify();
         .world.collision_manager.Remove(.collision_body);
         threadKill(.action_thread);
-        threadKill(.jump_thread);
         .EntityRelease();
     };
 
@@ -239,7 +252,7 @@ global MakeCar = function(world, coord, car_type, lane)
         {
             if (rhs == rhs.owner.collision_body)
             {
-                local damage = rhs.damage;
+                local damage = 1.0f;
 
                 .TakeDamage(damage);
 
@@ -252,6 +265,11 @@ global MakeCar = function(world, coord, car_type, lane)
         }
 
         return false;
+    };
+
+    Car.OnDie = function()
+    {
+        // TODO: explosion!
     };
 
 	return Car;

@@ -1,10 +1,4 @@
 
-global PlayerDefaults =
-{
-	MaxHealth = 40.0f,
-	MaxEnergy = 20.0f,
-};
-
 global MakeCarInput = function(press, hold, arg)
 {
     assert(?press);
@@ -120,6 +114,8 @@ global MakePlayerCar = function(world, coord)
     PlayerCar.type = "PlayerCar";
 	PlayerCar.mass = 1.2f;
 	PlayerCar.anim.ChangeTo("player");
+    PlayerCar.max_health = 10.0f;
+    PlayerCar.health = PlayerCar.max_health;
 
     // TODO: move to config
 	PlayerCar.air_max_speed = v3(6.0f, 4.0f, 8.0f);
@@ -145,6 +141,8 @@ global MakePlayerCar = function(world, coord)
         //local s = g.state;
         //local c = s.cam;
 		//g_game.state.cam.SetTargetPos( v2(.pos) );
+
+        // TODO: if health < N: smoke effects
 	};
 
 	return PlayerCar;

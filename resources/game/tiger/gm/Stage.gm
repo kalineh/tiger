@@ -3,8 +3,26 @@ global StageConfig =
 {
     Highway =
     {
+        // debug
         { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
         { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        // real
+        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 20, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 40, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 60, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 80, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 100, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 120, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 140, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 160, type = "SpawnCar", args = { type = 1, lane = 1 } },
     },
     Street =
     {
@@ -41,6 +59,11 @@ global MakeStage = function(world, name)
         local cam = g_game.state.cam;
         local ofs = cam.pos - .camera_start;
         local len = safe_length(ofs);
+
+        // DEBUG: incrementing for now
+        if ( !?.progress_debug ) { .progress_debug = 0; }
+        .progress_debug += 1;
+        return .progress_debug;
 
         // TODO: camera update handling, position doesnt reflect in stage
         return 0;
@@ -88,7 +111,7 @@ global MakeStage = function(world, name)
 
     Stage.ProcessSpawnCar = function(args)
     {
-        local base = g_game.state.cam.pos;
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
         local pos = v3(base.x, base.y + args.y, 0.0f);
         local car = MakeCar(.world, pos, args.type, args.lane);
         local ai = MakeCarAI(car);
