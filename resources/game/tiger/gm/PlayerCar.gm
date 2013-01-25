@@ -100,30 +100,6 @@ global MakePlayerCarController = function(car)
 
             c.move_input = .controls.MoveFunction.Press();
 
-            local u = .controls.Up.Hold();
-            local d = .controls.Down.Hold();
-            local l = .controls.Left.Hold();
-            local r = .controls.Right.Hold();
-
-            if (c.anim.facing == FACING.LEFT)
-            {
-                local temp = l;
-                l = r;
-                r = temp;
-            }
-
-            local move_mask = 0x0;
-
-            if (.controls.Punch.Press())
-            {
-            }
-            else if (.controls.Kick.Press())
-            {
-            }
-            else if (.controls.Throw.Press())
-            {
-            }
-
             if (!threadIsAlive(c.action_thread))
             {
             }
@@ -139,7 +115,7 @@ global MakePlayerCarController = function(car)
 
 global MakePlayerCar = function(world, coord)
 {
-	local PlayerCar = MakeCar(world, coord, 0);
+	local PlayerCar = MakeCar(world, coord, 0, 0);
 
     PlayerCar.type = "PlayerCar";
 	PlayerCar.mass = 1.2f;

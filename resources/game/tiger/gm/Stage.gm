@@ -3,8 +3,8 @@ global StageConfig =
 {
     Highway =
     {
-        { time = 0, type = "SpawnCar", args = { type = 0, ai = "Thug", y = 0.0f, } },
-        { time = 0, type = "SpawnCar", args = { type = 0, ai = "Thug", y = 40.0f, } },
+        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
     },
     Street =
     {
@@ -90,7 +90,8 @@ global MakeStage = function(world, name)
     {
         local base = g_game.state.cam.pos;
         local pos = v3(base.x, base.y + args.y, 0.0f);
-        local car = MakeCar(.world, pos, args.type);
+        local car = MakeCar(.world, pos, args.type, args.lane);
+        local ai = MakeCarAI(car);
 
         .world.AddLifeRow(car);
     };

@@ -277,6 +277,12 @@ global g_fileData =
                     looping = true,
                     tags = { },
                 },
+                npc1 = {
+                    tileIndex = { 1 },
+                    times = { 0.0f },
+                    looping = true,
+                    tags = { },
+                },
             }
         },
 

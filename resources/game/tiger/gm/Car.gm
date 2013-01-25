@@ -1,9 +1,46 @@
 
-global MakeCar = function(world, coord, type)
+global CarLaneY = {
+    -240.0f,
+    -326.0f,
+};
+
+global MakeCarAI = function(car)
+{
+    local AI = table();
+
+    AI.car = car;
+
+    AI.Update = function()
+    {
+        // TODO: can just do with physics and 0.0f friction
+        while (true)
+        {
+            if (.car.lane == 0)
+            {
+                .car.move_input = v2(-2.0f, 0.0f);
+                .car.anim.facing = FACING.LEFT;
+            }
+            else 
+            {
+                .car.move_input = v2(-0.2f, 0.0f);
+            }
+
+            // TODO: lane changes
+
+            yield();
+        }
+    };
+
+    AI.update_thread = AI:thread(AI.Update);
+    return AI;
+};
+
+global MakeCar = function(world, coord, car_type, lane)
 {
 	local Car = MakeEntity(world, coord);
 
-    assert(?type);
+    assert(?car_type);
+    assert(?lane);
 
 	Car.type = "Car";
 	Car.controls = null;
@@ -25,9 +62,14 @@ global MakeCar = function(world, coord, type)
 	Car.ground_max_speed = v3(4.0f, 3.0f, 4.0f);
 	Car.notify_release = MakeNotify(this, "NotifyRelease");
 	Car.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
+    Car.constant_speed = v2();
 
+    Car.lane = lane;
+    Car.car_type = car_type;
     Car.collision_body.SetEnabled(true);
-	Car.anim.ChangeTo("npc0");
+	Car.anim.ChangeTo("npc" + car_type);
+    // TODO: offscreen right camera
+    Car.pos = v3(Car.pos.x, CarLaneY[Car.lane], 0.0f);
 
     world.collision_manager.Add(Car.collision_body);
 
@@ -51,6 +93,28 @@ global MakeCar = function(world, coord, type)
     {
         assert(!threadIsAlive(.action_thread));
         .action_thread = this_:thread(f, a, b, c, d, e);
+    };
+
+    Car.SetNPCLane = function(lane)
+    {
+        local action_function = function(lane)
+        {
+            while (true)
+            {
+                if (lane == 0)
+                {
+                    .move_input = v2(-2.0f, 0.0f);
+                    .anim.facing = FACING.LEFT;
+                }
+                else 
+                {
+                    .move_input = v2(-0.2f, 0.0f);
+                }
+
+                yield();
+            }
+        };
+        .action_thread = this:thread(action_function, lane);
     };
 
 	Car.OnPreUpdate = function()
@@ -89,8 +153,8 @@ global MakeCar = function(world, coord, type)
         {
             if (.frames_ground >= 1)
             {
-                if (.move_input.x < 0.0f) { .anim.facing = FACING.RIGHT; }
-                if (.move_input.x > 0.0f) { .anim.facing = FACING.LEFT; }
+                //if (.move_input.x < 0.0f) { .anim.facing = FACING.RIGHT; }
+                //if (.move_input.x > 0.0f) { .anim.facing = FACING.LEFT; }
 
                 local len = safe_length(.vel + .accel);
 

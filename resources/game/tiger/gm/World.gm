@@ -189,7 +189,7 @@ global MakeWorld = function(stage_config)
 
 		.threadId = this:thread(.Update);
 
-		local player_spawn = v3();
+		local player_spawn = v3(-500.0f, -200.0f);
 
         local player_spawn_fun = MakePlayer;
         local player_controller_fun = MakePlayerController;
