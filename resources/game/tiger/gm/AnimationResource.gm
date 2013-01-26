@@ -49,7 +49,7 @@ global g_fileData =
 
 				jump =
 				{
-                    tileIndex = { 14,15,15,15,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17, },
+                    tileIndex = { 14,15,15,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17,16,17, },
 					times = { 0.06f },
 					looping = false,
                     tags = { },
@@ -85,8 +85,8 @@ global g_fileData =
 
 				uppercut =
 				{
-                    tileIndex = { 2, 2, 4 },
-					times = { 0.1f, 0.1f, 0.001f },
+                    tileIndex = { 2, 19, 19 },
+					times = { 0.15f, 0.001f, 0.2f },
 					looping = false,
                     tags = {
                         hit = { 2 },
@@ -97,10 +97,10 @@ global g_fileData =
                 knee =
 				{
                     tileIndex = { 32,32,32 },
-					times = { 0.1f },
+					times = { 0.1f,0.1f,0.01f },
 					looping = false,
                     tags = {
-                        hit = { 1 },
+                        hit = { 2 },
                     },
 				},
 
@@ -127,11 +127,12 @@ global g_fileData =
 
                 sweepkick =
 				{
-                    tileIndex = { 19,18,3, },
-					times = { 0.2f },
+                    tileIndex = { 19,18,3,3 },
+					times = { 0.1f,0.1f,0.05f,0.01f },
 					looping = false,
                     tags = {
-                        hit = { 1 },
+                        hit = { 3 },
+                        knockdown = { 3 },
                     },
 				},
 

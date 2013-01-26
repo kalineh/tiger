@@ -168,7 +168,7 @@ global MakeFighter = function(world, coord, config_name)
             }
             else // airborne
             {
-                if (.vel.z < 0.0f)
+                if (.vel.z < -5.0f)
                 {
                     .anim.ChangeToNoReset("fall");
                 }
@@ -209,10 +209,11 @@ global MakeFighter = function(world, coord, config_name)
             assert(?input);
 
             local jump_min_frames = 6;
-            local jump_frames = 48;
-            local jump_start = 4.0f;
-            local jump_force = 4.0f;
-            local jump_falloff = 0.12f;
+            local jump_frames = 40;
+            local jump_start = 5.0f;
+            local jump_force = 5.0f;
+            local jump_falloff = 0.17f;
+            local jump_falloff_limit = 18;
 
             .vel = v3(.vel.x, .vel.y, jump_start);
 
@@ -228,7 +229,10 @@ global MakeFighter = function(world, coord, config_name)
 
                 .accel += v3(0.0f, 0.0f, jump_force);
 
-                jump_force = max(0.0f, jump_force - jump_falloff);
+                if (i < jump_falloff_limit)
+                {
+                    jump_force = max(0.0f, jump_force - jump_falloff);
+                }
 
                 yield();
             }
@@ -318,7 +322,6 @@ global MakeFighter = function(world, coord, config_name)
 
         local knockback_function = function(force, dir)
         {
-            print("knockback");
             local knockback_time = force * 8.0f;
 
             .anim.ChangeToNoReset("stun");
@@ -342,11 +345,13 @@ global MakeFighter = function(world, coord, config_name)
             .anim.ChangeToNoReset("knockdown");
 
             // some minimum for knockdowns...
-            knockback = max(2.0f, knockback);
+            knockback = max(1.0f, knockback);
+            local push = v3(0.0f, 0.0f, +1.0f * knockback) + dir * knockback;
 
             for (i = 0; i < 8; i += 1)
             {
-                .accel += v3(0.0f, 0.0f, +2.0f * knockback) + dir * knockback;
+                .accel += push;
+                push *= 0.50f;
                 yield();
             }
 
@@ -404,6 +409,12 @@ global MakeFighter = function(world, coord, config_name)
                 if (!?knockback) { knockback = 0.0f; }
                 if (!?knockup) { knockup = 0.0f; }
                 if (!?knockdown) { knockdown = false; }
+
+                // double stun = knockdown
+                if (.stun > 2 && stun)
+                {
+                    knockdown = true;
+                }
 
                 .TakeDamage(damage);
                 .Stun(stun);
