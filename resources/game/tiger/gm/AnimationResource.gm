@@ -260,26 +260,26 @@ global g_fileData =
 
 			animations = {
                 idle = {
-                    tileIndex = { 0 },
-                    times = { 0.0f },
+                    tileIndex = { 0, 1 },
+                    times = { 0.06f },
                     looping = true,
                     tags = { },
                 },
                 player = {
-                    tileIndex = { 0 },
-                    times = { 0.0f },
+                    tileIndex = { 0, 1 },
+                    times = { 0.06f },
                     looping = true,
                     tags = { },
                 },
                 npc0 = {
-                    tileIndex = { 1 },
-                    times = { 0.0f },
+                    tileIndex = { 2, 3 },
+                    times = { 0.06f },
                     looping = true,
                     tags = { },
                 },
                 npc1 = {
-                    tileIndex = { 1 },
-                    times = { 0.0f },
+                    tileIndex = { 4, 5 },
+                    times = { 0.06f },
                     looping = true,
                     tags = { },
                 },
@@ -299,6 +299,25 @@ global g_fileData =
                 idle = {
                     tileIndex = { 0,1,2,3,4,5 },
                     times = { 0.11f },
+                    looping = false,
+                    tags = { },
+                },
+            }
+        },
+
+        oil_spill =
+        {
+			texturePath = "oil_spill.png",
+			textureMinMagFilter = Gfx.LINEAR,
+			textureWrap = Gfx.CLAMP,
+
+			textureEffectiveSize = v2(128.0f, 128.0f),
+			tileSize = v2(128.0f),
+
+			animations = {
+                idle = {
+                    tileIndex = { 0, },
+                    times = { 0.1f },
                     looping = false,
                     tags = { },
                 },

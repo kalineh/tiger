@@ -109,6 +109,9 @@ global DrawNotifyText = function( text, pos, color )
 	local font = g_game.fonts["zekton_30"];
 	local textDimen = font.GetDimen(text);
 
+    // TODO: fix camera
+    pos -= g_game.state.cam.pos;
+
 	local params =
 	{
 		text = text,

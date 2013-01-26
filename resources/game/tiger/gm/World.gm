@@ -12,6 +12,7 @@ global MakeWorld = function(stage_config)
 		messages = table(),
         stage_config = stage_config,
         frame = 0,
+        drawCollision = false,
 
 		queryResults = array(),
 
@@ -26,6 +27,8 @@ global MakeWorld = function(stage_config)
         Gui.Print("Entities: " + tableCount(.entities));
         Gui.Print("Life Row: " + tableCount(.liferow));
         Gui.Print("Death Row: " + tableCount(.deathrow));
+        Gui.Separator();
+        .drawCollision = Gui.CheckBox("Draw Collision", .drawCollision);
 
 		Gui.End();
 	};
@@ -165,8 +168,10 @@ global MakeWorld = function(stage_config)
 
 	World.DrawCollision = function()
 	{
-        // TODO: toggle gui option
-        //.collision_manager.DebugDraw();
+        if (.drawCollision)
+        {
+            .collision_manager.DebugDraw();
+        }
 	};
 
 	World.Update = function()

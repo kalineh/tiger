@@ -80,6 +80,9 @@ global MakeCollisionManager = function()
         {
             local pos = v2(item.volume.pos.x, item.volume.pos.y + item.volume.pos.z);
 
+            // TODO: fix camera
+            pos -= g_game.state.cam.pos;
+
             Gfx.Color(Gfx.WHITE);
             if (item.enabled == false)
             {
@@ -104,7 +107,7 @@ global MakeCollisionManager = function()
     return CollisionManager;
 };
 
-global CollisionDepthMinimum = 20.0f;
+global CollisionDepthMinimum = 24.0f;
 
 global MakeCollisionVolume = function(type, size)
 {

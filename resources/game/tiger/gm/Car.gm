@@ -41,6 +41,12 @@ global MakeCarSpawner = function(world)
         {
             sleep(randfloat(0.1f, 0.5f));
             .Spawn();
+
+            if (randint(0, 100) < 10)
+            {
+                .SpawnOil();
+            }
+
             yield();
         }
     };
@@ -64,6 +70,16 @@ global MakeCarSpawner = function(world)
         local ai = MakeCarAI(car);
 
         .world.AddLifeRow(car);
+    };
+
+    CarSpawner.SpawnOil = function()
+    {
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
+        local yofs = randfloat(CarLaneY[0] + 20.0f, CarLaneY[3] - 20.0f);
+        local pos = v3(base.x, base.y + yofs, 0.0f);
+        local oil = MakeOilSpill(.world, pos);
+
+        .world.AddLifeRow(oil);
     };
 
     CarSpawner.update_thread = CarSpawner:thread(CarSpawner.Update);
@@ -101,8 +117,9 @@ global MakeCarAI = function(car)
 
             // TODO: lane changes
 
-            local visible = .car.IsInsideCam();
-            if (.car.pos.x < g_game.state.cam.pos.x && !visible)
+            // TODO: fix camera
+            local offset = .car.pos.x - g_game.state.cam.pos.x;
+            if (offset < -g_game.dimen.x)
             {
                 .car.world.AddDeathRow(.car);
                 return;
@@ -154,6 +171,51 @@ global MakeCarAI = function(car)
     return AI;
 };
 
+global MakeOilSpill = function(world, coord)
+{
+    local OilSpill = MakeEntity(world, coord);
+
+    OilSpill.type = "OilSpill"; 
+    OilSpill.mass = 0.0f;
+    OilSpill.anim = MakeSpriteAnimation(g_game.animBank, "oil_spill");
+    OilSpill.collision_body = MakeCollision(OilSpill, CollisionType.Circle, 30.0f);
+	OilSpill.air_max_speed = v3(1.0f, 1.0f, 1.0f);
+	OilSpill.ground_max_speed = v3(16.0f, 1.0f, 1.0f);
+    world.collision_manager.Add(OilSpill.collision_body);
+    OilSpill.collision_body.SetEnabled(true);
+
+    OilSpill.OnPreUpdate = function()
+    {
+        // TODO: fix camera (should be moving just by camera motion)
+        .vel = v3(-15.0f, 0.0f, 0.0f);
+    };
+
+    OilSpill.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+        local dir = .GetFacingDir();
+        .collision_body.SetPosition(center);
+        .collision_body.SetEnabled(true);
+
+        // TODO: fix camera
+        local offset = .pos.x - g_game.state.cam.pos.x;
+        if (offset < -g_game.dimen.x)
+        {
+            .world.AddDeathRow(this);
+            return;
+        }
+    };
+
+    OilSpill.OnCollide = function(lhs, rhs)
+    {
+        // does nothing
+        return false;
+    };
+
+    return OilSpill;
+};
+
+
 global MakeCar = function(world, coord, car_type, lane)
 {
 	local Car = MakeEntity(world, coord);
@@ -182,6 +244,7 @@ global MakeCar = function(world, coord, car_type, lane)
 	Car.notify_release = MakeNotify(this, "NotifyRelease");
 	Car.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
     Car.constant_speed = v2();
+    Car.spinout = 0.0f;
 
     Car.lane = lane;
     Car.car_type = car_type;
@@ -250,8 +313,9 @@ global MakeCar = function(world, coord, car_type, lane)
             .frames_air = 0;
         }
 
-        if (!threadIsAlive(.action_thread))
-        {
+        // cars can still move during action
+        //if (!threadIsAlive(.action_thread))
+        //{
             local move = .move_input;
             local move_speed = .ground_move_speed;
 
@@ -263,66 +327,9 @@ global MakeCar = function(world, coord, car_type, lane)
             move *= move_speed;
 
             .accel += v3(move);
-        }
+        //}
 
         .anim.speed = 1.0f;
-
-        if (!threadIsAlive(.action_thread))
-        {
-            if (.frames_ground >= 1)
-            {
-                //if (.move_input.x < 0.0f) { .anim.facing = FACING.RIGHT; }
-                //if (.move_input.x > 0.0f) { .anim.facing = FACING.LEFT; }
-
-                local len = safe_length(.vel + .accel);
-
-                if (len <= 0.01f )
-                {
-                    //.anim.ChangeToNoReset("idle");
-                }
-                else
-                {
-                    if (.move_input.x < 0.0f)
-                    {
-                        if (.vel.x > 0.0f)
-                        {
-                            //.anim.ChangeToNoReset("stop");
-                        }
-                        else
-                        {
-                            //.anim.ChangeToNoReset("move");
-                        }
-                    }
-                    if (.move_input.x > 0.0f)
-                    {
-                        if (.vel.x < 0.0f)
-                        {
-                            //.anim.ChangeToNoReset("stop");
-                        }
-                        else
-                        {
-                            //.anim.ChangeToNoReset("move");
-                        }
-                    }
-
-                    if (.anim.currAnimName == "move")
-                    {
-                        .anim.speed = abs(.vel.x) + abs(.vel.y);
-                    }
-                }
-            }
-            else // airborne
-            {
-                if (.vel.z < 0.0f)
-                {
-                    //.anim.ChangeToNoReset("fall");
-                }
-                else if (.vel.z > 0.0f)
-                {
-                    //.anim.ChangeToNoReset("jump");
-                }
-            }
-        }
 
         .move_input = v2(0.0f, 0.0f);
 	};
@@ -346,10 +353,32 @@ global MakeCar = function(world, coord, car_type, lane)
         .notify_take_damage.Notify(damage);
     };
 
+    Car.SpinOut = function(frames)
+    {
+        threadKill(.action_thread);
+
+        fork id {
+            local base = sign(.vel.y) + randfloat(-0.1f, 0.1f);
+            for (i = 0; i < frames; i += 1)
+            {
+                .spinout = base;
+                yield();
+            }
+            .spinout = 0.0f;
+        };
+        .action_thread = id;
+    };
+
     Car.OnCollide = function(lhs, rhs)
     {
         if (rhs.owner.type == .type)
         {
+            return;
+        }
+
+        if (rhs.owner.type == "OilSpill")
+        {
+            .SpinOut(20);
             return;
         }
 

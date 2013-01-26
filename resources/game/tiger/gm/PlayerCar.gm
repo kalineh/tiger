@@ -157,19 +157,26 @@ global MakePlayerCar = function(world, coord)
 	{
         .BaseOnPreUpdate();
 
-        // TODO: get stage axis from .world.stage
-        // TODO: why is this null for cars?
-        //local g = g_game;
-        //local s = g.state;
-        //local c = s.cam;
-		//g_game.state.cam.SetTargetPos( v2(.pos) );
-
         // TODO: if health < N: smoke effects
 
         .stun = max(0, .stun - 1);
+        .accel += v3( .spinout * randfloat(-0.1f, 0.1f), .spinout, 0.0f );
 
         g_dump.player_pos = .pos;
+        g_dump.stun = .stun;
     };
+
+	PlayerCar.BaseOnPostUpdate = PlayerCar.OnPostUpdate;
+	PlayerCar.OnPostUpdate = function()
+	{
+        .BaseOnPostUpdate();
+
+        // clamp to screen edges
+        local cam = g_game.state.cam;
+        .pos = v3( max(.pos.x, cam.pos.x - 670.0f), .pos.y, .pos.z );
+        .pos = v3( min(.pos.x, cam.pos.x + 400.0f), .pos.y, .pos.z );
+    };
+
 
     PlayerCar.CarOnTakeDamage = PlayerCar.OnTakeDamage;
     PlayerCar.OnTakeDamage = function(damage)
