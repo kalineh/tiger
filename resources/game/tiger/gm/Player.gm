@@ -400,7 +400,7 @@ global MakePlayerController = function(fighter)
             {
                 // we may still be on the ground for a frame while jump is still active
                 // so ignore if the jump thread is still running
-                if (!threadIsAlive(.jump_thread))
+                if (!threadIsAlive(f.jump_thread))
                 {
                     if (.controls.Jump.Press())
                     {

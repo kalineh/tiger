@@ -42,7 +42,7 @@ global MakeHighwayState = function()
 
     State.Finish = function()
     {
-        sleep(60.0f * 1.0f);
+        sleep(50.0f);
 		g_game.musicPlayer.FadeOut(2.0f);
 		g_fader.FadeOut(3.0f, Gfx.BLACK, null, null, null, 3.0f);
 
