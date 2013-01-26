@@ -4,6 +4,23 @@ global CarLaneY = {
     -326.0f,
 };
 
+global MakeCarExplosion = function(car)
+{
+    local Explosion = MakeEntity(car.world, car.pos);
+
+	Explosion.anim = MakeSpriteAnimation(g_game.animBank, "car_explosion");
+
+    Explosion.OnPostUpdate = function()
+    {
+        if (.anim.IsFinished())
+        {
+            .world.AddDeathRow(this);
+        }
+    };
+
+    return Explosion;
+};
+
 global MakeCarAI = function(car)
 {
     local AI = table();
@@ -269,7 +286,8 @@ global MakeCar = function(world, coord, car_type, lane)
 
     Car.OnDie = function()
     {
-        // TODO: explosion!
+        local explosion = MakeCarExplosion(this);
+        .world.AddLifeRow(explosion);
     };
 
 	return Car;

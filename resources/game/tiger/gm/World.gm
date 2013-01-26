@@ -11,6 +11,7 @@ global MakeWorld = function(stage_config)
 		ticklist = table(),
 		messages = table(),
         stage_config = stage_config,
+        frame = 0,
 
 		queryResults = array(),
 
@@ -171,8 +172,15 @@ global MakeWorld = function(stage_config)
             .stage.Update();
 
             .ProcessLifeRow();
-            .collision_manager.Collide();
+
+            if (.frame > 0)
+            {
+                .collision_manager.Collide();
+            }
+
             .ProcessDeathRow();
+
+            .frame += 1;
 
 			yield();
 		}
@@ -186,6 +194,7 @@ global MakeWorld = function(stage_config)
 	World.Init = function(player_is_car)
 	{	
 		.cpp = World();
+        .frame = 0;
 
 		.threadId = this:thread(.Update);
 

@@ -286,5 +286,23 @@ global g_fileData =
             }
         },
 
+        car_explosion =
+        {
+			texturePath = "car_explosion.png",
+			textureMinMagFilter = Gfx.LINEAR,
+			textureWrap = Gfx.CLAMP,
+
+			textureEffectiveSize = v2(512.0f, 512.0f),
+			tileSize = v2(128.0f),
+
+			animations = {
+                idle = {
+                    tileIndex = { 0,1,2,3,4,5 },
+                    times = { 0.11f },
+                    looping = false,
+                    tags = { },
+                },
+            }
+        },
 	},
 };
