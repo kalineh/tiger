@@ -33,6 +33,7 @@ global MakeCarSpawner = function(world)
 
     CarSpawner.world = world;
     CarSpawner.last_lane = 0;
+    CarSpawner.spawn_extra_delay = 1.0f;
 
     CarSpawner.Release = function()
     {
@@ -43,10 +44,12 @@ global MakeCarSpawner = function(world)
     {
         while (true)
         {
-            sleep(randfloat(0.25f, 0.8f));
+            .spawn_adjust = max(0.0f, .spawn_adjust - 0.05f);
+            sleep(.spawn_extra_delay);
+            sleep(randfloat(0.10f, 0.45f));
             .Spawn();
 
-            if (randint(0, 100) < 20)
+            if (randint(0, 100) < 15)
             {
                 .SpawnOil();
             }

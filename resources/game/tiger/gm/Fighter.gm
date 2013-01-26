@@ -12,7 +12,7 @@ global FighterConfig =
     {
         MaxHealth = 20.0f,
         MaxEnergy = 0.0f,
-        Animations = "player",
+        Animations = "enemy0",
     },
 };
 
