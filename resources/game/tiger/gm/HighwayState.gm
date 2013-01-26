@@ -42,17 +42,26 @@ global MakeHighwayState = function()
 
     State.Finish = function()
     {
-        //sleep(60.0f * 4.0f);
-        sleep(0.5f);
+        sleep(60.0f * 1.0f);
 		g_game.musicPlayer.FadeOut(2.0f);
 		g_fader.FadeOut(3.0f, Gfx.BLACK, null, null, null, 3.0f);
 
-        // TODO: VOICE
+        g_game.voicePlayer.Play("highway_finished_0");
 
         // HACK
         .world.player.OnCollide = function() { };
         .world.player.OnPreUpdate = function() { };
         .world.player.OnPostUpdate = function() { };
+
+        foreach (e in .world.entities)
+        {
+            if (e.type == "Car")
+            {
+                e.Die();
+            }
+        }
+
+        .spawner.Release();
 
         local speedaway = 0.0f;
         for (i = 0; i < 120; i += 1)
@@ -62,7 +71,7 @@ global MakeHighwayState = function()
             yield();
         }
 
-        // TODO: VOICE
+        g_game.voicePlayer.Play("highway_finished_1");
 
 		g_fader.WaitOn();
         g_game.GotoState("game");

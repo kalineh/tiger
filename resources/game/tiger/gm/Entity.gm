@@ -120,6 +120,8 @@ global MakeEntity = function(world, pos)
         // TODO: fix so transform is used correctly instead!
         draw_position -= g_game.state.cam.pos;
 
+		Gfx.Color(.color, .alpha);
+
 		if ( ?.anim )
 		{
 			// render only if in camera
