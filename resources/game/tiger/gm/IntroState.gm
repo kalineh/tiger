@@ -62,10 +62,10 @@ global MakeIntroState = function()
 			g_fader.WaitOn();
         };
 
-        local fade_out = function()
+        local fade_out = function(extra)
         {
-			local fadeTime = 1.0f;
-			g_fader.FadeOut(fadeTime, Gfx.BLACK);
+			local fadeTime = 0.75f;
+			g_fader.FadeOut(fadeTime, Gfx.BLACK, null, null, extra);
 			g_fader.WaitOn();
         };
 
@@ -76,53 +76,52 @@ global MakeIntroState = function()
         .currentText = .texts[0];
 		//g_game.soundBanks["cutscene"].Play("dooropen");
         fade_in();
-        sleep(1.0f);
-        .WaitKeyOrTime(2.0f);
+        //sleep(0.5f);
+        .WaitKeyOrTime(1.5f);
         fade_out();
 
         .currentCutscene = .cutscenes[1];
         .currentText = .texts[1];
         fade_in();
 		//g_game.soundBanks["cutscene"].Play("suprise");
-        sleep(1.0f);
+        //sleep(0.5f);
 		//g_game.soundBanks["quotes"].Play("wtf");
-        sleep(1.0f);
-        .WaitKeyOrTime(2.0f);
+        //sleep(0.5f);
+        .WaitKeyOrTime(1.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[2];
         .currentText = .texts[2];
         fade_in();
 		//g_game.soundBanks["cutscene"].Play("suprise");
-        sleep(1.0f);
+        //sleep(0.5f);
 		//g_game.soundBanks["quotes"].Play("bastards");
-        sleep(1.0f);
-        .WaitKeyOrTime(2.0f);
+        //sleep(0.5f);
+        .WaitKeyOrTime(1.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[3];
         .currentText = .texts[3];
         fade_in();
-        sleep(1.0f);
+        //sleep(0.5f);
 		//g_game.soundBanks["quotes"].Play("ill_save_you_lil_t");
-        sleep(1.0f);
-        .WaitKeyOrTime(2.0f);
+        //sleep(0.5f);
+        .WaitKeyOrTime(1.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[4];
         .currentText = .texts[4];
         fade_in();
 		//g_game.soundBanks["cutscene"].Play("cardoor");
-        sleep(1.0f);
+        //sleep(0.5f);
 		//g_game.soundBanks["cutscene"].Play("ignition");
-        sleep(1.0f);
+        //sleep(0.5f);
 		//g_game.soundBanks["cutscene"].Play("screeching");
-        sleep(1.0f);
+        sleep(0.0f);
         .WaitKeyOrTime(1.0f);
-        fade_out();
 
-		g_game.musicPlayer.FadeOut(1.0f);
-        sleep(1.0f);
+		g_game.musicPlayer.FadeOut(2.0f);
+        fade_out(3.0f);
 
         threadKill(.threadId);
         g_game.GotoState("highway");

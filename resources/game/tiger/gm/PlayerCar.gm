@@ -110,7 +110,6 @@ global MakePlayerCarController = function(car)
 
                 if (.controls.Punch.Press())
                 {
-                    assert(false);
                 }
             }
 
