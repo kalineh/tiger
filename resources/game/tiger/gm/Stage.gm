@@ -29,14 +29,12 @@ global StageConfig =
     },
     Street =
     {
-        /*
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
-        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
-        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
-        { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
-        */
+        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
+        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
+        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
     },
 };
 
