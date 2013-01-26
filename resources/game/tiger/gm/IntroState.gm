@@ -70,6 +70,7 @@ global MakeIntroState = function()
         };
 
 		g_game.musicPlayer.Play(g_game.songs.intro, 0.1f);
+		g_game.voicePlayer.Play("test");
 
         .currentCutscene = .cutscenes[0];
         .currentText = .texts[0];
@@ -120,15 +121,11 @@ global MakeIntroState = function()
         .WaitKeyOrTime(1.0f);
         fade_out();
 
-        print("a");
 		g_game.musicPlayer.FadeOut(1.0f);
         sleep(1.0f);
 
-        print("b");
         threadKill(.threadId);
-        g_game.GotoState("game");
-        print("c");
-        //g_game.GotoState("highway");
+        g_game.GotoState("highway");
     };
 
 	State.Init = function()

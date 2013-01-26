@@ -1,4 +1,70 @@
 
+global MakeVoicePlayer = function()
+{
+    local VoicePlayer = table();
+
+    VoicePlayer.voices = {
+        unknown = { text = "it is what it is", sfx = null, },
+    };
+
+    VoicePlayer.current = "unknown";
+    VoicePlayer.counter = 0;
+
+    VoicePlayer.Release = function()
+    {
+        threadKill(.update_thread);
+    };
+
+    VoicePlayer.Play = function(key)
+    {
+        local entry = .voices[key];
+        if (!?entry)
+        {
+            entry = .voices.unknown;
+        }
+
+        .current = entry.text;
+        .counter = 120;
+    };
+
+    VoicePlayer.Draw = function()
+    {
+		local font = g_game.fonts["zekton_30"];
+        local text = .current;
+    	local textDimen = font.GetDimen(text);
+
+        // TODO: fix camera
+        local base = v2(300, 40.0f);
+        local center = base + textDimen * v2(-0.5f, 0.5f);
+
+        local pos = base + center;
+
+        g_game.BeginScreenSpace();
+		Gfx.BeginDefaultShader();
+		Gfx.Enable(Gfx.BLEND);
+		Gfx.Color( Gfx.WHITE, 0.8f );
+		font.Print( "'" + text + "'", base + center );
+		Gfx.EndDefaultShader();
+        g_game.EndScreenSpace();
+    };
+
+    VoicePlayer.Update = function()
+    {
+        while (true)
+        {
+            if (.counter > 0)
+            {
+        		RegisterDraw( DrawLayers.Scene_UI, .Draw, this );
+                .counter -= 1;
+            }
+            yield();
+        }
+    };
+
+    VoicePlayer.update_thread = VoicePlayer:thread(VoicePlayer.Update);
+    return VoicePlayer;
+};
+
 local CreateGame = function()
 {
 	local Game = 
@@ -203,9 +269,10 @@ local CreateGame = function()
 
 		.state = null;
 
+		.GotoState("intro");
 		//.GotoState("title");
 		//.GotoState("highway");
-		.GotoState("game");
+		//.GotoState("game");
 		//.GotoState("intro");
 	};
 
@@ -261,6 +328,8 @@ local CreateGame = function()
 		._InitSounds();
 		._InitAnimationBank();
 
+        .voicePlayer = MakeVoicePlayer();
+
 		fork
 		{
 			._InitGameComponents();
@@ -284,6 +353,9 @@ local CreateGame = function()
 
 	Game.Release = function()
 	{
+        .voicePlayer.Release();
+        .voicePlayer = null;
+
 		.musicPlayer.Release();
 		.musicPlayer = null;
 

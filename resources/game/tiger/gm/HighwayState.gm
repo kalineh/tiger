@@ -37,7 +37,36 @@ global MakeHighwayState = function()
 		._InitParticles();
 
 		.threadId = this:thread(.Update);
+		.finish_thread = this:thread(.Finish);
 	};
+
+    State.Finish = function()
+    {
+        //sleep(60.0f * 4.0f);
+        sleep(0.5f);
+		g_game.musicPlayer.FadeOut(2.0f);
+		g_fader.FadeOut(3.0f, Gfx.BLACK, null, null, null, 3.0f);
+
+        // TODO: VOICE
+
+        // HACK
+        .world.player.OnCollide = function() { };
+        .world.player.OnPreUpdate = function() { };
+        .world.player.OnPostUpdate = function() { };
+
+        local speedaway = 0.0f;
+        for (i = 0; i < 120; i += 1)
+        {
+            speedaway += 0.2f;
+            .world.player.pos += v3(speedaway, 0.0f, 0.0f);
+            yield();
+        }
+
+        // TODO: VOICE
+
+		g_fader.WaitOn();
+        g_game.GotoState("game");
+    };
 
 	State.EmitParticlesAt = function(particleName, pos, numParticles)
 	{

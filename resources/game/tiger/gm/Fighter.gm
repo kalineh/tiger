@@ -10,7 +10,7 @@ global FighterConfig =
 
     Thug = 
     {
-        MaxHealth = 2.0f,
+        MaxHealth = 20.0f,
         MaxEnergy = 0.0f,
         Animations = "player",
     },
@@ -460,7 +460,7 @@ global MakeFighter = function(world, coord, config_name)
 
         local death_function = function()
         {
-            .Knockdown(15.0f, .GetFacingDir() * -1.0f);
+            .Knockdown(15.0f, .GetFacingDir() * +1.0f);
             sleep(2.0f);
             for (i = 0; i < 120; i += 1)
             {

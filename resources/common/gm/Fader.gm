@@ -104,7 +104,7 @@ local CreateFader = function()
 		.threadId = id;
 	};
 
-	Fader.FadeOut = function( seconds, color, callbackFinishFunc = null, callbackObj = null, callbackArgs = null )
+	Fader.FadeOut = function( seconds, color, callbackFinishFunc = null, callbackObj = null, callbackArgs = null, extra_wait = null )
 	{
 		Log("Fade Out..");
 		assert( seconds >= 0.0f && ?color );
@@ -132,7 +132,19 @@ local CreateFader = function()
 			// callback object
 			if ( ?callbackFinishFunc )	{ callbackObj:callbackFinishFunc(callbackArgs); 	}
 
-			// Register one more call or else the game will flicker one frame
+            local frames = 0;
+            if (?extra_wait)
+            {
+                frames = (extra_wait * 60.0f).Int();
+            }
+
+            for (i = 0; i < frames; i += 1)
+            {
+    			RegisterDraw( DrawLayers.ScreenFade, .Draw, this, data );
+                yield();
+            }
+
+			// Register at least one more call or else the game will flicker one frame
 			RegisterDraw( DrawLayers.ScreenFade, .Draw, this, data );
 
 			.KillFade();
