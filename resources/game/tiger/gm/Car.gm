@@ -119,7 +119,7 @@ global MakeCarAI = function(car)
                 .car.move_input = v2(+0.05f + variation1 + .car.pushaway, 0.0f);
             }
 
-            // TODO: lane changes
+            .pushaway *= 0.95f;
 
             // TODO: fix camera
             local offset = .car.pos.x - g_game.state.cam.pos.x;
@@ -129,35 +129,39 @@ global MakeCarAI = function(car)
                 return;
             }
 
-            if (!threadIsAlive(.lane_change_thread) && randint(0, 1000) < 400 && false)
+            if (!threadIsAlive(.lane_change_thread) && randint(0, 1000) < 4)
             {
                 fork id {
 
                     if (.car.lane < 2)
                     {
-                        local move = v2(0.0f, Select(.car.lane == 0, +1.0f, -1.0f));
+                        local move = v2(0.0f, Select(.car.lane == 0, -1.0f, +1.0f));
                         .car.lane = Select(.car.lane == 0, 1, 0);
                     }
                     else
                     {
-                        local move = v2(0.0f, Select(.car.lane == 2, +1.0f, -1.0f));
+                        local move = v2(0.0f, Select(.car.lane == 2, -1.0f, +1.0f));
                         .car.lane = Select(.car.lane == 2, 3, 2);
                     }
-                    return;
+
+                    if (!?move)
+                    {
+                        return;
+                    }
 
                     while (true)
                     {
-                        local pos = v2(.car.pos);
-                        local dst = v2(.car.pos.x, CarLaneY[.car.lane]);
-                        local ofs = dst - pos;
-                        local len = safe_length(ofs);
+                        local src = .car.pos.y;
+                        local dst = CarLaneY[.car.lane];
+                        local ofs = dst - src;
 
-                        if (len < 0.1f)
+                        // NOTE: too low and we go past sign flip and fly offscreen (< 1.0f~)
+                        if (abs(ofs) < 4.5f)
                         {
                             break;
                         }
 
-                        .car.move_input += move * min(1.0f, len);
+                        .car.move_input += move * abs(sign(ofs)) * 0.5f;
 
                         yield();
                     }
@@ -388,7 +392,7 @@ global MakeCar = function(world, coord, car_type, lane)
                 .accel += v3(force.x, 0.0f, 0.0f);
                 .vel += v3(force.x, 0.0f, 0.0f);
 
-                .pushaway += force.x * 0.08f;
+                .pushaway += force.x * 0.04f;
             }
         }
 

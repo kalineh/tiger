@@ -134,7 +134,7 @@ global MakePlayerCar = function(world, coord)
     PlayerCar.type = "PlayerCar";
 	PlayerCar.mass = 1.2f;
 	PlayerCar.anim.ChangeTo("player");
-    PlayerCar.max_health = 10.0f;
+    PlayerCar.max_health = 15.0f;
     PlayerCar.health = PlayerCar.max_health;
     PlayerCar.stun = 0;
 
