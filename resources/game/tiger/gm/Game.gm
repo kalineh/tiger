@@ -206,7 +206,7 @@ local CreateGame = function()
 
 			threadSetGroup( ThreadGroups.TIGER_STATE );
 
-			g_fader.FadeIn( 1.0f, Gfx.WHITE );
+			g_fader.FadeIn( 1.0f, Gfx.BLACK );
 
 			local func = .stateFuncs[name];
 			assert(?func);
@@ -269,11 +269,10 @@ local CreateGame = function()
 
 		.state = null;
 
-		.GotoState("intro");
-		//.GotoState("title");
+		.GotoState("title");
+		//.GotoState("intro");
 		//.GotoState("highway");
 		//.GotoState("game");
-		//.GotoState("intro");
 	};
 
 	Game._InitSounds = function()
