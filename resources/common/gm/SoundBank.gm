@@ -50,7 +50,7 @@ global MakeSoundBank = function(resourceFile)
 			.PlayNow(name);
 		}
 
-		.queuedSounds = {};
+		tableClear(.queuedSounds);
 	};
 
 	// queues the sound, call PlayAllQueued() to play

@@ -8,7 +8,7 @@ global MakeDumpGui = function()
 
     DumpGui.Draw = function()
     {
-		Gui.Begin("Dump", 20, g_core.screenDimen.y.Int() - 10);
+		Gui.Begin("Dump", 20, g_core.screenDimen.y.Int() - 60);
         Gui.DisplayTable(g_dump, .tableSelector);
 		Gui.End();
     };

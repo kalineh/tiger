@@ -1,7 +1,9 @@
 
 global CarLaneY = {
-    -240.0f,
-    -326.0f,
+    -152.0f,
+    -224.0f,
+    -288.0f,
+    -368.0f,
 };
 
 global MakeCarExplosion = function(car)
@@ -21,15 +23,64 @@ global MakeCarExplosion = function(car)
     return Explosion;
 };
 
+global MakeCarSpawner = function(world)
+{
+    local CarSpawner = table();
+
+    CarSpawner.world = world;
+    CarSpawner.last_lane = 0;
+
+    CarSpawner.Release = function()
+    {
+        threadKill(.update_thread);
+    };
+
+    CarSpawner.Update = function()
+    {
+        while (true)
+        {
+            sleep(randfloat(0.1f, 0.5f));
+            .Spawn();
+            yield();
+        }
+    };
+
+    CarSpawner.Spawn = function()
+    {
+        while (true)
+        {
+            local lane = randint(0, 3);
+            if (lane != .last_lane)
+            {
+                break;
+            }
+        }
+
+        local type = randint(0, 2);
+        local y = CarLaneY[lane];
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
+        local pos = v3(base.x, base.y + y, 0.0f);
+        local car = MakeCar(.world, pos, type, lane);
+        local ai = MakeCarAI(car);
+
+        .world.AddLifeRow(car);
+    };
+
+    CarSpawner.update_thread = CarSpawner:thread(CarSpawner.Update);
+    return CarSpawner;
+};
+
 global MakeCarAI = function(car)
 {
     local AI = table();
 
     AI.car = car;
+    AI.lane_change_thread = -1;
 
     AI.NotifyOwnerRelease = function()
     {
         threadKill(.update_thread);
+        threadKill(.lane_change_thread);
         return false;
     };
 
@@ -38,7 +89,7 @@ global MakeCarAI = function(car)
         // TODO: can just do with physics and 0.0f friction
         while (true)
         {
-            if (.car.lane == 0)
+            if (.car.lane < 2)
             {
                 .car.move_input = v2(-5.0f, 0.0f);
                 .car.anim.facing = FACING.RIGHT;
@@ -50,10 +101,47 @@ global MakeCarAI = function(car)
 
             // TODO: lane changes
 
-            if (.car.pos.x < -900.0f)
+            local visible = .car.IsInsideCam();
+            if (.car.pos.x < g_game.state.cam.pos.x && !visible)
             {
                 .car.world.AddDeathRow(.car);
                 return;
+            }
+
+            if (!threadIsAlive(.lane_change_thread) && randint(0, 1000) < 400 && false)
+            {
+                fork id {
+
+                    if (.car.lane < 2)
+                    {
+                        local move = v2(0.0f, Select(.car.lane == 0, +1.0f, -1.0f));
+                        .car.lane = Select(.car.lane == 0, 1, 0);
+                    }
+                    else
+                    {
+                        local move = v2(0.0f, Select(.car.lane == 2, +1.0f, -1.0f));
+                        .car.lane = Select(.car.lane == 2, 3, 2);
+                    }
+                    return;
+
+                    while (true)
+                    {
+                        local pos = v2(.car.pos);
+                        local dst = v2(.car.pos.x, CarLaneY[.car.lane]);
+                        local ofs = dst - pos;
+                        local len = safe_length(ofs);
+
+                        if (len < 0.1f)
+                        {
+                            break;
+                        }
+
+                        .car.move_input += move * min(1.0f, len);
+
+                        yield();
+                    }
+                }
+                .lane_change_thread = id;
             }
 
             yield();

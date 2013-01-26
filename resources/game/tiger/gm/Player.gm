@@ -366,6 +366,8 @@ global MakePlayerController = function(fighter)
         {
             local f = .fighter;
 
+            g_dump.player_pos = f.pos;
+
             if (f.IsDead())
             {
                 yield();
@@ -487,7 +489,26 @@ global MakePlayer = function(world, coord)
         .BaseOnPreUpdate();
 
         // TODO: get stage axis from .world.stage
-		g_game.state.cam.SetTargetPos( v2(.pos) );
+
+        local cam = g_game.state.cam;
+        local ofs = .pos.x - cam.pos.x;
+
+        local move = v2(0.0f);
+        local border = 350.0f;
+        g_dump.ofs = ofs;
+        if (ofs > border)
+        {
+            move = v2(ofs - border, 0.0f);
+    		//cam.SetTargetPos( cam.pos + move );
+        }
+
+        if (ofs < -border)
+        {
+            move = v2(-(-ofs - border), 0.0f);
+        }
+
+        g_dump.move = move;
+        cam.SetTargetPos( cam.pos + move );
 	};
 
 	return Player;

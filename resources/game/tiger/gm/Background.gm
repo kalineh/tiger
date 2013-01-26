@@ -55,7 +55,7 @@ global MakeBackground = function(type)
 		Gfx.BeginDefaultShader();
 
 		g_game.BeginScreenSpace();
-		DrawTexture(.textures.street_bg, v2(0.0f));
+        ._DrawParallaxLayer(.textures.street_bg, v2(0.0f), 1.0f, 0.0f);
 		g_game.EndScreenSpace();
 
 		Gfx.EndDefaultShader();
@@ -67,7 +67,7 @@ global MakeBackground = function(type)
 		Gfx.BeginDefaultShader();
 
 		g_game.BeginScreenSpace();
-		DrawTexture(.textures.street_fg, v2(0.0f));
+        ._DrawParallaxLayer(.textures.street_fg, v2(0.0f), 1.0f, 0.0f);
 		g_game.EndScreenSpace();
 
 		Gfx.EndDefaultShader();

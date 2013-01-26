@@ -65,7 +65,7 @@ local CreateGame = function()
 	{
 		Gui.Begin("Tiger", g_core.screenDimen.x.Int()-230, g_core.screenDimen.y.Int() - 5);
 	
-		Gui.Print("Game Time: " + .time );
+		Gui.Print("Game Time: " + .time.Int());
 		Gui.Separator();
 		.showAnimationGui = Gui.CheckBox("Show Animation Bank", .showAnimationGui);
 		.showShaderGui = Gui.CheckBox("Show Shader Bank", .showShaderGui);
@@ -204,8 +204,8 @@ local CreateGame = function()
 		.state = null;
 
 		//.GotoState("title");
-		.GotoState("highway");
-		//.GotoState("game");
+		//.GotoState("highway");
+		.GotoState("game");
 		//.GotoState("intro");
 	};
 

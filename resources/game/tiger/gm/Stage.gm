@@ -3,15 +3,17 @@ global StageConfig =
 {
     Highway =
     {
+        // replaced with spawner
+        /*
         // debug
         { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
-        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
-        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
-        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
-        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
-        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
-        { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
-        { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 46, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 12, type = "SpawnCar", args = { type = 0, lane = 2 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 3 } },
+        { time = 20, type = "SpawnCar", args = { type = 0, lane = 0 } },
+        { time = 15, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        { time = 8, type = "SpawnCar", args = { type = 0, lane = 2 } },
+        { time = 0, type = "SpawnCar", args = { type = 1, lane = 3 } },
         // real
         { time = 0, type = "SpawnCar", args = { type = 0, lane = 0 } },
         { time = 0, type = "SpawnCar", args = { type = 1, lane = 1 } },
@@ -23,15 +25,18 @@ global StageConfig =
         { time = 120, type = "SpawnCar", args = { type = 1, lane = 1 } },
         { time = 140, type = "SpawnCar", args = { type = 0, lane = 0 } },
         { time = 160, type = "SpawnCar", args = { type = 1, lane = 1 } },
+        */
     },
     Street =
     {
+        /*
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
         { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
         { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
         { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
         { time = 40, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
+        */
     },
 };
 

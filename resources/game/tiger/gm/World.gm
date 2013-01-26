@@ -23,6 +23,9 @@ global MakeWorld = function(stage_config)
 		Gui.Begin("World", g_core.screenDimen.x - 400, g_core.screenDimen.y - 10 );
 
 		Gui.Separator();
+        Gui.Print("Entities: " + tableCount(.entities));
+        Gui.Print("Life Row: " + tableCount(.liferow));
+        Gui.Print("Death Row: " + tableCount(.deathrow));
 
 		Gui.End();
 	};
@@ -46,7 +49,7 @@ global MakeWorld = function(stage_config)
 			.entities[e] = e;
 		}
 
-		.liferow = table();
+		tableClear( .liferow );
 	};
 
 
@@ -142,17 +145,22 @@ global MakeWorld = function(stage_config)
 			e.Release();
 		}
 
-		.deathrow = table();
+		tableClear( .deathrow );
 	};
 
 	World.DrawEntities = function()
 	{
 		Gfx.Enable(Gfx.BLEND);
 
+        local cam = g_game.state.cam;
+        cam.DrawBegin();
+
 		foreach (e in .entities)
 		{
 			e.Draw();
 		}
+
+        cam.DrawEnd();
 	};
 
 	World.DrawCollision = function()

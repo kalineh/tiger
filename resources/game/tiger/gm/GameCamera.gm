@@ -86,7 +86,7 @@ global MakeGameCamera = function()
 	GameCamera.CanSeeBox = function( position, size )
 	{	
 		local newDimen = g_game.dimen/.zoom;
-		local camPos = .CalcPosClamped();
+		local camPos = .CalcPos();
 		
 		// clamp the position to world
 		local minCamPos = camPos-newDimen*0.5;
@@ -123,7 +123,7 @@ global MakeGameCamera = function()
 
 	GameCamera._CalcPos = function()
 	{
-		.pos = lerp(.pos, .targetPos, 0.05f );
+		.pos = lerp(.pos, .targetPos, 0.15f );
 
         g_dump.target = .targetPos;
         g_dump.pos = .pos;

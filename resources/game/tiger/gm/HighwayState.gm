@@ -30,6 +30,7 @@ global MakeHighwayState = function()
 		.cam = MakeGameCamera();
 		.world = MakeWorld("Highway");
 		.world.Init(true);
+        .spawner = MakeCarSpawner(.world);
 		.gui = MakeGameGui();
 
 		._InitTextures();
@@ -80,6 +81,9 @@ global MakeHighwayState = function()
 	{
 		.bg.Release();
 		.bg = null;
+
+        .spawner.Release();
+        .spawner = null;
 
 		.world.Release();
 		.world = null;

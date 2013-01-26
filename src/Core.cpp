@@ -21,7 +21,7 @@
 namespace funk
 {
 Core::Core()
-	: m_gameRunning(true), m_msGpu(0.0f), m_showAnalyticsGui(false)
+	: m_gameRunning(true), m_msGpu(0.0f), m_showAnalyticsGui(true)
 {;}
 
 void Core::Init()
