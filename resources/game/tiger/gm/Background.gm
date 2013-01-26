@@ -4,6 +4,7 @@ global MakeBackground = function(type)
 	{
         type = type,
         textures = table(),
+        parallax_axis = 0,
 	};
 
     Background.UpdateStreet = function()
@@ -26,22 +27,27 @@ global MakeBackground = function(type)
         }
     };
 
-	Background._DrawParallaxLayer = function(tex, xParallax, yParallax)
+	Background._DrawParallaxLayer = function(tex, coord, xParallax, yParallax)
 	{
 		local camera = g_game.state.cam;
-		local camPos = g_game.state.cam.CalcPosClamped();
+		local camPos = g_game.state.cam.CalcPos();
 
 		local camPosParallax = camPos * v2( xParallax, yParallax );
 		local x = fmod(camPosParallax.x, g_game.dimen.x);
 		local y = fmod(camPosParallax.y, g_game.dimen.y);
 
-		camera.DrawBegin();
+		//camera.DrawBegin();
 		local i;
 		for ( i = -1; i <= 1; i+= 1 )
 		{
-			DrawTexture(tex, camPosParallax + v2(i*tex.Dimen().x,0.0f) );
+        	tex.Bind(0);
+            local pos = v2(-x, -y) + coord;
+            local ofs = Select(.parallax_axis == 0, v2(i * tex.Dimen().x, 0.0f), v2(0.0f, i * tex.Dimen().y));
+        	Gfx.DrawRectTexCoords(pos + ofs, tex.Dimen());
+        	Gfx.DrawRectTexCoords(pos, tex.Dimen());
+        	tex.Unbind();
 		}
-		camera.DrawEnd();
+		//camera.DrawEnd();
 	};
 
 	Background.DrawStreetBG = function()
@@ -71,10 +77,8 @@ global MakeBackground = function(type)
 	{
 		Gfx.BeginDefaultShader();
 
-		g_game.BeginScreenSpace();
-		DrawTexture(.textures.highway_bg, v2(0.0f));
-		DrawTexture(.textures.highway_street, v2(0.0f));
-		g_game.EndScreenSpace();
+        ._DrawParallaxLayer(.textures.highway_bg, v2(0.0f), 0.1f, 1.0f);
+        ._DrawParallaxLayer(.textures.highway_street, v2(0.0f), 4.0f, 1.0f);
 
 		Gfx.EndDefaultShader();
 	};
@@ -85,7 +89,7 @@ global MakeBackground = function(type)
 
 		g_game.BeginScreenSpace();
 
-		DrawTexture(.textures.highway_fg, v2(0.0f));
+        ._DrawParallaxLayer(.textures.highway_fg, v2(0.0f, 140.0f), 4.5f, 1.0f);
 
 		g_game.EndScreenSpace();
 

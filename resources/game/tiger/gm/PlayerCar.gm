@@ -92,7 +92,10 @@ global MakePlayerCarController = function(car)
                 continue;
             }
 
-            c.move_input = .controls.MoveFunction.Press();
+            if (c.stun <= 0)
+            {
+                c.move_input = .controls.MoveFunction.Press();
+            }
 
             if (!threadIsAlive(c.action_thread))
             {
@@ -116,6 +119,7 @@ global MakePlayerCar = function(world, coord)
 	PlayerCar.anim.ChangeTo("player");
     PlayerCar.max_health = 10.0f;
     PlayerCar.health = PlayerCar.max_health;
+    PlayerCar.stun = 0;
 
     // TODO: move to config
 	PlayerCar.air_max_speed = v3(6.0f, 4.0f, 8.0f);
@@ -143,7 +147,16 @@ global MakePlayerCar = function(world, coord)
 		//g_game.state.cam.SetTargetPos( v2(.pos) );
 
         // TODO: if health < N: smoke effects
+
+        .stun = max(0, .stun - 1);
 	};
+
+    PlayerCar.CarOnTakeDamage = PlayerCar.OnTakeDamage;
+    PlayerCar.OnTakeDamage = function(damage)
+    {
+        .CarOnTakeDamage(damage);
+        .stun = 24;
+    };
 
 	return PlayerCar;
 };

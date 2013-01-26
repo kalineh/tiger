@@ -10,24 +10,11 @@ local AddDrawLayers = function()
 	.Scene_Begin		= val; val+=1;
 	.Scene_CamBegin		= val; val+=1;
 	.Scene_BG			= val; val+=1;
-	.Scene_Grid			= val; val+=1;
 	.Scene				= val; val+=1;
 	.Scene_FG			= val; val+=1;
-	.Scene_Freeze		= val; val+=1;
 	.Scene_UI			= val; val+=1;
 	.Scene_CamEnd		= val; val+=1;
 	.Scene_End			= val; val+=1;
-
-	// Crew select
-	.CrewSelect_Begin		= val; val+=1;
-	.CrewSelect_BG			= val; val+=1;
-	.CrewSelect_Bokeh		= val; val+=1;
-	.CrewSelect_TopBar		= val; val+=1;
-	.CrewSelect				= val; val+=1;
-	.CrewSelect_Particles	= val; val+=1;
-	.CrewSelect_Icon		= val; val+=1;
-	.CrewSelect_IconDrag	= val; val+=1;
-	.CrewSelect_End			= val; val+=1;
 
 	.Offscreen_End	= val; val+=1;
 

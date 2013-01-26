@@ -113,9 +113,20 @@ global MakeGameCamera = function()
 		return pos;
 	};
 
+    GameCamera.CalcPos = function()
+    {
+        local dimen = g_game.dimen / .zoom;
+        local pos = .pos + dimen * 0.5f;
+
+        return pos;
+    };
+
 	GameCamera._CalcPos = function()
 	{
 		.pos = lerp(.pos, .targetPos, 0.05f );
+
+        g_dump.target = .targetPos;
+        g_dump.pos = .pos;
 
 		// zooming
 		local newDimen = g_game.dimen/.zoom;

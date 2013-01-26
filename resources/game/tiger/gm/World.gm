@@ -158,7 +158,7 @@ global MakeWorld = function(stage_config)
 	World.DrawCollision = function()
 	{
         // TODO: toggle gui option
-        .collision_manager.DebugDraw();
+        //.collision_manager.DebugDraw();
 	};
 
 	World.Update = function()

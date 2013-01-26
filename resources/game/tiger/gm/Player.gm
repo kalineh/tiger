@@ -471,6 +471,9 @@ global MakePlayer = function(world, coord)
     Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
 
+	Player.max_health = PlayerDefaults.MaxHealth;
+	Player.health = Player.max_health;
+
     Player.FighterRelease = Player.Release;
     Player.Release = function()
     {

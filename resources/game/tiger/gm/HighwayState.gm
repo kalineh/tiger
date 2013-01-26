@@ -8,6 +8,9 @@ global MakeHighwayState = function()
 	{
 		while( true )
 		{		
+            local scroll = v2(5.0f, 0.0f);
+    		.cam.SetTargetPos(.cam.targetPos + scroll);
+
 			RegisterGui(.Gui, this);
 			yield();
 		}
@@ -31,9 +34,6 @@ global MakeHighwayState = function()
 
 		._InitTextures();
 		._InitParticles();
-
-		// force camera to focus player first
-		//.cam.TeleportTo(.world.GetPlayer().coord * .world.tilesize);
 
 		.threadId = this:thread(.Update);
 	};

@@ -52,3 +52,13 @@ global DrawCoordSysDebug = function()
 	Gfx.Enable(Gfx.DEPTH_TEST);
 	Gfx.EndDefaultShader();
 };
+
+global Select = function(cond, a, b)
+{
+    if (cond)
+    {
+        return a;
+    }
+
+    return b;
+};

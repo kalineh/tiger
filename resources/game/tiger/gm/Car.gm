@@ -88,7 +88,7 @@ global MakeCar = function(world, coord, car_type, lane)
     Car.frames_ground = 0;
     Car.frames_air = 0;
     Car.action_thread = -1;
-    Car.collision_body = MakeCollision(Car, CollisionType.Circle, 32.0f);
+    Car.collision_body = MakeCollision(Car, CollisionType.Circle, 96.0f);
 	Car.air_max_speed = v3(8.0f, 3.0f, 4.0f);
 	Car.ground_max_speed = v3(8.0f, 3.0f, 4.0f);
 	Car.notify_release = MakeNotify(this, "NotifyRelease");
@@ -270,14 +270,16 @@ global MakeCar = function(world, coord, car_type, lane)
             if (rhs == rhs.owner.collision_body)
             {
                 local damage = 1.0f;
+                local power = 3.0f;
 
                 .TakeDamage(damage);
 
                 local ofs = .pos - rhs.owner.pos;
                 local dir = safe_normalize(ofs * v3(1,0,0));
-                local force = dir * 1.0f;
+                local force = dir * power;
 
                 .accel += v3(force.x, force.y, 0.0f);
+                .vel += v3(force.x, force.y, 0.0f);
             }
         }
 
