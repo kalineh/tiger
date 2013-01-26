@@ -173,8 +173,8 @@ global MakePlayerCar = function(world, coord)
 
         // clamp to screen edges
         local cam = g_game.state.cam;
-        .pos = v3( max(.pos.x, cam.pos.x - 670.0f), .pos.y, .pos.z );
-        .pos = v3( min(.pos.x, cam.pos.x + 400.0f), .pos.y, .pos.z );
+        .pos = v3( max(.pos.x, cam.pos.x - 670.0f), max( .pos.y, cam.pos.y - 370.0f ), .pos.z );
+        .pos = v3( min(.pos.x, cam.pos.x + 400.0f), min( .pos.y, cam.pos.y - 150.0f ), .pos.z );
     };
 
 

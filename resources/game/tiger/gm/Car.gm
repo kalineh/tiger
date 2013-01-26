@@ -39,10 +39,10 @@ global MakeCarSpawner = function(world)
     {
         while (true)
         {
-            sleep(randfloat(0.1f, 0.5f));
+            sleep(randfloat(0.25f, 0.8f));
             .Spawn();
 
-            if (randint(0, 100) < 10)
+            if (randint(0, 100) < 20)
             {
                 .SpawnOil();
             }
@@ -55,9 +55,10 @@ global MakeCarSpawner = function(world)
     {
         while (true)
         {
-            local lane = randint(0, 3);
+            local lane = randint(0, 4);
             if (lane != .last_lane)
             {
+                .last_lane = lane;
                 break;
             }
         }
@@ -102,17 +103,20 @@ global MakeCarAI = function(car)
 
     AI.Update = function()
     {
+        local variation0 = sign(randfloat(-1.0f, 1.0f)) * 0.5f;
+        local variation1 = sign(randfloat(-1.0f, 1.0f)) * 0.02f;
+
         // TODO: can just do with physics and 0.0f friction
         while (true)
         {
             if (.car.lane < 2)
             {
-                .car.move_input = v2(-5.0f, 0.0f);
+                .car.move_input = v2(-7.0f + variation0 + .car.pushaway, 0.0f);
                 .car.anim.facing = FACING.RIGHT;
             }
             else 
             {
-                .car.move_input = v2(-0.2f, 0.0f);
+                .car.move_input = v2(+0.05f + variation1 + .car.pushaway, 0.0f);
             }
 
             // TODO: lane changes
@@ -178,7 +182,7 @@ global MakeOilSpill = function(world, coord)
     OilSpill.type = "OilSpill"; 
     OilSpill.mass = 0.0f;
     OilSpill.anim = MakeSpriteAnimation(g_game.animBank, "oil_spill");
-    OilSpill.collision_body = MakeCollision(OilSpill, CollisionType.Circle, 30.0f);
+    OilSpill.collision_body = MakeCollision(OilSpill, CollisionType.Circle, 24.0f);
 	OilSpill.air_max_speed = v3(1.0f, 1.0f, 1.0f);
 	OilSpill.ground_max_speed = v3(16.0f, 1.0f, 1.0f);
     world.collision_manager.Add(OilSpill.collision_body);
@@ -240,11 +244,17 @@ global MakeCar = function(world, coord, car_type, lane)
     Car.action_thread = -1;
     Car.collision_body = MakeCollision(Car, CollisionType.Circle, 96.0f);
 	Car.air_max_speed = v3(8.0f, 3.0f, 4.0f);
-	Car.ground_max_speed = v3(8.0f, 3.0f, 4.0f);
+	Car.ground_max_speed = v3(10.0f, 3.0f, 4.0f);
 	Car.notify_release = MakeNotify(this, "NotifyRelease");
 	Car.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
     Car.constant_speed = v2();
     Car.spinout = 0.0f;
+    Car.pushaway = 0.0f;
+
+	Car.ground_max_speed = v3(
+        Car.ground_max_speed.x + sign(randfloat(-1.0f, 1.0f)) * 1.5f,
+        Car.ground_max_speed.y,
+        Car.ground_max_speed.z);
 
     Car.lane = lane;
     Car.car_type = car_type;
@@ -274,28 +284,6 @@ global MakeCar = function(world, coord, car_type, lane)
     {
         assert(!threadIsAlive(.action_thread));
         .action_thread = this_:thread(f, a, b, c, d, e);
-    };
-
-    Car.SetNPCLane = function(lane)
-    {
-        local action_function = function(lane)
-        {
-            while (true)
-            {
-                if (lane == 0)
-                {
-                    .move_input = v2(-2.0f, 0.0f);
-                    .anim.facing = FACING.LEFT;
-                }
-                else 
-                {
-                    .move_input = v2(-0.2f, 0.0f);
-                }
-
-                yield();
-            }
-        };
-        .action_thread = this:thread(action_function, lane);
     };
 
 	Car.OnPreUpdate = function()
@@ -371,14 +359,9 @@ global MakeCar = function(world, coord, car_type, lane)
 
     Car.OnCollide = function(lhs, rhs)
     {
-        if (rhs.owner.type == .type)
-        {
-            return;
-        }
-
         if (rhs.owner.type == "OilSpill")
         {
-            .SpinOut(20);
+            .SpinOut(30);
             return;
         }
 
@@ -387,7 +370,14 @@ global MakeCar = function(world, coord, car_type, lane)
             if (rhs == rhs.owner.collision_body)
             {
                 local damage = 1.0f;
-                local power = 3.0f;
+                local power = 1.0f;
+
+                // no damage for self-type, just push
+                if (rhs.owner.type == .type)
+                {
+                    damage = 0.0f;
+                }
+
 
                 .TakeDamage(damage);
 
@@ -395,8 +385,10 @@ global MakeCar = function(world, coord, car_type, lane)
                 local dir = safe_normalize(ofs * v3(1,0,0));
                 local force = dir * power;
 
-                .accel += v3(force.x, force.y, 0.0f);
-                .vel += v3(force.x, force.y, 0.0f);
+                .accel += v3(force.x, 0.0f, 0.0f);
+                .vel += v3(force.x, 0.0f, 0.0f);
+
+                .pushaway += force.x * 0.08f;
             }
         }
 
