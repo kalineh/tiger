@@ -242,7 +242,14 @@ global MakeEntity = function(world, pos)
 
 		if (.IsDead())
 		{
-			.Die();
+            if (?.DeathEffect)
+            {
+                .DeathEffect();
+            }
+            else
+            {
+    			.Die();
+            }
 		}
 	};
 

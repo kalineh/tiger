@@ -10,7 +10,7 @@ global FighterConfig =
 
     Thug = 
     {
-        MaxHealth = 20.0f,
+        MaxHealth = 2.0f,
         MaxEnergy = 0.0f,
         Animations = "player",
     },
@@ -41,6 +41,7 @@ global MakeFighter = function(world, coord, config_name)
     Fighter.frames_ground = 0;
     Fighter.frames_air = 0;
     Fighter.action_thread = -1;
+    Fighter.death_thread = -1;
     Fighter.jump_thread = -1;
     Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
     Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
@@ -66,18 +67,21 @@ global MakeFighter = function(world, coord, config_name)
         .world.collision_manager.Remove(.collision_body);
         .world.collision_manager.Remove(.collision_weapon);
         threadKill(.action_thread);
+        threadKill(.death_thread);
         threadKill(.jump_thread);
         .EntityRelease();
     };
 
     Fighter.StartActionThread = function(name, f, a, b, c, d, e)
     {
+        print("action:", name);
         assert(!threadIsAlive(.action_thread));
         .action_thread = this:thread(f, a, b, c, d, e);
     };
 
     Fighter.StartActionThreadThis = function(this_, name, f, a, b, c, d, e)
     {
+        print("actionthis:", name);
         assert(!threadIsAlive(.action_thread));
         .action_thread = this_:thread(f, a, b, c, d, e);
     };
@@ -119,6 +123,11 @@ global MakeFighter = function(world, coord, config_name)
             .anim.ChangeToNoReset("stun");
             .stun -= 1;
             .move_input = v2(0.0f, 0.0f);
+            return;
+        }
+
+        if (threadIsAlive(.death_thread))
+        {
             return;
         }
 
@@ -299,7 +308,7 @@ global MakeFighter = function(world, coord, config_name)
         assert(?ProjectileHitConfig[type]);
 
         local floating = v3(0.0f, 0.0f, 0.5f);
-        local pos = .GetAnimCenter() + .GetFacingDir() * -32.0f + floating;
+        local pos = .GetAnimCenter() + .GetFacingDir() * +48.0f + floating;
         local vel = .GetFacingDir() * -20.0f;
         local projectile = MakeProjectile(.world, type, pos, vel);
 
@@ -365,9 +374,14 @@ global MakeFighter = function(world, coord, config_name)
             .anim.ChangeToNoReset("prone");
             .collision_body.SetEnabled(false);
             sleep(randfloat(1.5f, 2.5f));
-            .anim.ChangeToNoReset("getup");
-            .anim.WaitFinished();
-            .collision_body.SetEnabled(true);
+
+            // HACK
+            if (!.IsDead())
+            {
+                .anim.ChangeToNoReset("getup");
+                .anim.WaitFinished();
+                .collision_body.SetEnabled(true);
+            }
         };
 
         .StartActionThread("Knockdown", knockdown_function, knockback, dir);
@@ -438,6 +452,32 @@ global MakeFighter = function(world, coord, config_name)
         }
 
         return false;
+    };
+
+    Fighter.DeathEffect = function()
+    {
+        threadKill(.action_thread);
+
+        local death_function = function()
+        {
+            .Knockdown(15.0f, .GetFacingDir() * -1.0f);
+            sleep(2.0f);
+            for (i = 0; i < 120; i += 1)
+            {
+                .alpha = Select((i % 10) < 5, 0.0f, 1.0f);
+                yield();
+            }
+            .Die();
+            sleep(1.0f);
+        };
+
+        local wait_function = function()
+        {
+            sleep(10000.0f);
+        };
+
+        .death_thread = this:thread(death_function);
+        .StartActionThread("DeathWait", wait_function);
     };
 
 	return Fighter;

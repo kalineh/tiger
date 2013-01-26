@@ -106,11 +106,11 @@ global g_fileData =
 
                 kick =
 				{
-                    tileIndex = { 7,8,7 },
-					times = { 0.1f },
+                    tileIndex = { 7,8,8,7 },
+					times = { 0.1f,0.05f,0.01f,0.1f },
 					looping = false,
                     tags = {
-                        hit = { 1 },
+                        hit = { 2 },
                     },
 				},
 

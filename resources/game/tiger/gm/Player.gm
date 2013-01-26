@@ -93,7 +93,7 @@ global PlayerGroundAttacks =
     Kick =
     {
         anim = "kick",
-        damage = 2.0f,
+        damage = 1.0f,
         finish = false,
         stun = 1,
         push = 0.25f,
@@ -129,7 +129,7 @@ global PlayerGroundAttacks =
     SweepKick =
     {
         anim = "sweepkick",
-        damage = 2.0f,
+        damage = 1.0f,
         finish = true,
         stun = 0,
         push = 0.0f,
@@ -179,28 +179,33 @@ global PlayerGroundComboChains =
     },
 
     PunchL = {
+        { name = "AfroPick", action = ComboActions.Throw, },
         { name = "PunchR", action = ComboActions.Punch, },
         { name = "Knee", action = ComboActions.Kick | ComboActions.Forward, },
         { name = "Kick", action = ComboActions.Kick, },
     },
 
     PunchR = {
+        { name = "AfroPick", action = ComboActions.Throw, },
         { name = "Uppercut", action = ComboActions.Punch | ComboActions.Forward, },
         { name = "SpinKick", action = ComboActions.Kick, },
     },
 
     Kick = {
+        { name = "AfroPick", action = ComboActions.Throw, },
         { name = "SweepKick", action = ComboActions.Kick | ComboActions.Down, },
         { name = "PunchL", action = ComboActions.Punch, },
         { name = "Kick", action = ComboActions.Kick, },
     },
 
     SpinKick = {
+        { name = "AfroPick", action = ComboActions.Throw, },
         { name = "PunchL", action = ComboActions.Punch, },
         { name = "Kick", action = ComboActions.Kick, },
     },
 
     Knee = {
+        { name = "AfroPick", action = ComboActions.Throw, },
         { name = "PunchL", action = ComboActions.Punch, },
     },
 };

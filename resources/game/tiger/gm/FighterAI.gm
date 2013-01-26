@@ -47,6 +47,11 @@ global MakeFighterAI = function(owner, name)
                 continue;
             }
 
+            if (.owner.IsDead())
+            {
+                return;
+            }
+
             // TODO: use state instead of animation?
             if (.owner.anim.currAnimName == "knockdown" ||
                 .owner.anim.currAnimName == "prone")

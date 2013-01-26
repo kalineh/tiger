@@ -14,8 +14,15 @@ global MakeProjectile = function(world, type, pos, vel)
 {
     local Projectile = MakeEntity(world, pos);
 
+	Projectile.type = "PlayerProjectile";
 	Projectile.shadow = MakeSpriteAnimation(g_game.animBank, "projectile_shadow");
 	Projectile.anim = MakeSpriteAnimation(g_game.animBank, type);
+    Projectile.collision_body = MakeCollision(Projectile, CollisionType.Circle, 12.0f);
+    Projectile.collision_body.SetEnabled(true);
+    Projectile.collision_body.damage = 0.0f;
+    Projectile.collision_body.knockback = 0.1f;
+    Projectile.collision_body.stun = 1;
+    world.collision_manager.Add(Projectile.collision_body);
 
 	Projectile.mass = 0.1f;
 	Projectile.vel = vel;
@@ -23,6 +30,32 @@ global MakeProjectile = function(world, type, pos, vel)
 	Projectile.ground_friction = v3(0.2f, 0.2f, 0.2f);
 	Projectile.air_max_speed = v3(20.0f, 20.0f, 0.0f);
 	Projectile.ground_max_speed = v3(10.0f, 10.0f, 1.0f);
+
+    Projectile.EntityRelease = Projectile.Release;
+    Projectile.Release = function()
+    {
+        .world.collision_manager.Remove(.collision_body);
+        .EntityRelease();
+    };
+
+    Projectile.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+        .collision_body.SetPosition(center + v3(0.0f, -64.0f, 0.0f));
+
+        if (.frame_count > 120)
+        {
+            .Die();
+        }
+    };
+
+    Projectile.OnCollide = function(lhs, rhs)
+    {
+        if (rhs.owner.type == "Enemy")
+        {
+            .Die();
+        }
+    };
 
 	Projectile.OnDie = function()
 	{
