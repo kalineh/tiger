@@ -3,14 +3,14 @@ global FighterConfig =
 {
     Player = 
     {
-        MaxHealth = 10.0f,
-        MaxEnergy = 10.0f,
+        MaxHealth = 20.0f,
+        MaxEnergy = 20.0f,
         Animations = "player",
     },
 
     Thug = 
     {
-        MaxHealth = 50.0f,
+        MaxHealth = 20.0f,
         MaxEnergy = 0.0f,
         Animations = "player",
     },
@@ -32,7 +32,7 @@ global MakeFighter = function(world, coord, config_name)
 	Fighter.health = Fighter.max_health;
 	Fighter.energy = Fighter.max_energy;
 	Fighter.stun = 0;
-	Fighter.mass = 3.0f;
+	Fighter.mass = 5.0f;
 	Fighter.shadow = MakeSpriteAnimation(g_game.animBank, config.Animations + "_shadow");
 	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
 	Fighter.move_input = v2();
@@ -193,8 +193,10 @@ global MakeFighter = function(world, coord, config_name)
         // TODO: why were we setting this here?
         //.collision_body.SetEnabled(true);
 
+        .pos = v3(.pos.x, clamp(.pos.y, .world.bounds_min_y, .world.bounds_max_y), .pos.z);
+
         .collision_body.SetPosition(center);
-        .collision_weapon.SetPosition(center + dir * 48.0f);
+        .collision_weapon.SetPosition(center + dir * 58.0f);
     };
 
     Fighter.Jump = function(input)
@@ -316,6 +318,7 @@ global MakeFighter = function(world, coord, config_name)
 
         local knockback_function = function(force, dir)
         {
+            print("knockback");
             local knockback_time = force * 8.0f;
 
             .anim.ChangeToNoReset("stun");
@@ -330,15 +333,24 @@ global MakeFighter = function(world, coord, config_name)
         .StartActionThread("Knockback", knockback_function, force, dir);
     };
 
-    Fighter.Knockdown = function()
+    Fighter.Knockdown = function(knockback, dir)
     {
         threadKill(.action_thread);
 
-        local knockdown_function = function()
+        local knockdown_function = function(knockback, dir)
         {
             .anim.ChangeToNoReset("knockdown");
 
-            sleep(0.2f);
+            // some minimum for knockdowns...
+            knockback = max(2.0f, knockback);
+
+            for (i = 0; i < 8; i += 1)
+            {
+                .accel += v3(0.0f, 0.0f, +2.0f * knockback) + dir * knockback;
+                yield();
+            }
+
+            sleep(0.1f);
 
             while (.frames_ground <= 0)
             {
@@ -353,11 +365,13 @@ global MakeFighter = function(world, coord, config_name)
             .collision_body.SetEnabled(true);
         };
 
-        .StartActionThread("Knockdown", knockdown_function);
+        .StartActionThread("Knockdown", knockdown_function, knockback, dir);
     };
 
     Fighter.OnTakeDamage = function(damage)
     {
+		DrawNotifyText( "-"+damage.Int(), v2(.GetAnimCenter() + .GetAnimSize() * v3(0.0f, 0.55f, 0.0f)), Gfx.RED);
+
         .notify_take_damage.Notify(damage);
 
         // TODO: anything else we need to disable here?
@@ -400,12 +414,15 @@ global MakeFighter = function(world, coord, config_name)
 
                 .accel += v3(force.x, force.y, knockup);
 
-                .Knockback(knockback, dir);
-
                 if (knockdown)
                 {
-                    .Knockdown();
+                    .Knockdown(knockback, dir);
                 }
+                else
+                {
+                    .Knockback(knockback, dir);
+                }
+
             }
         }
 

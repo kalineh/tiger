@@ -234,8 +234,6 @@ global MakeEntity = function(world, pos)
 
 		// flash red
 		//.color = Gfx.RED;
-		DrawNotifyText( "-"+damage.Int(), v2(.GetAnimCenter() + .GetAnimSize() * v3(0.0f, 0.55f, 0.0f)), Gfx.RED);
-
 		//g_game.state.EmitParticlesAt("entityTakeDamage", .GetCenterWorld(), 5*damage.Int());
 
 		.health -= damage;

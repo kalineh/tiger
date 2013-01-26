@@ -29,12 +29,12 @@ global StageConfig =
     },
     Street =
     {
-        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
-        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
-        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
-        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 0.0f, } },
-        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 120.0f, } },
-        { time = 200, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = 240.0f, } },
+        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -120.0f, } },
+        { time = 400, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -200.0f, } },
+        { time = 400, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -140.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -210.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -150.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -250.0f, } },
     },
 };
 
@@ -64,12 +64,12 @@ global MakeStage = function(world, name)
         local len = safe_length(ofs);
 
         // DEBUG: incrementing for now
-        if ( !?.progress_debug ) { .progress_debug = 0; }
-        .progress_debug += 1;
-        return .progress_debug;
+        //if ( !?.progress_debug ) { .progress_debug = 0; }
+        //.progress_debug += 1;
+        //return .progress_debug;
 
         // TODO: camera update handling, position doesnt reflect in stage
-        return 0;
+        g_dump.progress = len.Int();
 
         return len.Int();
     };
@@ -104,7 +104,7 @@ global MakeStage = function(world, name)
 
     Stage.ProcessSpawnEnemy = function(args)
     {
-        local base = g_game.state.cam.pos;
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
         local pos = v3(base.x, base.y + args.y, 0.0f);
         local enemy = MakeFighter(.world, pos, args.type);
         local ai = MakeFighterAI(enemy, args.type);

@@ -1,4 +1,8 @@
 
+//
+// I'M SORRY THIS CODE IS SO BAD
+//
+
 global CarLaneY = {
     -152.0f,
     -224.0f,
@@ -392,7 +396,7 @@ global MakeCar = function(world, coord, car_type, lane)
                 .accel += v3(force.x, 0.0f, 0.0f);
                 .vel += v3(force.x, 0.0f, 0.0f);
 
-                .pushaway += force.x * 0.04f;
+                .pushaway += force.x * 0.08f;
             }
         }
 

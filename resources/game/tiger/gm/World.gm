@@ -13,6 +13,8 @@ global MakeWorld = function(stage_config)
         stage_config = stage_config,
         frame = 0,
         drawCollision = false,
+        bounds_max_y = -88.0f,
+        bounds_min_y = -356.0f,
 
 		queryResults = array(),
 

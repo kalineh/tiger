@@ -6,9 +6,17 @@ global MakeGameState = function()
 
 	State.Update = function()
 	{
+		// force camera to focus player first
+		.cam.TeleportTo(v2(.world.player.pos.x, 0.0f));
+
 		while( true )
 		{		
 			RegisterGui(.Gui, this);
+
+            local cam = g_game.state.cam;
+            cam.pos = v2(max(0.0f, cam.pos.x), cam.pos.y);
+            cam.targetPos = v2(max(0.0f, cam.targetPos.x), cam.targetPos.y);
+
 			yield();
 		}
 	};
@@ -31,9 +39,6 @@ global MakeGameState = function()
 
 		._InitTextures();
 		._InitParticles();
-
-		// force camera to focus player first
-		//.cam.TeleportTo(.world.GetPlayer().coord * .world.tilesize);
 
 		.threadId = this:thread(.Update);
 	};

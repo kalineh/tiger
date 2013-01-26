@@ -204,8 +204,8 @@ local CreateGame = function()
 		.state = null;
 
 		//.GotoState("title");
-		.GotoState("highway");
-		//.GotoState("game");
+		//.GotoState("highway");
+		.GotoState("game");
 		//.GotoState("intro");
 	};
 

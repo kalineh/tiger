@@ -85,8 +85,8 @@ global PlayerGroundAttacks =
         finish = false,
         stun = 0,
         push = 0.1f,
-        knockback = 1.5f,
-        knockup = 1.5f,
+        knockback = 7.5f,
+        knockup = 15.0f,
         projectile = null,
     },
 
@@ -108,8 +108,8 @@ global PlayerGroundAttacks =
         damage = 1.0f,
         finish = true,
         stun = 8,
-        push = 2.0f,
-        knockback = 1.0f,
+        push = 0.1f,
+        knockback = 0.1f,
         knockup = 8.0f,
         projectile = null,
     },
@@ -117,12 +117,12 @@ global PlayerGroundAttacks =
     SpinKick =
     {
         anim = "spinkick",
-        damage = 2.0f,
+        damage = 1.0f,
         finish = true,
         stun = 2,
-        push = -0.1f,
+        push = +0.1f,
         knockback = 0.0f,
-        knockup = 2.0f,
+        knockup = 8.0f,
         projectile = null,
     },
 
@@ -163,49 +163,50 @@ global ComboActions =
     Backward = 0x80,
 }; 
 
+// NOTE: be sure to iterate in integer order to tableCount()
 global PlayerGroundComboChains =
 {
     Default = {
-        AfroPick = ComboActions.Throw,
-        PunchL = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     AfroPick = {
-        AfroPick = ComboActions.Throw,
-        PunchL = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     PunchL = {
-        PunchR = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "PunchR", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     PunchR = {
-        Knee = ComboActions.Kick | ComboActions.Forward,
-        Uppercut = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "Knee", action = ComboActions.Kick | ComboActions.Forward, },
+        { name = "Uppercut", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     Uppercut = {
-        SpinKick = ComboActions.Kick,
-        PunchL = ComboActions.Punch,
+        { name = "SpinKick", action = ComboActions.Kick, },
+        { name = "PunchL", action = ComboActions.Punch, },
     },
 
     Kick = {
-        SweepKick = ComboActions.Kick | ComboActions.Down,
-        PunchL = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "SweepKick", action = ComboActions.Kick | ComboActions.Down, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     SpinKick = {
-        PunchL = ComboActions.Punch,
-        Kick = ComboActions.Kick,
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
     },
 
     Knee = {
-        PunchL = ComboActions.Punch,
+        { name = "PunchL", action = ComboActions.Punch, },
     },
 };
 
@@ -304,8 +305,11 @@ global MakeComboSystem = function(chains, attacks)
            return null;
         }
 
-        foreach (next and action in .current)
+        // NOTE: be sure to iterate by integer index, ordering is needed
+        for (i = 0; i < tableCount(.current); i += 1)
         {
+            local next = .current[i].name;
+            local action = .current[i].action;
             foreach (a in .actions)
             {
                 if ((action & a) == action)
@@ -409,7 +413,6 @@ global MakePlayerController = function(fighter)
             if (r) { move_mask |= ComboActions.Backward; }
 
             g_dump.move_mask = move_mask;
-
             g_dump.current = f.ground_combo.current;
 
             // TODO: jump version
@@ -462,7 +465,7 @@ global MakePlayer = function(world, coord)
 	local Player = MakeFighter(world, coord, "Player");
 
     Player.type = "Player";
-	Player.mass = 1.2f;
+	Player.mass = 2.5f;
 
     // TODO: move to config
 	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
@@ -494,9 +497,10 @@ global MakePlayer = function(world, coord)
         local ofs = .pos.x - cam.pos.x;
 
         local move = v2(0.0f);
-        local border = 350.0f;
-        g_dump.ofs = ofs;
-        if (ofs > border)
+        local border = 220.0f;
+
+        // one-way scroll
+        if (ofs > 0.0f && ofs > border)
         {
             move = v2(ofs - border, 0.0f);
     		//cam.SetTargetPos( cam.pos + move );
