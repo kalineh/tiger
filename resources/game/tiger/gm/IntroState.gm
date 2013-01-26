@@ -14,9 +14,9 @@ global MakeIntroState = function()
 		g_game.BeginScreenSpace();
 		Gfx.BeginDefaultShader();
 
-        .currentCutscene.Bind(0);
+        //.currentCutscene.Bind(0);
 		DrawTexture(.currentCutscene, v2(0.0f));
-        .currentCutscene.Unbind(0);
+        //.currentCutscene.Unbind(0);
 
 		local font = g_game.fonts["zekton_30"];
 		Gfx.Color(Gfx.WHITE, 0.5f);
@@ -28,7 +28,7 @@ global MakeIntroState = function()
 
 	State.Update = function()
 	{
-        this:thread(.CutsceneThread);
+        .cutsceneThread = this:thread(.CutsceneThread);
         yield();
 
 		while( true )
@@ -120,10 +120,14 @@ global MakeIntroState = function()
         .WaitKeyOrTime(1.0f);
         fade_out();
 
+        print("a");
 		g_game.musicPlayer.FadeOut(1.0f);
         sleep(1.0f);
 
+        print("b");
+        threadKill(.threadId);
         g_game.GotoState("game");
+        print("c");
         //g_game.GotoState("highway");
     };
 
@@ -146,8 +150,10 @@ global MakeIntroState = function()
 
 	State.Release = function()
 	{
+		g_game.musicPlayer.FadeOut(1.0f);
         tableClear(.cutscenes);
 		threadKill(.threadId);
+		threadKill(.cutsceneThread);
 	};
 	
 	State.Init();
