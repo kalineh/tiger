@@ -36,7 +36,7 @@ global MakeTitleState = function()
 
 	State.Update = function()
 	{
-		g_game.musicPlayer.Play(g_game.songs.title, 0.1f);
+		g_game.musicPlayer.Play(g_game.songs.title, 0.25f);
 
 		while( true )
 		{		
@@ -81,7 +81,7 @@ global MakeTitleState = function()
 
 	State.Release = function()
 	{
-		g_game.musicPlayer.FadeOut(1.0f);
+		g_game.musicPlayer.Stop();
 
 		.texLogo = null;
 		.texBG = null;

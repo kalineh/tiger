@@ -20,7 +20,7 @@ global MakeBackground = function(type)
     Background.UpdateHighway = function()
     {
         .bg_color = 1.0f;
-        local stage_time = 90.0f;
+        local stage_time = 60.0f;
 
         local i = 0;
         while (true)

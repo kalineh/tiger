@@ -40,6 +40,8 @@ global MakeGameState = function()
 		._InitTextures();
 		._InitParticles();
 
+		g_game.musicPlayer.Play(g_game.songs.fight, 0.25f);
+
 		.threadId = this:thread(.Update);
 	};
 
@@ -83,6 +85,8 @@ global MakeGameState = function()
 
 	State.Release = function()
 	{
+		g_game.musicPlayer.Stop();
+
 		.bg.Release();
 		.bg = null;
 

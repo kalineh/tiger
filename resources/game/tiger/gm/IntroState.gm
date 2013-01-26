@@ -69,7 +69,7 @@ global MakeIntroState = function()
 			g_fader.WaitOn();
         };
 
-		g_game.musicPlayer.Play(g_game.songs.intro, 0.1f);
+		g_game.musicPlayer.Play(g_game.songs.intro, 0.25f);
 		g_game.voicePlayer.Play("test");
 
         .currentCutscene = .cutscenes[0];
@@ -146,7 +146,8 @@ global MakeIntroState = function()
 
 	State.Release = function()
 	{
-		g_game.musicPlayer.FadeOut(1.0f);
+		g_game.musicPlayer.Stop();
+
         tableClear(.cutscenes);
 		threadKill(.threadId);
 		threadKill(.cutsceneThread);

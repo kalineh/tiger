@@ -156,7 +156,7 @@ local CreateGame = function()
 		if (!previous && .playMusic)
 		{
 			global g_ENABLE_MUSIC = true;
-			g_game.musicPlayer.Play(g_game.musicPlayer.lastFile, 1.0f);
+			g_game.musicPlayer.Play(g_game.musicPlayer.lastFile, 0.5f);
 		}
 		if (previous && !.playMusic)
 		{

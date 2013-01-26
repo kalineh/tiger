@@ -99,6 +99,21 @@ global MakeMusicPlayer = function()
 	{	
 	};
 
+    MusicPlayer.Stop = function()
+    {
+        if (?.song)
+        {
+            .song.Stop();
+            .song = null;
+        }
+
+        if (?.fadeThread)
+        {
+            threadKill(.fadeThread);
+            .fadeThread = null;
+        }
+    };
+
 	MusicPlayer.Release = function()
 	{
 		if ( ?.song ) { .song.Stop(); }

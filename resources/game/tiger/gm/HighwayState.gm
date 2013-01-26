@@ -36,13 +36,15 @@ global MakeHighwayState = function()
 		._InitTextures();
 		._InitParticles();
 
+		g_game.musicPlayer.Play(g_game.songs.highway, 0.25f);
+
 		.threadId = this:thread(.Update);
 		.finish_thread = this:thread(.Finish);
 	};
 
     State.Finish = function()
     {
-        sleep(90.0f);
+        sleep(60.0f);
 		g_game.musicPlayer.FadeOut(2.0f);
 		g_fader.FadeOut(3.0f, Gfx.BLACK, null, null, null, 3.0f);
 
@@ -117,6 +119,8 @@ global MakeHighwayState = function()
 
 	State.Release = function()
 	{
+		g_game.musicPlayer.Stop();
+
 		.bg.Release();
 		.bg = null;
 
