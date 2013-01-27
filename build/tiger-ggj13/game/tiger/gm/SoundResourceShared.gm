@@ -1,0 +1,81 @@
+// generated: 2012-06-23, 02:06:11 AM
+global g_fileData =
+{
+    cancel = 
+    {
+        filename = "game/tiger/snd/cancel.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    error = 
+    {
+        filename = "game/tiger/snd/error.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    gameOver = 
+    {
+        filename = "common/snd/missing.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    hit0 = 
+    {
+        filename = "game/tiger/snd/hit0.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    hit1 = 
+    {
+        filename = "game/tiger/snd/hit1.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    hit2 = 
+    {
+        filename = "game/tiger/snd/hit2.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    fall = 
+    {
+        filename = "game/tiger/snd/fall.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    crash = 
+    {
+        filename = "game/tiger/snd/crash.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    throw = 
+    {
+        filename = "game/tiger/snd/throw.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    screech = 
+    {
+        filename = "game/tiger/snd/screech.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    explode = 
+    {
+        filename = "game/tiger/snd/explode.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+};

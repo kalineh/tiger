@@ -1,0 +1,509 @@
+
+global FighterConfig =
+{
+    Player = 
+    {
+        MaxHealth = 20.0f,
+        MaxEnergy = 20.0f,
+        Animations = "player",
+    },
+
+    Enemy0 = 
+    {
+        MaxHealth = 12.0f,
+        MaxEnergy = 0.0f,
+        Animations = "enemy0",
+    },
+
+    Enemy1 = 
+    {
+        MaxHealth = 40.0f,
+        MaxEnergy = 0.0f,
+        Animations = "enemy1",
+    },
+};
+
+global MakeFighter = function(world, coord, config_name)
+{
+	local Fighter = MakeEntity(world, coord);
+    local config = FighterConfig[config_name];
+
+    assert(?config_name);
+    assert(?config);
+
+	Fighter.type = "Enemy";
+	Fighter.controls = null;
+	Fighter.color = Gfx.WHITE;
+	Fighter.max_health = config.MaxHealth;
+	Fighter.max_energy = config.MaxEnergy;
+	Fighter.health = Fighter.max_health;
+	Fighter.energy = Fighter.max_energy;
+	Fighter.stun = 0;
+	Fighter.mass = 5.0f;
+	Fighter.shadow = MakeSpriteAnimation(g_game.animBank, config.Animations + "_shadow");
+	Fighter.anim = MakeSpriteAnimation(g_game.animBank, config.Animations);
+	Fighter.move_input = v2();
+    Fighter.air_move_speed = v2(1.0f, 0.5f);
+    Fighter.ground_move_speed = v2(1.5f, 1.2f);
+    Fighter.frames_ground = 0;
+    Fighter.frames_air = 0;
+    Fighter.action_thread = -1;
+    Fighter.death_thread = -1;
+    Fighter.jump_thread = -1;
+    Fighter.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Fighter.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Fighter.collision_body = MakeCollision(Fighter, CollisionType.Circle, 18.0f);
+    Fighter.collision_weapon = MakeCollision(Fighter, CollisionType.Circle, 16.0f);
+    // TODO: less hacky way?
+    Fighter.collision_weapon.knockdown = false;
+	Fighter.air_max_speed = v3(4.0f, 3.0f, 4.0f);
+	Fighter.ground_max_speed = v3(4.0f, 3.0f, 4.0f);
+	Fighter.notify_release = MakeNotify(this, "NotifyRelease");
+	Fighter.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
+
+    Fighter.collision_body.SetEnabled(true);
+    Fighter.collision_weapon.SetEnabled(false);
+
+    world.collision_manager.Add(Fighter.collision_body);
+    world.collision_manager.Add(Fighter.collision_weapon);
+
+    Fighter.EntityRelease = Fighter.Release;
+    Fighter.Release = function()
+    {
+        .notify_release.Notify();
+        .world.collision_manager.Remove(.collision_body);
+        .world.collision_manager.Remove(.collision_weapon);
+        threadKill(.action_thread);
+        threadKill(.death_thread);
+        threadKill(.jump_thread);
+        .EntityRelease();
+    };
+
+    Fighter.StartActionThread = function(name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this:thread(f, a, b, c, d, e);
+    };
+
+    Fighter.StartActionThreadThis = function(this_, name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this_:thread(f, a, b, c, d, e);
+    };
+
+	Fighter.OnPreUpdate = function()
+	{
+        local airborne = .IsAirborne();
+
+        if (airborne)
+        {
+            .frames_ground = 0;
+            .frames_air += 1;
+        }
+        else
+        {
+            .frames_ground += 1;
+            .frames_air = 0;
+        }
+
+        if (!threadIsAlive(.action_thread))
+        {
+            local move = .move_input;
+            local move_speed = .ground_move_speed;
+
+            if (.IsAirborne())
+            {
+                move_speed = .air_move_speed;
+            }
+
+            move *= move_speed;
+
+            .accel += v3(move);
+        }
+
+        .anim.speed = 1.0f;
+
+        if (.stun > 0)
+        {
+            .anim.ChangeToNoReset("stun");
+            .stun -= 1;
+            .move_input = v2(0.0f, 0.0f);
+            return;
+        }
+
+        if (threadIsAlive(.death_thread))
+        {
+            return;
+        }
+
+        if (!threadIsAlive(.action_thread))
+        {
+            if (.frames_ground >= 1)
+            {
+                if (.move_input.x < 0.0f) { .anim.facing = FACING.RIGHT; }
+                if (.move_input.x > 0.0f) { .anim.facing = FACING.LEFT; }
+
+                local len = safe_length(.vel + .accel);
+
+                if (len <= 0.01f )
+                {
+                    .anim.ChangeToNoReset("idle");
+                }
+                else
+                {
+                    if (.move_input.x < 0.0f)
+                    {
+                        if (.vel.x > 0.0f)
+                        {
+                            .anim.ChangeToNoReset("stop");
+                        }
+                        else
+                        {
+                            .anim.ChangeToNoReset("move");
+                        }
+                    }
+                    if (.move_input.x > 0.0f)
+                    {
+                        if (.vel.x < 0.0f)
+                        {
+                            .anim.ChangeToNoReset("stop");
+                        }
+                        else
+                        {
+                            .anim.ChangeToNoReset("move");
+                        }
+                    }
+
+                    if (.anim.currAnimName == "move")
+                    {
+                        .anim.speed = abs(.vel.x) + abs(.vel.y);
+                    }
+                }
+            }
+            else // airborne
+            {
+                if (.vel.z < -5.0f)
+                {
+                    .anim.ChangeToNoReset("fall");
+                }
+                else if (.vel.z > 0.0f)
+                {
+                    .anim.ChangeToNoReset("jump");
+                }
+            }
+        }
+
+        .move_input = v2(0.0f, 0.0f);
+	};
+
+    Fighter.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+        local dir = .GetFacingDir();
+
+        // TODO: facing is backwards?
+        dir *= -1.0f;
+
+        // TODO: why were we setting this here?
+        //.collision_body.SetEnabled(true);
+
+        .pos = v3(.pos.x, clamp(.pos.y, .world.bounds_min_y, .world.bounds_max_y), .pos.z);
+
+        .collision_body.SetPosition(center);
+        .collision_weapon.SetPosition(center + dir * 58.0f);
+    };
+
+    Fighter.Jump = function(input)
+    {
+        assert(!threadIsAlive(.jump_thread));
+        assert(?input);
+
+        local jump_function = function(input)
+        {
+            assert(?input);
+
+            local jump_min_frames = 6;
+            local jump_frames = 40;
+            local jump_start = 5.0f;
+            local jump_force = 5.0f;
+            local jump_falloff = 0.17f;
+            local jump_falloff_limit = 18;
+
+            .vel = v3(.vel.x, .vel.y, jump_start);
+
+            for (i = 0; i < jump_frames; i += 1)
+            {
+                if (i >= jump_min_frames)
+                {
+                    if (!input.Hold())
+                    {
+                        break;
+                    }
+                }
+
+                .accel += v3(0.0f, 0.0f, jump_force);
+
+                if (i < jump_falloff_limit)
+                {
+                    jump_force = max(0.0f, jump_force - jump_falloff);
+                }
+
+                yield();
+            }
+
+            while (.frames_air > 0)
+            {
+                yield();
+            }
+        };
+
+        .jump_thread = this:thread(jump_function, input);
+    };
+
+    Fighter.Combo = function(combo_data)
+    {
+        assert(!threadIsAlive(.action_thread));
+
+        local combo_function = function(combo_data)
+        {
+            assert(?combo_data);
+
+            .anim.ChangeTo(combo_data.anim);
+
+            // TODO: some better way of doing this?
+            .collision_weapon.damage = combo_data.damage;
+            .collision_weapon.stun = combo_data.stun;
+            .collision_weapon.push = combo_data.push;
+            .collision_weapon.knockback = combo_data.knockback;
+            .collision_weapon.knockup = combo_data.knockup;
+
+            while (.anim.IsFinished() == false)
+            {
+                local hit_tag = .anim.HasTag("hit");
+                local throw_tag = .anim.HasTag("throw");
+                local knockdown_tag = .anim.HasTag("knockdown");
+
+                // TODO: what if action thread is killed and these are left on?
+                .collision_weapon.SetEnabled(hit_tag);
+                .collision_weapon.knockdown = knockdown_tag;
+
+                if (throw_tag)
+                {
+                    .ThrowProjectile(combo_data.projectile);
+                }
+
+                yield();
+            }
+
+            .collision_weapon.damage = null;
+            .collision_weapon.stun = null;
+            .collision_weapon.push = null;
+            .collision_weapon.knockback = null;
+            .collision_weapon.knockup = null;
+
+            .collision_weapon.SetEnabled(false);
+        };
+
+        .StartActionThread("Combo", combo_function, combo_data);
+    };
+
+    Fighter.ThrowProjectile = function(type)
+    {
+        assert(?type);
+        assert(?ProjectileHitConfig[type]);
+
+        local floating = v3(0.0f, 0.0f, 0.5f);
+        local pos = .GetAnimCenter() + .GetFacingDir() * +48.0f + floating;
+        local vel = .GetFacingDir() * -20.0f;
+        local projectile = MakeProjectile(.world, type, pos, vel);
+
+		g_game.soundBanks["shared"].Play("throw");
+
+        .world.AddLifeRow(projectile);
+    };
+
+    Fighter.Stun = function(stun)
+    {
+        .stun += stun;
+    };
+
+    Fighter.Knockback = function(force, dir)
+    {
+        if (force <= 0.0f)
+        {
+            return;
+        }
+
+        threadKill(.action_thread);
+
+        local knockback_function = function(force, dir)
+        {
+            local knockback_time = force * 8.0f;
+
+            .anim.ChangeToNoReset("stun");
+
+            for (i = 0; i < knockback_time.Int(); i += 1)
+            {
+                // TODO: push dir more?
+                yield();
+            }
+        };
+
+        .StartActionThread("Knockback", knockback_function, force, dir);
+    };
+
+    Fighter.Knockdown = function(knockback, dir)
+    {
+        threadKill(.action_thread);
+
+        local knockdown_function = function(knockback, dir)
+        {
+            .anim.ChangeToNoReset("knockdown");
+
+            // some minimum for knockdowns...
+            knockback = max(1.0f, knockback);
+            local push = v3(0.0f, 0.0f, +1.0f * knockback) + dir * knockback;
+
+            for (i = 0; i < 8; i += 1)
+            {
+                .accel += push;
+                push *= 0.50f;
+                yield();
+            }
+
+            sleep(0.1f);
+
+            while (.frames_ground <= 0)
+            {
+                yield();
+            }
+
+    		g_game.soundBanks["shared"].Play("fall");
+            .anim.ChangeToNoReset("prone");
+            .collision_body.SetEnabled(false);
+            sleep(randfloat(1.5f, 2.5f));
+
+            // HACK
+            if (!.IsDead())
+            {
+                .anim.ChangeToNoReset("getup");
+                .anim.WaitFinished();
+                .collision_body.SetEnabled(true);
+            }
+        };
+
+        .StartActionThread("Knockdown", knockdown_function, knockback, dir);
+    };
+
+    Fighter.OnTakeDamage = function(damage)
+    {
+		DrawNotifyText( "-"+damage.Int(), v2(.GetAnimCenter() + .GetAnimSize() * v3(0.0f, 0.55f, 0.0f)), Gfx.RED);
+
+        .notify_take_damage.Notify(damage);
+
+        // TODO: anything else we need to disable here?
+        .collision_weapon.SetEnabled(false);
+        .collision_weapon.knockdown = false;
+    };
+
+    Fighter.OnCollide = function(lhs, rhs)
+    {
+        if (rhs.owner.type == .type)
+        {
+            return;
+        }
+
+        if (lhs == .collision_body)
+        {
+            if (rhs == rhs.owner.collision_body || rhs == rhs.owner.collision_weapon)
+            {
+                local damage = rhs.damage;
+                local stun = rhs.stun;
+                local push = rhs.push;
+                local knockback = rhs.knockback;
+                local knockup = rhs.knockup;
+                local knockdown = rhs.knockdown;
+
+                // TODO: better handling for body collision
+                if (!?damage) { damage = 0.0f; }
+                if (!?stun) { stun = 0; }
+                if (!?push) { push = 1.0f; }
+                if (!?knockback) { knockback = 0.0f; }
+                if (!?knockup) { knockup = 0.0f; }
+                if (!?knockdown) { knockdown = false; }
+
+                // double stun = knockdown
+                if (.stun > 2 && stun)
+                {
+                    knockdown = true;
+                }
+
+                // sometimes fall over
+                local fall_chance = 2;
+                if (damage > 0.0f)
+                {
+                    fall_chance = 5;
+                }
+
+                if (randint(0, 100) <= fall_chance)
+                {
+                    knockdown = true;
+                }
+
+                if (damage > 0.0f || knockdown)
+                {
+    				g_game.soundBanks["shared"].Play("hit"+randint(0,3));
+                }
+
+                .TakeDamage(damage);
+                .Stun(stun);
+
+                local ofs = .pos - rhs.owner.pos;
+                local dir = safe_normalize(ofs * v3(1,0,0));
+                local force = dir * push;
+
+                .accel += v3(force.x, force.y, knockup);
+
+                if (knockdown)
+                {
+                    .Knockdown(knockback, dir);
+                }
+                else
+                {
+                    .Knockback(knockback, dir);
+                }
+
+            }
+        }
+
+        return false;
+    };
+
+    Fighter.DeathEffect = function()
+    {
+        threadKill(.action_thread);
+
+        local death_function = function()
+        {
+            .Knockdown(15.0f, .GetFacingDir() * +1.0f);
+            sleep(2.0f);
+            for (i = 0; i < 120; i += 1)
+            {
+                .alpha = Select((i % 10) < 5, 0.0f, 1.0f);
+                yield();
+            }
+            .Die();
+            sleep(1.0f);
+        };
+
+        local wait_function = function()
+        {
+            sleep(10000.0f);
+        };
+
+        .death_thread = this:thread(death_function);
+        .StartActionThread("DeathWait", wait_function);
+    };
+
+	return Fighter;
+};

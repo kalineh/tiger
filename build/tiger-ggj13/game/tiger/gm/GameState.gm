@@ -1,0 +1,119 @@
+global MakeGameState = function()
+{
+	local State = 
+	{
+	};
+
+	State.Update = function()
+	{
+		// force camera to focus player first
+		.cam.TeleportTo(v2(.world.player.pos.x, 0.0f));
+
+		while( true )
+		{		
+			RegisterGui(.Gui, this);
+
+            local cam = g_game.state.cam;
+            cam.pos = v2(max(0.0f, cam.pos.x), cam.pos.y);
+            cam.targetPos = v2(max(0.0f, cam.targetPos.x), cam.targetPos.y);
+
+			yield();
+		}
+	};
+
+	State.Gui = function()
+	{
+		Gui.Begin("Game State", g_core.screenDimen.x*0.4f, g_core.screenDimen.y-10.0f );
+		
+		Gui.End();
+	};
+
+	State._Init = function()
+	{	
+		.bg = MakeBackground("Street");
+
+		.cam = MakeGameCamera();
+		.world = MakeWorld("Street");
+		.world.Init(false);
+		.gui = MakeGameGui();
+
+		._InitTextures();
+		._InitParticles();
+
+		g_game.musicPlayer.Play(g_game.songs.fight, 0.25f);
+
+		.threadId = this:thread(.Update);
+	};
+
+    State.End = function()
+    {
+        g_game.musicPlayer.FadeOut(2.0f);
+        g_game.voicePlayer.Play("street_end");
+        g_fader.FadeOut(2.0f, Gfx.BLACK, null, null, null, 2.0f);
+        g_fader.WaitOn();
+        g_game.GotoState("highway");
+    };
+
+	State.EmitParticlesAt = function(particleName, pos, numParticles)
+	{
+		local particles = .particles[particleName];
+		assert(?particles);
+		particles.cpp.pos = pos;
+		particles.cpp.Emit(numParticles);
+	};
+
+	State._InitParticles = function()
+	{
+		local particlesData =
+		{
+			smoke = { numParticles=1024, drawLayer=DrawLayers.Scene, file="TIGER_smoke.gm" },
+			blood = { numParticles=1024, file="TIGER_blood.gm" },
+			fire = { numParticles=4096, drawLayer=DrawLayers.Scene, file="TIGER_fire.gm" },
+		};
+		
+		.particles = {};
+
+		foreach( name and data in particlesData )
+		{
+			local particles = MakeParticles2d(data.numParticles);
+			particles.LoadFile(data.file);
+			particles.drawLayer = select( ?data.drawLayer, data.drawLayer, DrawLayers.Scene_FG);
+			particles.useScreenCamera = select(?data.useScreenCamera, data.useScreenCamera, false );
+
+			.particles[name] = particles;
+		}
+	};
+
+	State._InitTextures = function()
+	{
+		.textures = 
+		{
+			//projectileRocket = Texture("game/tiger/img/projectileRocket.png"),
+		};
+	};
+
+	State.Release = function()
+	{
+		g_game.musicPlayer.Stop();
+
+		.bg.Release();
+		.bg = null;
+
+		.world.Release();
+		.world = null;
+
+		.gui.Release();
+		.gui = null;
+
+		.texBG = null;
+		.textures = null;
+		
+		.cam.Release();
+		.cam = null;
+
+		threadKill(.threadId);
+	};
+	
+	State._Init();
+	return State;
+};

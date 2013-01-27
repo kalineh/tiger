@@ -1,0 +1,429 @@
+
+//
+// I'M SORRY THIS CODE IS SO BAD
+//
+
+global CarLaneY = {
+    -152.0f,
+    -224.0f,
+    -288.0f,
+    -368.0f,
+};
+
+global MakeCarExplosion = function(car)
+{
+    local Explosion = MakeEntity(car.world, car.pos);
+
+	Explosion.anim = MakeSpriteAnimation(g_game.animBank, "car_explosion");
+
+    Explosion.OnPostUpdate = function()
+    {
+        if (.anim.IsFinished())
+        {
+            .world.AddDeathRow(this);
+        }
+    };
+
+	g_game.soundBanks["shared"].Play("explode");
+    return Explosion;
+};
+
+global MakeCarSpawner = function(world)
+{
+    local CarSpawner = table();
+
+    CarSpawner.world = world;
+    CarSpawner.last_lane = 0;
+    CarSpawner.spawn_extra_delay = 1.0f;
+
+    CarSpawner.Release = function()
+    {
+        threadKill(.update_thread);
+    };
+
+    CarSpawner.Update = function()
+    {
+        while (true)
+        {
+            .spawn_extra_delay = max(0.0f, .spawn_extra_delay - 0.020f);
+            sleep(.spawn_extra_delay);
+            print(.spawn_extra_delay);
+            sleep(randfloat(0.10f, 0.45f));
+            .Spawn();
+
+            if (randint(0, 100) < 18)
+            {
+                .SpawnOil();
+            }
+
+            yield();
+        }
+    };
+
+    CarSpawner.Spawn = function()
+    {
+        while (true)
+        {
+            local lane = randint(0, 4);
+            if (lane != .last_lane)
+            {
+                .last_lane = lane;
+                break;
+            }
+        }
+
+        local type = randint(0, 2);
+        local y = CarLaneY[lane];
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
+        local pos = v3(base.x, base.y + y, 0.0f);
+        local car = MakeCar(.world, pos, type, lane);
+        local ai = MakeCarAI(car);
+
+        .world.AddLifeRow(car);
+    };
+
+    CarSpawner.SpawnOil = function()
+    {
+        local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
+        local yofs = randfloat(CarLaneY[0] + 20.0f, CarLaneY[3] - 20.0f);
+        local pos = v3(base.x, base.y + yofs, 0.0f);
+        local oil = MakeOilSpill(.world, pos);
+
+        .world.AddLifeRow(oil);
+    };
+
+    CarSpawner.update_thread = CarSpawner:thread(CarSpawner.Update);
+    return CarSpawner;
+};
+
+global MakeCarAI = function(car)
+{
+    local AI = table();
+
+    AI.car = car;
+    AI.lane_change_thread = -1;
+
+    AI.NotifyOwnerRelease = function()
+    {
+        threadKill(.update_thread);
+        threadKill(.lane_change_thread);
+        return false;
+    };
+
+    AI.Update = function()
+    {
+        local variation0 = sign(randfloat(-1.0f, 1.0f)) * 0.5f;
+        local variation1 = sign(randfloat(-1.0f, 1.0f)) * 0.02f;
+
+        // TODO: can just do with physics and 0.0f friction
+        while (true)
+        {
+            if (.car.lane < 2)
+            {
+                .car.move_input = v2(-7.0f + variation0 + .car.pushaway, 0.0f);
+                .car.anim.facing = FACING.RIGHT;
+            }
+            else 
+            {
+                .car.move_input = v2(+0.05f + variation1 + .car.pushaway, 0.0f);
+            }
+
+            .pushaway *= 0.95f;
+
+            // TODO: fix camera
+            local offset = .car.pos.x - g_game.state.cam.pos.x;
+            if (offset < -g_game.dimen.x)
+            {
+                .car.world.AddDeathRow(.car);
+                return;
+            }
+
+            if (!threadIsAlive(.lane_change_thread) && randint(0, 1000) < 4)
+            {
+                fork id {
+
+                    if (.car.lane < 2)
+                    {
+                        local move = v2(0.0f, Select(.car.lane == 0, -1.0f, +1.0f));
+                        .car.lane = Select(.car.lane == 0, 1, 0);
+                    }
+                    else
+                    {
+                        local move = v2(0.0f, Select(.car.lane == 2, -1.0f, +1.0f));
+                        .car.lane = Select(.car.lane == 2, 3, 2);
+                    }
+
+                    if (!?move)
+                    {
+                        return;
+                    }
+
+                    while (true)
+                    {
+                        local src = .car.pos.y;
+                        local dst = CarLaneY[.car.lane];
+                        local ofs = dst - src;
+
+                        // NOTE: too low and we go past sign flip and fly offscreen (< 1.0f~)
+                        if (abs(ofs) < 4.5f)
+                        {
+                            break;
+                        }
+
+                        .car.move_input += move * abs(sign(ofs)) * 0.5f;
+
+                        yield();
+                    }
+                }
+                .lane_change_thread = id;
+            }
+
+            yield();
+        }
+    };
+
+    AI.car.notify_release.Register(AI, AI.NotifyOwnerRelease);
+
+    AI.update_thread = AI:thread(AI.Update);
+    return AI;
+};
+
+global MakeOilSpill = function(world, coord)
+{
+    local OilSpill = MakeEntity(world, coord);
+
+    OilSpill.type = "OilSpill"; 
+    OilSpill.mass = 0.0f;
+    OilSpill.anim = MakeSpriteAnimation(g_game.animBank, "oil_spill");
+    OilSpill.collision_body = MakeCollision(OilSpill, CollisionType.Circle, 24.0f);
+	OilSpill.air_max_speed = v3(1.0f, 1.0f, 1.0f);
+	OilSpill.ground_max_speed = v3(16.0f, 1.0f, 1.0f);
+    world.collision_manager.Add(OilSpill.collision_body);
+    OilSpill.collision_body.SetEnabled(true);
+
+    OilSpill.OnPreUpdate = function()
+    {
+        // TODO: fix camera (should be moving just by camera motion)
+        .vel = v3(-15.0f, 0.0f, 0.0f);
+    };
+
+    OilSpill.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+        local dir = .GetFacingDir();
+        .collision_body.SetPosition(center);
+        .collision_body.SetEnabled(true);
+
+        // TODO: fix camera
+        local offset = .pos.x - g_game.state.cam.pos.x;
+        if (offset < -g_game.dimen.x)
+        {
+            .world.AddDeathRow(this);
+            return;
+        }
+    };
+
+    OilSpill.OnCollide = function(lhs, rhs)
+    {
+        // does nothing
+        return false;
+    };
+
+    return OilSpill;
+};
+
+
+global MakeCar = function(world, coord, car_type, lane)
+{
+	local Car = MakeEntity(world, coord);
+
+    assert(?car_type);
+    assert(?lane);
+
+	Car.type = "Car";
+	Car.controls = null;
+	Car.color = Gfx.WHITE;
+	Car.max_health = 1.0f;
+	Car.max_energy = 1.0f;
+	Car.health = Car.max_health;
+	Car.energy = Car.max_energy;
+	Car.mass = 2.0f;
+	Car.anim = MakeSpriteAnimation(g_game.animBank, "cars");
+	Car.move_input = v2();
+    Car.air_move_speed = v2(1.0f, 0.5f);
+    Car.ground_move_speed = v2(5.0f, 1.2f);
+    Car.frames_ground = 0;
+    Car.frames_air = 0;
+    Car.action_thread = -1;
+    Car.collision_body = MakeCollision(Car, CollisionType.Circle, 84.0f);
+	Car.air_max_speed = v3(8.0f, 3.0f, 4.0f);
+	Car.ground_max_speed = v3(10.0f, 3.0f, 4.0f);
+	Car.notify_release = MakeNotify(this, "NotifyRelease");
+	Car.notify_take_damage = MakeNotify(this, "NotifyTakeDamage");
+    Car.constant_speed = v2();
+    Car.spinout = 0.0f;
+    Car.pushaway = 0.0f;
+
+	Car.ground_max_speed = v3(
+        Car.ground_max_speed.x + sign(randfloat(-1.0f, 1.0f)) * 1.5f,
+        Car.ground_max_speed.y,
+        Car.ground_max_speed.z);
+
+    Car.lane = lane;
+    Car.car_type = car_type;
+    Car.collision_body.SetEnabled(true);
+	Car.anim.ChangeTo("npc" + car_type);
+    // TODO: offscreen right camera
+    Car.pos = v3(Car.pos.x, CarLaneY[Car.lane], 0.0f);
+
+    world.collision_manager.Add(Car.collision_body);
+
+    Car.EntityRelease = Car.Release;
+    Car.Release = function()
+    {
+        .notify_release.Notify();
+        .world.collision_manager.Remove(.collision_body);
+        threadKill(.action_thread);
+        .EntityRelease();
+    };
+
+    Car.StartActionThread = function(name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this:thread(f, a, b, c, d, e);
+    };
+
+    Car.StartActionThreadThis = function(this_, name, f, a, b, c, d, e)
+    {
+        assert(!threadIsAlive(.action_thread));
+        .action_thread = this_:thread(f, a, b, c, d, e);
+    };
+
+	Car.OnPreUpdate = function()
+	{
+        local airborne = .IsAirborne();
+
+        if (airborne)
+        {
+            .frames_ground = 0;
+            .frames_air += 1;
+        }
+        else
+        {
+            .frames_ground += 1;
+            .frames_air = 0;
+        }
+
+        // cars can still move during action
+        //if (!threadIsAlive(.action_thread))
+        //{
+            local move = .move_input;
+            local move_speed = .ground_move_speed;
+
+            if (.IsAirborne())
+            {
+                move_speed = .air_move_speed;
+            }
+
+            move *= move_speed;
+
+            .accel += v3(move);
+        //}
+
+        .anim.speed = 1.0f;
+
+        .move_input = v2(0.0f, 0.0f);
+	};
+
+    Car.OnPostUpdate = function()
+    {
+        local center = .GetAnimCenter();
+        local dir = .GetFacingDir();
+
+        // TODO: facing is backwards?
+        dir *= -1.0f;
+
+        // TODO: why were we setting this here?
+        //.collision_body.SetEnabled(true);
+
+        .collision_body.SetPosition(center);
+    };
+
+    Car.OnTakeDamage = function(damage)
+    {
+        .notify_take_damage.Notify(damage);
+    };
+
+    Car.SpinOut = function(frames)
+    {
+        // hack hack time
+        if (.type != "PlayerCar")
+        {
+            return;
+        }
+
+        threadKill(.action_thread);
+
+        fork id {
+            local base = sign(.vel.y) + randfloat(-0.1f, 0.1f);
+            for (i = 0; i < frames; i += 1)
+            {
+                if (i == 2)
+                {
+            		g_game.soundBanks["shared"].Play("screech");
+                }
+
+                .spinout = base;
+                yield();
+            }
+            .spinout = 0.0f;
+        };
+        .action_thread = id;
+    };
+
+    Car.OnCollide = function(lhs, rhs)
+    {
+        if (rhs.owner.type == "OilSpill")
+        {
+            .SpinOut(30);
+            return;
+        }
+
+        if (lhs == .collision_body)
+        {
+            if (rhs == rhs.owner.collision_body)
+            {
+                local damage = 1.0f;
+                local power = 1.0f;
+
+                // no damage for self-type, just push
+                if (rhs.owner.type == .type)
+                {
+                    damage = 0.0f;
+                }
+
+
+                .TakeDamage(damage);
+
+                local ofs = .pos - rhs.owner.pos;
+                local dir = safe_normalize(ofs * v3(1,0,0));
+                local force = dir * power;
+
+                .accel += v3(force.x, 0.0f, 0.0f);
+                .vel += v3(force.x, 0.0f, 0.0f);
+
+                .pushaway += force.x * 0.08f;
+            }
+        }
+
+        return false;
+    };
+
+    Car.OnDie = function()
+    {
+        local explosion = MakeCarExplosion(this);
+        .world.AddLifeRow(explosion);
+    };
+
+	return Car;
+};

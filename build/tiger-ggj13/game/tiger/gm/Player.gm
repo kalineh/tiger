@@ -1,0 +1,565 @@
+
+global PlayerDefaults =
+{
+	MaxHealth = 40.0f,
+	MaxEnergy = 20.0f,
+};
+
+global MakeInput = function(press, hold, arg)
+{
+    assert(?press);
+    assert(?hold);
+    assert(?arg);
+
+    local input = table();
+
+    input.press = press;
+    input.hold = hold;
+    input.arg = arg;
+
+    input.Press = function()
+    {
+        return .press(.arg);
+    };
+    
+    input.Hold = function()
+    {
+        return .hold(.arg);
+    };
+
+	return input;
+};
+
+global PlayerControlsKeyboard =
+{
+	MoveFunction = MakeInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsKeyDown("UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsKeyDown("DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsKeyDown("LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsKeyDown("RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+    }, function() { return null; }, {}),
+
+	Jump = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
+	Punch = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
+	Kick = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
+	//Block = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
+	Throw = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
+	Up = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "UP"),
+	Down = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "DOWN"),
+	Left = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "LEFT"),
+	Right = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
+};
+
+global PlayerControlsGamePad =
+{
+	MoveFunction = MakeInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsPadDown("DPAD_UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsPadDown("DPAD_DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsPadDown("DPAD_LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsPadDown("DPAD_RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+    }, function() { return null; }, {}),
+
+	Jump = MakeInput(Input.IsPadPress, Input.IsPadDown, "A"),
+	Punch = MakeInput(Input.IsPadPress, Input.IsPadDown, "X"),
+	Kick = MakeInput(Input.IsPadPress, Input.IsPadDown, "B"),
+	//Block = MakeInput(Input.IsPadPress, Input.IsPadDown, "Y"),
+	Throw = MakeInput(Input.IsPadPress, Input.IsPadDown, "Y"),
+	Up = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_UP"),
+	Down = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_DOWN"),
+	Left = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_LEFT"),
+	Right = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_RIGHT"),
+};
+
+global PlayerGroundAttacks =
+{
+    PunchL =
+    {
+        anim = "punchl",
+        damage = 1.0f,
+        finish = false,
+        stun = 0,
+        push = 0.1f,
+        knockback = 0.0f,
+        knockup = 1.5f,
+        projectile = null,
+    },
+
+    PunchR =
+    {
+        anim = "punchr",
+        damage = 1.0f,
+        finish = false,
+        stun = 0,
+        push = 0.1f,
+        knockback = 0.0f,
+        knockup = 1.5f,
+        projectile = null,
+    },
+
+    Uppercut =
+    {
+        anim = "uppercut",
+        damage = 1.0f,
+        finish = true,
+        stun = 0,
+        push = 0.1f,
+        knockback = 7.5f,
+        knockup = 15.0f,
+        projectile = null,
+    },
+
+    Kick =
+    {
+        anim = "kick",
+        damage = 1.0f,
+        finish = false,
+        stun = 1,
+        push = 0.25f,
+        knockback = 0.25f,
+        knockup = 10.0f,
+        projectile = null,
+    },
+
+    Knee =
+    {
+        anim = "knee",
+        damage = 1.0f,
+        finish = true,
+        stun = 24,
+        push = 0.1f,
+        knockback = 0.1f,
+        knockup = 8.0f,
+        projectile = null,
+    },
+
+    SpinKick =
+    {
+        anim = "spinkick",
+        damage = 1.0f,
+        finish = true,
+        stun = 1,
+        push = +0.1f,
+        knockback = 0.0f,
+        knockup = 8.0f,
+        projectile = null,
+    },
+
+    SweepKick =
+    {
+        anim = "sweepkick",
+        damage = 1.0f,
+        finish = true,
+        stun = 0,
+        push = 0.0f,
+        knockback = 1.0f,
+        knockup = 2.5f,
+        projectile = null,
+    },
+
+    AfroPick =
+    {
+        anim = "throw",
+        damage = 0.0f,
+        finish = false,
+        stun = 0,
+        push = 0.0f,
+        knockback = 0.0f,
+        knockup = 0.0f,
+        projectile = "afropick",
+    },
+};
+
+global ComboActions =
+{
+    Punch = 0x01,
+    Kick = 0x02,
+    Block = 0x04,
+    Throw = 0x08,
+    Up = 0x10,
+    Down = 0x20,
+    Forward = 0x40,
+    Backward = 0x80,
+}; 
+
+// NOTE: be sure to iterate in integer order to tableCount()
+global PlayerGroundComboChains =
+{
+    Default = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
+    },
+
+    AfroPick = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
+    },
+
+    PunchL = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchR", action = ComboActions.Punch, },
+        { name = "Knee", action = ComboActions.Kick | ComboActions.Forward, },
+        { name = "Kick", action = ComboActions.Kick, },
+    },
+
+    PunchR = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "Uppercut", action = ComboActions.Punch | ComboActions.Forward, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "SpinKick", action = ComboActions.Kick, },
+    },
+
+    Kick = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "SweepKick", action = ComboActions.Kick | ComboActions.Forward, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
+    },
+
+    SpinKick = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+        { name = "Kick", action = ComboActions.Kick, },
+    },
+
+    Knee = {
+        { name = "AfroPick", action = ComboActions.Throw, },
+        { name = "PunchL", action = ComboActions.Punch, },
+    },
+};
+
+global PlayerAirCombos =
+{
+    JumpKick =
+    {
+        anim = "jumpkick",
+        damage = 2.0f,
+        finish = true,
+        stuns = false,
+    },
+};
+
+global MakeComboSystem = function(chains, attacks)
+{
+    assert(?chains);
+    assert(?chains.Default);
+    assert(?attacks);
+
+    local combo = table();
+
+    combo.data = data;
+    combo.chains = chains;
+    combo.attacks = attacks;;
+    combo.current = chains.Default;
+    combo.actions = table();
+    combo.wait_thread = -1;
+    combo.reset_thread = -1;
+    combo.used_current_combo = false;
+
+    combo.TryAddInput = function(action, input)
+    {
+        assert(?action);
+        assert(?input);
+
+        if (threadIsAlive(.wait_thread))
+        {
+            return;
+        }
+
+        .actions[tableCount(.actions)] = action;
+
+        .WaitInput(input);
+        .StartResetCountdown();
+
+        .used_current_combo = false;
+    };
+
+    combo.Reset = function()
+    {
+        .current = .chains.Default;
+        tableClear(.actions);
+        threadKill(.wait_thread);
+        threadKill(.reset_thread);
+    };
+
+    combo.StartResetCountdown = function()
+    {
+        threadKill(.reset_thread);
+
+        local reset_function = function()
+        {
+            // beware of long combos
+            sleep(0.5f);
+            // beware of reset thread kill order killing this thread
+            .Reset();
+        };
+
+        .reset_thread = this:thread(reset_function);
+    };
+
+    combo.WaitInput = function(input)
+    {
+        // TODO: can probably remove
+
+        if (threadIsAlive(.wait_thread))
+        {
+            return;
+        }
+
+        local wait_function = function(input)
+        {
+            while (input.Hold())
+            {
+                yield();
+            }
+        };
+
+        .wait_thread = this:thread(wait_function, input);
+    };
+
+    combo.GetCombo = function()
+    {
+        if (.used_current_combo)
+        {
+           return null;
+        }
+
+        // NOTE: be sure to iterate by integer index, ordering is needed
+        for (i = 0; i < tableCount(.current); i += 1)
+        {
+            local next = .current[i].name;
+            local action = .current[i].action;
+            foreach (a in .actions)
+            {
+                if ((action & a) == action)
+                {
+                    .used_current_combo = true;
+                    .current = .chains[next];
+                    tableClear(.actions);
+                    return next;
+                }
+            }
+        }
+
+        return null;
+    };
+
+    return combo;
+};
+
+global MakePlayerController = function(fighter)
+{
+    assert(?fighter);
+
+	local Controller = table();
+
+	Controller.fighter = fighter;
+	Controller.controls = PlayerControlsKeyboard;
+    Controller.queue = table();
+
+    Controller.QueueComboAction = function(combo, action, control)
+    {
+        if (!?.queue[action])
+        {
+            .queue[action] = table();
+        }
+
+        .queue[action].valid = true;
+        .queue[action].combo = combo;
+        .queue[action].action = action;
+        .queue[action].control = control;
+    };
+
+    Controller.ProcessComboActions = function()
+    {
+        foreach (item in .queue)
+        {
+            if (item.valid)
+            {
+                item.combo.TryAddInput(item.action, item.control);
+            }
+
+            item.valid = false;
+        }
+    };
+
+    Controller.DebugGetChainName = function()
+    {
+        // debug
+        foreach (name and item in PlayerGroundComboChains)
+        {
+            if (.fighter.ground_combo.current == item)
+            {
+                return name;
+            }
+        }
+
+        return "unknown";
+    };
+
+	Controller.Update = function()
+	{
+        while (true)
+        {
+            local f = .fighter;
+
+            g_dump.player_pos = f.pos;
+            g_dump.chain = .DebugGetChainName();
+
+            if (f.IsDead())
+            {
+                yield();
+                continue;
+            }
+
+            if (g_game.gamepad)
+            {
+                .controls = PlayerControlsGamePad;
+            }
+            else
+            {
+                .controls = PlayerControlsKeyboard;
+            }
+
+
+            f.move_input = .controls.MoveFunction.Press();
+
+            if (f.frames_ground > 0)
+            {
+                // we may still be on the ground for a frame while jump is still active
+                // so ignore if the jump thread is still running
+                if (!threadIsAlive(f.jump_thread))
+                {
+                    if (.controls.Jump.Press())
+                    {
+                        f.Jump(.controls.Jump);
+                    }
+                }
+            }
+
+            local u = .controls.Up.Hold();
+            local d = .controls.Down.Hold();
+            local l = .controls.Left.Hold();
+            local r = .controls.Right.Hold();
+
+            if (f.anim.facing == FACING.LEFT)
+            {
+                local temp = l;
+                l = r;
+                r = temp;
+            }
+
+            local move_mask = 0x0;
+
+            if (u) { move_mask |= ComboActions.Up; }
+            if (d) { move_mask |= ComboActions.Down; }
+            if (l) { move_mask |= ComboActions.Forward; }
+            if (r) { move_mask |= ComboActions.Backward; }
+
+            // TODO: jump version
+            if (.controls.Punch.Press())
+            {
+                .QueueComboAction(f.ground_combo, ComboActions.Punch | move_mask, .controls.Punch);
+            }
+            else if (.controls.Kick.Press())
+            {
+                .QueueComboAction(f.ground_combo, ComboActions.Kick | move_mask, .controls.Kick);
+            }
+            else if (.controls.Throw.Press())
+            {
+                .QueueComboAction(f.ground_combo, ComboActions.Throw | move_mask, .controls.Throw);
+            }
+            //else if (.controls.Block.Press())
+            //{
+                //.QueueComboAction(f.ground_combo, ComboActions.Block | move_mask, .controls.Block);
+            //}
+
+            if (!threadIsAlive(f.action_thread))
+            {
+                .ProcessComboActions();
+
+                local combo_name = f.ground_combo.GetCombo();
+                if (?combo_name)
+                {
+                    local combo_data = PlayerGroundAttacks[combo_name];
+
+                    f.Combo(combo_data);
+                    tableClear(.queue);
+
+                    if (combo_data.finish)
+                    {
+                        f.ground_combo.Reset();
+                    }
+                }
+            }
+
+            yield();
+        }
+	};
+
+    Controller:thread(Controller.Update);
+
+	return Controller;
+};
+
+global MakePlayer = function(world, coord)
+{
+	local Player = MakeFighter(world, coord, "Player");
+
+    Player.type = "Player";
+	Player.mass = 2.5f;
+
+    // TODO: move to config
+	Player.air_max_speed = v3(6.0f, 4.0f, 8.0f);
+	Player.ground_max_speed = v3(6.0f, 4.0f, 8.0f);
+	Player.air_friction = v3(0.97f, 1.0f, 0.9f);
+	Player.ground_friction = v3(0.7f, 0.7f, 0.9f);
+
+    Player.ground_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+    Player.air_combo = MakeComboSystem(PlayerGroundComboChains, PlayerGroundAttacks);
+
+	Player.max_health = PlayerDefaults.MaxHealth;
+	Player.health = Player.max_health;
+
+    Player.FighterRelease = Player.Release;
+    Player.Release = function()
+    {
+        //threadKill(.
+        .FighterRelease();
+    };
+
+	Player.BaseOnPreUpdate = Player.OnPreUpdate;
+	Player.OnPreUpdate = function()
+	{
+        .BaseOnPreUpdate();
+
+        // TODO: get stage axis from .world.stage
+
+        local cam = g_game.state.cam;
+        local ofs = .pos.x - cam.pos.x;
+
+        local move = v2(0.0f);
+        local border = 220.0f;
+
+        // one-way scroll
+        if (ofs > 0.0f && ofs > border)
+        {
+            move = v2(ofs - border, 0.0f);
+    		//cam.SetTargetPos( cam.pos + move );
+        }
+
+        if (ofs < -border)
+        {
+            move = v2(-(-ofs - border), 0.0f);
+        }
+
+        cam.SetTargetPos( cam.pos + move );
+	};
+
+	return Player;
+};

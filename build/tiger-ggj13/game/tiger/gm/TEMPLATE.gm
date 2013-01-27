@@ -1,0 +1,35 @@
+global MakeTEMPLATE = function()
+{
+	local TEMPLATE = 
+	{
+
+	};
+
+	TEMPLATE.Draw = function()
+	{
+		
+	};
+
+
+	TEMPLATE.Update = function()
+	{
+		while( true )
+		{	
+			//RegisterDraw( DrawLayers.Scene_BG, .Draw, this);
+			yield();
+		}
+	};
+
+	TEMPLATE.Init = function()
+	{	
+		.threadId = this:thread(.Update);
+	};
+
+	TEMPLATE.Release = function()
+	{
+		threadKill(.threadId);
+	};
+	
+	TEMPLATE.Init();
+	return TEMPLATE;
+};

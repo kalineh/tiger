@@ -1,0 +1,168 @@
+global MakeIntroState = function()
+{
+	local State = 
+	{
+		transitionThread = null,
+        cutscenes = { },
+        texts = { },
+        currentCutscene = null,
+        currentText = null,
+	};
+
+	State.Draw = function()
+	{
+		g_game.BeginScreenSpace();
+		Gfx.BeginDefaultShader();
+
+        //.currentCutscene.Bind(0);
+		DrawTexture(.currentCutscene, v2(0.0f));
+        //.currentCutscene.Unbind(0);
+
+		local font = g_game.fonts["zekton_30"];
+		Gfx.Color(Gfx.WHITE, 0.5f);
+		font.Print(.currentText, v2(430.0f, 320.0f));
+
+		Gfx.EndDefaultShader();
+		g_game.EndScreenSpace();
+	};
+
+	State.Update = function()
+	{
+        .cutsceneThread = this:thread(.CutsceneThread);
+        yield();
+
+		while( true )
+		{		
+			RegisterDraw( DrawLayers.Scene, .Draw, this);
+			yield();
+		}
+	};
+
+    State.WaitKeyOrTime = function(time)
+    {
+        local frames = time * 60.0f;
+
+        for (i = 0; i < frames.Int(); i += 1)
+        {
+			if (Input.DidKeyJustGoDown("SPACE") ||
+				Input.DidKeyJustGoDown("RETURN") ||
+				Input.DidKeyJustGoDown("KP_ENTER") ||
+				Input.IsPadPress("START") ||
+				Input.IsPadPress("A"))
+            {
+                break;
+            }
+
+            yield();
+        }
+    };
+
+    State.CutsceneThread = function()
+    {
+        local fade_in = function()
+        {
+			local fadeTime = 1.0f;
+			g_fader.FadeIn(fadeTime, Gfx.BLACK);
+			g_fader.WaitOn();
+        };
+
+        local fade_out = function(extra)
+        {
+			local fadeTime = 0.75f;
+			g_fader.FadeOut(fadeTime, Gfx.BLACK, null, null, extra);
+			g_fader.WaitOn();
+        };
+
+		g_game.musicPlayer.Play(g_game.songs.intro, 0.25f);
+		g_game.voicePlayer.Play("test");
+
+        .currentCutscene = .cutscenes[0];
+        .currentText = .texts[0];
+		//g_game.soundBanks["cutscene"].Play("dooropen");
+        fade_in();
+        g_game.voicePlayer.Play("intro_quote_0");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
+        fade_out();
+
+        .currentCutscene = .cutscenes[1];
+        .currentText = .texts[1];
+        fade_in();
+		//g_game.soundBanks["cutscene"].Play("suprise");
+        sleep(0.5f);
+        g_game.voicePlayer.Play("intro_quote_1");
+		//g_game.soundBanks["quotes"].Play("wtf");
+        //sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
+        fade_out();
+
+        .currentCutscene = .cutscenes[2];
+        .currentText = .texts[2];
+        fade_in();
+		//g_game.soundBanks["cutscene"].Play("suprise");
+        g_game.voicePlayer.Play("intro_quote_2");
+        sleep(0.5f);
+		//g_game.soundBanks["quotes"].Play("bastards");
+        g_game.voicePlayer.Play("intro_quote_3");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
+        fade_out();
+
+        .currentCutscene = .cutscenes[3];
+        .currentText = .texts[3];
+        fade_in();
+        sleep(0.5f);
+		//g_game.soundBanks["quotes"].Play("ill_save_you_lil_t");
+        g_game.voicePlayer.Play("intro_quote_4");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
+        fade_out();
+
+        .currentCutscene = .cutscenes[4];
+        .currentText = .texts[4];
+        fade_in();
+		//g_game.soundBanks["cutscene"].Play("cardoor");
+        //sleep(0.5f);
+		//g_game.soundBanks["cutscene"].Play("ignition");
+        //sleep(0.5f);
+		//g_game.soundBanks["cutscene"].Play("screeching");
+        sleep(0.0f);
+        .WaitKeyOrTime(3.0f);
+
+		g_game.musicPlayer.FadeOut(2.0f);
+        fade_out(3.0f);
+        g_game.voicePlayer.Play("intro_quote_5");
+
+        threadKill(.threadId);
+        g_game.GotoState("highway");
+    };
+
+	State.Init = function()
+	{	
+		.threadId = this:thread(.Update);
+
+		.cutscenes[0] = Texture("game/tiger/img/cutscene0.png");
+		.cutscenes[1] = Texture("game/tiger/img/cutscene1.png");
+		.cutscenes[2] = Texture("game/tiger/img/cutscene2.png");
+		.cutscenes[3] = Texture("game/tiger/img/cutscene3.png");
+		.cutscenes[4] = Texture("game/tiger/img/cutscene4.png");
+
+        .texts[0] = "black tiger arrives home";
+        .texts[1] = "tiger cage is busted open";
+        .texts[2] = "black tiger finds a dropped business card";
+        .texts[3] = "black tiger looks at portrait";
+        .texts[4] = "black tiger gets in car";
+	};
+
+	State.Release = function()
+	{
+		g_game.musicPlayer.Stop();
+
+        tableClear(.cutscenes);
+		threadKill(.threadId);
+		threadKill(.cutsceneThread);
+	};
+	
+	State.Init();
+	return State;
+};

@@ -1,0 +1,364 @@
+
+global EntityType =
+{
+    None = 0x00,
+	Player = 0x01,
+	PlayerWeapon = 0x02,
+	Enemy = 0x04,
+	EnemyWeapon = 0x08,
+	Pickup = 0x10,
+};
+
+global MakeEntity = function(world, pos)
+{
+	assert(?world);
+	assert(?pos);
+	assert(?pos.x);
+	assert(?pos.y);
+	assert(?pos.z);
+
+	local Entity = table();
+
+	Entity.type = "None";
+	Entity.pos = pos;
+	Entity.vel = v3(0.0f);
+	Entity.accel = v3(0.0f);
+	Entity.air_friction = v3(1.0f, 1.0f, 0.9f);
+	Entity.ground_friction = v3(0.7f, 0.7f, 0.7f);
+	Entity.air_max_speed = v3(1.0f, 1.0f, 1.0f);
+	Entity.ground_max_speed = v3(1.0f, 1.0f, 1.0f);
+    Entity.mass = 1.0f;
+	Entity.coord = coord;
+	Entity.size = v2(1.0f);
+	Entity.world = world;
+	Entity.color = Gfx.WHITE;
+	Entity.max_health = 1.0f;
+	Entity.health = 1.0f;
+	Entity.post_tick_notify = MakeNotify(Entity, "PostTickNotify");
+	Entity.take_damage_filters = table();
+	Entity.draw_offset = v2(0.0f);
+	Entity.alpha = 1.0f;
+    Entity.update_thread = -1;
+    Entity.invincible = false;
+    Entity.invincible_thread = -1;
+	Entity.frame_count = 0;
+
+	Entity.IsInsideCam = function()
+	{
+        // TODO: size should be texture size?
+        // TODO: fix calculations for non-tile world style (zoom, etc)
+        //return g_game.state.cam.CanSeeBox( v2(.pos.x, .pos.y + .pos.z), .size );
+
+        // TODO: i hate cameras
+        // TODO: its all wrong
+
+        local center = .GetAnimCenter();
+        local size = .GetAnimSize();
+        local cam = g_game.state.cam;
+        local campos = cam.pos;
+        local camsize = g_game.dimen / cam.zoom;
+        local bl = center - size * 0.5f;
+        local tr = center + size * 0.5f;
+        local cambl = campos + camsize * 0.1f;
+        local camtr = campos + camsize * 0.8f;
+
+        //if (bl.x > camtr.x) { return false; }
+        //if (bl.y > camtr.y) { return false; }
+        //if (tr.x < cambl.x) { return false; }
+        //if (tr.y < cambl.y) { return false; }
+
+        return true;
+	};
+
+    Entity.GetDrawPosition = function()
+    {
+        local p = v2(.pos);
+        local o = .draw_offset;
+        local h = .pos.z;
+
+        // TODO: height maybe needs scaling?
+
+        return p + o + v2(0.0f, h);
+    };
+
+    Entity.GetAnimCenter = function()
+    {
+        return .pos + .GetAnimSize() * 0.5f;
+    };
+
+    Entity.GetAnimSize = function()
+    {
+        local anim_size = v3(0.0f);
+        if (?.anim)
+        {
+            anim_size = v3(.anim.animData.tileSize);
+        }
+        return anim_size;
+    };
+
+    Entity.GetFacingDir = function()
+    {
+        if (?.anim)
+        {
+            if (.anim.facing == FACING.LEFT)
+            {
+                return v3(-1.0f, 0.0f, 0.0f);
+            }
+            else
+            {
+                return v3(+1.0f, 0.0f, 0.0f);
+            }
+        }
+
+        return v3(0.0f, 0.0f, 0.0f);
+    };
+
+	Entity.Draw = function()
+	{
+        local draw_position = .GetDrawPosition();
+
+        // TODO: fix so transform is used correctly instead!
+        draw_position -= g_game.state.cam.pos;
+
+		Gfx.Color(.color, .alpha);
+
+		if ( ?.anim )
+		{
+			// render only if in camera
+			if ( .IsInsideCam() )
+			{
+                if ( ?.shadow )
+                {
+    				.shadow.Draw(draw_position - v2(0.0f, .pos.z));
+                }
+
+                // TODO: maybe not have this...
+                if (.invincible)
+                {
+                    if (.frame_count % 8 < 4)
+                    {
+        				Gfx.Color(.color, .alpha * 0.25f);
+                    }
+                    else
+                    {
+        				Gfx.Color(.color, .alpha);
+                    }
+                }
+                else
+                {
+    				Gfx.Color(.color, .alpha);
+                }
+
+				.anim.Draw(draw_position);
+			}
+		}
+		else
+		{
+			// TODO: camera visible check
+			//if (g_game.state.cam.IsVisible(.coord * t, e) == false)
+			//{
+				//return;
+			//}
+
+            local size = v2(32.0f);
+
+			Gfx.BeginDefaultShader();
+			Gfx.Color(.color);
+			Gfx.DrawRectRounded(draw_position, size, 10.0f);
+
+			if ( this == .world.GetPlayer() )
+			{
+				Gfx.Color(Gfx.GREEN);
+			}
+			else
+			{
+				Gfx.Color(Gfx.RED*0.5f);
+			}
+
+			Gfx.SetLineWidth(3.0f);
+			
+			Gfx.DrawRectRoundedWire(p, s, 10.0f);
+			Gfx.SetLineWidth(1.0f);
+
+			// face
+			Gfx.Color(.color * 0.5f);
+			Gfx.DrawRect(draw_position + size * v2(0.2f, 0.6f), e * 0.2f);
+			Gfx.DrawRect(draw_position + size * v2(0.6f, 0.6f), e * 0.2f);
+			Gfx.DrawRect(draw_position + size * v2(0.2f, 0.2f), e * v2(0.6f, 0.1f));
+
+			Gfx.EndDefaultShader();
+		}
+	};
+
+	Entity.IsDead = function()
+	{
+		return .health <= 0.0f;
+	};
+
+	Entity.OnTakeDamage = function(damage)
+	{
+	};
+
+	Entity.Shake = function( range, time )
+	{
+		fork id
+		{
+			while(true)
+			{
+				.draw_offset = v2(randfloat(-range,range), randfloat(-range,range));
+				yield();
+			}
+		}
+
+		fork
+		{
+			sleep(time);
+			threadKill(id);
+		}
+	};
+
+	Entity.TakeDamage = function(damage)
+	{
+        if ( .invincible )
+        {
+            return;
+        }
+
+        if (damage <= 0.0f)
+        {
+            return;
+        }
+
+		.OnTakeDamage(damage);
+
+		// TODO: damage type different particles
+		// TODO: damage resist/reflect different particles
+
+		// flash red
+		//.color = Gfx.RED;
+		//g_game.state.EmitParticlesAt("entityTakeDamage", .GetCenterWorld(), 5*damage.Int());
+
+		.health -= damage;
+
+        .SetInvincibleFrames(2);
+
+		if (.IsDead())
+		{
+            if (?.DeathEffect)
+            {
+                .DeathEffect();
+            }
+            else
+            {
+    			.Die();
+            }
+		}
+	};
+
+    Entity.IsAirborne = function()
+    {
+        return .pos.z > 0.01f;
+    };
+
+	Entity.Update = function()
+	{
+		while( true )
+		{		
+			.OnPreUpdate();
+            .Physics();
+			.OnPostUpdate();
+
+            .frame_count += 1;
+
+			yield();
+		}
+	};
+
+	Entity.OnPreUpdate = function()
+	{
+	};
+
+	Entity.OnPostUpdate = function()
+	{
+	};
+
+	Entity.Physics = function()
+	{
+        local airborne = .IsAirborne();
+        local friction = .ground_friction;
+        local max_speed = .ground_max_speed;
+
+        if (airborne)
+        {
+            friction = .air_friction;
+            max_speed = .air_max_speed;
+        }
+
+        local gravity = v3(0.0f, 0.0f, -1.0f);
+
+        .accel += gravity * .mass;
+        .vel += .accel;
+
+        .vel = v3(
+             min(abs(.vel.x), max_speed.x) * sign(.vel.x),
+             min(abs(.vel.y), max_speed.y) * sign(.vel.y),
+             min(abs(.vel.z), max_speed.z) * sign(.vel.z)
+        );
+
+        .pos += .vel;
+        .accel = v3(0.0f);
+        .vel *= friction;
+        
+        .pos = v3(.pos.x, .pos.y, max(0.0f, .pos.z));
+
+        if (!airborne)
+        {
+            .vel *= v3(1.0f, 1.0f, 0.0f);
+        }
+	};
+
+	Entity.Die = function()
+	{
+		.OnDie();
+		.world.AddDeathRow(this);
+	};
+
+	Entity.OnDie = function()
+	{
+		// animations
+		// effects
+		// sounds
+	};
+
+	Entity.Init = function()
+	{	
+		.update_thread = this:thread(.Update);
+	};
+
+	Entity.Release = function()
+	{
+		if ( ?.anim ) 
+		{
+			.anim.Release();
+			.anim = null;
+		}
+
+		threadKill(.update_thread);
+        threadKill(.invincible_thread);
+	};
+
+    Entity.SetInvincibleFrames = function(frames)
+    {
+        local invincible_function = function(frames)
+        {
+            .invincible = true;
+            SleepFrames(frames);
+            .invincible = false;
+        };
+
+        this:thread(invincible_function, frames);
+    };
+	
+	Entity.Init();
+	return Entity;
+};

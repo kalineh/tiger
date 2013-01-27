@@ -1,0 +1,137 @@
+global MakeBackground = function(type)
+{
+	local Background = 
+	{
+        type = type,
+        textures = table(),
+        parallax_axis = 0,
+	};
+
+    Background.UpdateStreet = function()
+    {
+        while (true)
+        {
+			RegisterDraw( DrawLayers.Scene_BG, .DrawStreetBG, this);
+			RegisterDraw( DrawLayers.Scene_FG, .DrawStreetFG, this);
+            yield();
+        }
+    };
+
+    Background.UpdateHighway = function()
+    {
+        .bg_color = 1.0f;
+        local stage_time = 60.0f;
+
+        local i = 0;
+        while (true)
+        {
+            local t = 1.0f / stage_time * i.Float() / 60.0f;
+            .bg_color = max(0.5f, 1.0f - 0.5f * t);
+			RegisterDraw( DrawLayers.Scene_BG, .DrawHighwayBG, this);
+			RegisterDraw( DrawLayers.Scene_FG, .DrawHighwayFG, this);
+            i += 1;
+            yield();
+        }
+    };
+
+	Background._DrawParallaxLayer = function(tex, coord, xParallax, yParallax, color)
+	{
+        if (!?color)
+        {
+            color = Gfx.WHITE;
+        }
+
+		local camera = g_game.state.cam;
+		local camPos = g_game.state.cam.CalcPos();
+
+		local camPosParallax = camPos * v2( xParallax, yParallax );
+		local x = fmod(camPosParallax.x, g_game.dimen.x);
+		local y = fmod(camPosParallax.y, g_game.dimen.y);
+
+		//camera.DrawBegin();
+		local i;
+		for ( i = -1; i <= 1; i+= 1 )
+		{
+        	tex.Bind(0);
+            local pos = v2(-x, -y) + coord;
+            local ofs = Select(.parallax_axis == 0, v2(i * tex.Dimen().x, 0.0f), v2(0.0f, i * tex.Dimen().y));
+            Gfx.Color(color);
+        	Gfx.DrawRectTexCoords(pos + ofs, tex.Dimen());
+        	Gfx.DrawRectTexCoords(pos, tex.Dimen());
+            Gfx.Color(Gfx.WHITE);
+        	tex.Unbind();
+		}
+		//camera.DrawEnd();
+	};
+
+	Background.DrawStreetBG = function()
+	{
+		Gfx.BeginDefaultShader();
+
+		g_game.BeginScreenSpace();
+        ._DrawParallaxLayer(.textures.street_bg, v2(0.0f), 1.0f, 0.0f);
+		g_game.EndScreenSpace();
+
+		Gfx.EndDefaultShader();
+	};
+
+
+	Background.DrawStreetFG = function()
+	{
+		Gfx.BeginDefaultShader();
+
+		g_game.BeginScreenSpace();
+        ._DrawParallaxLayer(.textures.street_fg, v2(0.0f), 1.0f, 0.0f);
+		g_game.EndScreenSpace();
+
+		Gfx.EndDefaultShader();
+	};
+
+	Background.DrawHighwayBG = function()
+	{
+		Gfx.BeginDefaultShader();
+
+        local sky_color = Gfx.WHITE * .bg_color;
+        local street_color = Gfx.WHITE * .bg_color * 1.5f;
+        ._DrawParallaxLayer(.textures.highway_bg, v2(0.0f), 0.1f, 1.0f, sky_color);
+        ._DrawParallaxLayer(.textures.highway_street, v2(0.0f), 4.0f, 1.0f, street_color);
+
+		Gfx.EndDefaultShader();
+	};
+
+	Background.DrawHighwayFG = function()
+	{
+		Gfx.BeginDefaultShader();
+
+		g_game.BeginScreenSpace();
+
+        ._DrawParallaxLayer(.textures.highway_fg, v2(0.0f, 140.0f), 4.5f, 1.0f);
+
+		g_game.EndScreenSpace();
+
+		Gfx.EndDefaultShader();
+	};
+
+	Background.Init = function()
+	{	
+        .textures = {
+            highway_bg = Texture("game/tiger/img/highwayBg.png"),
+            highway_street = Texture("game/tiger/img/highwayStreet.png"),
+            highway_fg = Texture("game/tiger/img/highwayFg.png"),
+    		street_bg = Texture("game/tiger/img/stage11.png"),
+    		street_fg = Texture("game/tiger/img/parallax1.png"),
+        };
+
+        local update_function = this["Update" + .type];
+        assert(?update_function);
+		.threadId = this:thread(update_function);
+	};
+
+	Background.Release = function()
+	{
+		threadKill(.threadId);
+	};
+	
+	Background.Init();
+	return Background;
+};

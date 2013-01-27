@@ -1,0 +1,217 @@
+
+global CollisionType =
+{
+    None = 0,
+    Circle = 1,
+    AABB = 2,
+};
+
+global MakeCollisionManager = function()
+{
+    local CollisionManager = table();
+
+    CollisionManager.items = table();
+    CollisionManager.kill_list = table();
+
+    CollisionManager.Add = function(item)
+    {
+        .items[item] = item;
+    };
+
+    CollisionManager.Remove = function(item)
+    {
+        .items[item] = null;
+    };
+
+    CollisionManager.Collide = function()
+    {
+        foreach (lhs in .items)
+        {
+            if (lhs.enabled == false)
+            {
+                continue;
+            }
+
+            foreach (rhs in .items)
+            {
+                if (lhs == rhs)
+                {
+                    continue;
+                }
+
+                if (rhs.enabled == false)
+                {
+                    continue;
+                }
+
+                local volume_lhs = lhs.volume;
+                local volume_rhs = rhs.volume;
+
+                local hit = volume_lhs.Test(volume_rhs);
+                if (hit)
+                {
+                    // TODO: probably better to handle in .Release functions
+                    local killed = lhs.Collide(rhs);
+                    if (killed)
+                    {
+                        .kill_list[lhs] = lhs;
+                        // TODO: should we collide with all things in one frame or break on first?
+                        //break;
+                    }
+                }
+            }
+        }
+
+        foreach (item in .kill_list)
+        {
+            .Remove(item);
+        }
+
+        tableClear(.kill_list);
+    };
+
+    CollisionManager.DebugDraw = function()
+    {
+		Gfx.BeginDefaultShader();
+
+		Gfx.SetLineWidth(2.0f);
+
+        foreach (item in .items)
+        {
+            local pos = v2(item.volume.pos.x, item.volume.pos.y + item.volume.pos.z);
+
+            // TODO: fix camera
+            pos -= g_game.state.cam.pos;
+
+            Gfx.Color(Gfx.WHITE);
+            if (item.enabled == false)
+            {
+                Gfx.Color(Gfx.WHITE * 0.2f);
+            }
+
+            if (item.volume.type == CollisionType.Circle)
+            {
+                Gfx.DrawCircleWire(pos, item.volume.radius);
+            }
+            else if (item.volume.type == CollisionType.AABB)
+            {
+                Gfx.DrawRectWire(pos, item.volume.size);
+            }
+        }
+
+		Gfx.SetLineWidth(1.0f);
+
+		Gfx.EndDefaultShader();
+    };
+
+    return CollisionManager;
+};
+
+global CollisionDepthMinimum = 24.0f;
+
+global MakeCollisionVolume = function(type, size)
+{
+    local Volume = table();
+
+    Volume.type = type;
+    Volume.pos = v3(0.0f);
+
+    if (type == CollisionType.Circle)
+    {
+        Volume.radius = size;
+
+        Volume.Test = function(rhs)
+        {
+            local depth_offset = abs(.pos.y - rhs.pos.y);
+
+            if (depth_offset >= CollisionDepthMinimum)
+            {
+                return false;
+            }
+
+            local pos_lhs = v3(.pos.x, .pos.z, 0.0f);
+            local pos_rhs = v3(rhs.pos.x, rhs.pos.z, 0.0f);
+
+            if (rhs.type == CollisionType.Circle)
+            {
+                local ofs = pos_lhs - pos_rhs;
+                local len = safe_length(ofs);
+
+                if (len < .radius + rhs.radius)
+                {
+                    return true;
+                }
+            }
+            else if (rhs.type == CollisionType.AABB)
+            {
+                assert(false);
+            }
+
+            return false;
+        };
+    }
+    else if (type == CollisionType.AABB)
+    {
+        Volume.size = size;
+
+        Volume.Test = function(rhs)
+        {
+            local depth_offset = abs(.pos.y - rhs.pos.y);
+
+            if (depth_offset >= CollisionDepthMinimum)
+            {
+                return false;
+            }
+
+            if (rhs.type == CollisionType.Circle)
+            {
+                assert(false);
+            }
+            else if (rhs.type == CollisionType.AABB)
+            {
+                assert(false);
+            }
+
+            return false;
+        };
+    }
+
+    assert(?Volume.Test);
+    return Volume;
+};
+
+global MakeCollision = function(owner, type, size)
+{
+    assert(?owner);
+    assert(?type);
+    assert(?size);
+
+	local Collision = table();
+
+    Collision.owner = owner; 
+    Collision.enabled = true; 
+    Collision.volume = MakeCollisionVolume(type, size);
+
+    Collision.SetPosition = function(pos)
+    {
+        .volume.pos = pos;
+    };
+
+    Collision.SetSize = function(size)
+    {
+        .volume.size = size;
+    };
+
+    Collision.SetEnabled = function(enabled)
+    {
+        .enabled = enabled;
+    };
+
+    Collision.Collide = function(rhs)
+    {
+        local killed =  .owner.OnCollide(this, rhs);
+        return killed;
+    };
+
+	return Collision;
+};

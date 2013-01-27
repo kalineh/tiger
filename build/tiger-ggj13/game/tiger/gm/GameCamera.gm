@@ -1,0 +1,191 @@
+global MakeGameCamera = function()
+{
+	local GameCamera = 
+	{
+		pos = v2(0.0f),
+		targetPos = v2(0.0f),
+
+		// camera shake
+		shakeTime = 0.0f,
+		shakeIntensity = 0.0f,
+
+		// zoom
+		zoom = 1.0f,
+	};
+
+	GameCamera.DrawBegin = function()
+	{
+		.cam.Begin();
+	};
+
+	GameCamera.DrawEnd = function()
+	{
+		.cam.End();
+	};
+
+	GameCamera.SetTargetPos = function(pos)
+	{
+		.targetPos = pos;
+	};
+
+	GameCamera.ConvertWorldSpaceToScreenSpace = function(worldSpacePos)
+	{
+		local newDimen = g_game.dimen/.zoom;
+		local camPosWorldSpace = .CalcPosClamped();
+		return worldSpacePos - camPosWorldSpace + newDimen*0.5f;
+	};
+
+	GameCamera.TeleportTo = function(pos)
+	{
+		.pos = pos;
+		.targetPos = pos;
+	};
+
+	GameCamera.Shake = function(timeSecs, intensity)
+	{
+		if ( !?timeSecs ) { timeSecs = 0.3f; }
+		if ( !?intensity ) { intensity = 0.01f; }
+
+		.shakeTime += timeSecs;
+		.shakeIntensity += intensity;
+	};
+
+	GameCamera.Gui = function()
+	{
+		Gui.Begin("Camera", g_core.screenDimen.x*0.5f, g_core.screenDimen.y-10.0f );
+		Gui.Minimize();
+
+		Gui.Print("Pos: " + .pos );
+		Gui.Separator();
+
+		if (!?.debugShakeIntensity) { .debugShakeIntensity = 0.05f; }
+		if (!?.debugShakeTime) { .debugShakeTime = 0.25f; }
+		.debugShakeTime = Gui.SliderFloat("ShakeTime", .debugShakeTime, 0.0f, 1.0f);
+		.debugShakeIntensity = Gui.SliderFloat("ShakeIntensity", .debugShakeIntensity, 0.0f, 0.2f);
+		if ( Gui.Button("Shake") )	{ .Shake(.debugShakeTime, .debugShakeIntensity);	}
+		Gui.Separator();
+
+		.zoom = Gui.SliderFloat("Zoom", .zoom, 0.25f, 3.0f);
+		if ( Gui.Button("Reset Zoom") ) { .zoom = 1.0f; }
+		Gui.End();
+	};
+
+	GameCamera.Zoom = function(zoom, time)
+	{
+		if ( !?time ) { time = 0.5f; }
+
+		// stop old tween
+		if ( ?.tweenZoom )
+		{
+			.tweenZoom.Stop();
+		}
+
+		.tweenZoom = Tween.To(this, 0.5f, {zoom=zoom});
+	};
+
+	GameCamera.CanSeeBox = function( position, size )
+	{	
+		local newDimen = g_game.dimen/.zoom;
+		local camPos = .CalcPos();
+		
+		// clamp the position to world
+		local minCamPos = camPos-newDimen*0.5;
+		local maxCamPos = camPos+newDimen*0.5;
+
+		local posMin = position;
+		local posMax = position + size;
+
+		return posMin.x <= maxCamPos.x
+			&& posMin.y <= maxCamPos.y
+			&& posMax.x >= minCamPos.x 
+			&& posMax.y >= minCamPos.y;
+	};
+
+	GameCamera.CalcPosClamped = function()
+	{
+		local newDimen = g_game.dimen/.zoom;
+
+		// clamp the position to world
+		local minPos = newDimen*0.5;
+		local maxPos = v2(g_game.dimen) - newDimen*0.5f;
+		local pos = clamp( .pos, minPos, maxPos );
+
+		return pos;
+	};
+
+    GameCamera.CalcPos = function()
+    {
+        local dimen = g_game.dimen / .zoom;
+        local pos = .pos + dimen * 0.5f;
+
+        return pos;
+    };
+
+	GameCamera._CalcPos = function()
+	{
+		.pos = lerp(.pos, .targetPos, 0.15f );
+
+        g_dump.target = .targetPos;
+        g_dump.pos = .pos;
+
+		// zooming
+		local newDimen = g_game.dimen/.zoom;
+		.cam.SetBounds(newDimen*-0.5f, newDimen*0.5f);
+
+		local pos = .CalcPosClamped();
+		local normalizedPos = pos / (newDimen*0.5f);// - v2(1.0f);
+
+		// handle shaking
+		local shakeOffset = v2(0.0f);
+		if ( .shakeTime > 0.0f )
+		{
+			.shakeTime -= 1.0f / 60.0f;
+			.shakeIntensity *= 0.925f;
+
+			local clampedShake = min(.shakeIntensity, 0.5f);
+
+			shakeOffset = v2(
+				randfloat(-clampedShake, clampedShake),
+				randfloat(-clampedShake, clampedShake)
+			);
+		}
+
+		.cam.SetPos(normalizedPos + shakeOffset);
+	};
+
+	GameCamera.Update = function()
+	{
+		while( true )
+		{	
+			._CalcPos();
+
+			RegisterDraw( DrawLayers.Scene_CamBegin, .DrawBegin, this );
+			RegisterDraw( DrawLayers.Scene_CamEnd, .DrawEnd, this );
+			RegisterGui(.Gui, this);
+
+			yield();
+		}
+	};
+
+	GameCamera.Init = function()
+	{	
+		.cam = Cam2d();
+		.cam.InitScreenSpaceSize(g_game.dimen);
+		.cam.SetNearFar(v2(-1000.0f, 1000.0f ));
+
+		.threadId = this:thread(.Update);
+	};
+
+	GameCamera.Release = function()
+	{
+		threadKill(.threadId);
+
+		if ( threadIsAlive(.threadShakeId) ) 
+		{
+			threadKill(.threadShakeId);
+		}
+	};
+	
+	GameCamera.Init();
+	return GameCamera;
+};

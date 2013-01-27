@@ -1,0 +1,99 @@
+global MakeTitleState = function()
+{
+	local State = 
+	{
+		transitionThread = null,
+	};
+
+	State.Draw = function()
+	{
+		g_game.BeginScreenSpace();
+		Gfx.BeginDefaultShader();
+
+		local posOffset = v2(0.0f, 10.0f*sin(g_game.time*2.0f) );
+
+		// bg
+		local texDimen = .texBG.Dimen();
+        .texBG.Bind(0);
+		Gfx.DrawRectTexCoords( g_game.dimen*0.5f-texDimen*0.5f, texDimen);
+        .texBG.Unbind(0);
+
+		// title
+		local texDimen = .texLogo.Dimen()*0.5f;
+		.texLogo.Bind(0);
+		Gfx.DrawRectTexCoords( posOffset+g_game.dimen*0.5f-texDimen*0.5f + v2(0.0f,60.0f), texDimen);
+		.texLogo.Unbind();
+
+		// text
+
+		local font = g_game.fonts["zekton_30"];
+		Gfx.Color(Gfx.YELLOW, 0.5f);
+		font.Print("Black Tiger", v2(20.5f, 128.0f));
+
+		Gfx.EndDefaultShader();
+		g_game.EndScreenSpace();
+	};
+
+	State.Update = function()
+	{
+		g_game.musicPlayer.Play(g_game.songs.title, 0.25f);
+
+        local frame_count = 0;
+
+		while( true )
+		{		
+			RegisterDraw( DrawLayers.Scene, .Draw, this);
+
+			if (!?.transitionThread && frame_count > 60 * 5)
+			{
+                if (Input.DidMouseJustGoDown(0) ||
+					Input.DidMouseJustGoDown(1) ||
+					Input.DidKeyJustGoDown("C") ||
+					Input.DidKeyJustGoDown("X") ||
+					Input.DidKeyJustGoDown("Z") ||
+					Input.DidKeyJustGoDown("V") ||
+					Input.DidKeyJustGoDown("SPACE") ||
+					Input.DidKeyJustGoDown("RETURN") ||
+					Input.DidKeyJustGoDown("KP_ENTER") ||
+					Input.IsPadDown("START"))
+				{
+					fork id
+					{
+						g_game.musicPlayer.FadeOut(1.0f);
+						//g_game.soundBanks["shared"].Play("selectCard"); // TODO: specific sound
+						local fadeTime = 1.0f;
+						g_fader.FadeOut(fadeTime, Gfx.BLACK, null, null, 1.0f);
+						g_fader.WaitOn();
+						g_game.GotoState("intro");
+					}
+					.transitionThread = id;
+				}
+			}
+
+            frame_count += 1;
+
+			yield();
+		}
+	};
+
+	State.Init = function()
+	{	
+		.threadId = this:thread(.Update);
+
+		.texLogo = Texture("game/tiger/img/title/logo.png");
+		.texBG = Texture("game/tiger/img/title/bg.png");
+	};
+
+	State.Release = function()
+	{
+		g_game.musicPlayer.Stop();
+
+		.texLogo = null;
+		.texBG = null;
+
+		threadKill(.threadId);
+	};
+	
+	State.Init();
+	return State;
+};

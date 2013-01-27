@@ -1,0 +1,385 @@
+global CreatePostProcessHDR = function()
+{
+	local HDR = 
+	{
+		luminThreshold = 1.5f,
+		bloomCoeff = 1.6f,
+		numBlurPasses = 3,
+		numMipMaps = 4,
+		blurRadius = 1.2f,
+
+		// lens blur
+		lensFlareNumPasses = 2,
+		lensFlareRadius = 0.75f,
+		lensFlareCoeff = 3.0f,
+		lensFlarePower = 2.0f,
+		lensAspectRatio = 1.8f,
+
+		hdrWhiteLevel = 1.0f,
+		hdrExposure = 1.0f,
+
+		showDebug = false,
+		showGui = true,
+		enable = true,
+	};
+
+	HDR.InitFbos = function()
+	{
+		.rawFbo =  Fbo( g_core.screenDimen.x, g_core.screenDimen.y );
+		.rawFbo.GenerateRenderTargetTex(0, Gfx.FORMAT_INTERNAL_RGB16F, Gfx.FORMAT_RGBA, Gfx.DATATYPE_HALF_FLOAT);
+		.rawFbo.GenerateDepthBuffer();
+
+		.mipMaps = array(.numMipMaps);
+		.blurTexs = array(.numMipMaps);
+
+		for ( i = 0; i < .numMipMaps; i+=1 )
+		{
+			local texSize = 512 >> i;
+
+			local fbo0  = Fbo( texSize, texSize );
+			fbo0.GenerateRenderTargetTex( 0, Gfx.FORMAT_INTERNAL_RGB16F, Gfx.FORMAT_RGBA, Gfx.DATATYPE_HALF_FLOAT );
+
+			local fbo1  = Fbo( texSize, texSize );
+			fbo1.GenerateRenderTargetTex( 0, Gfx.FORMAT_INTERNAL_RGB16F, Gfx.FORMAT_RGBA, Gfx.DATATYPE_HALF_FLOAT);
+
+			.mipMaps[i] = fbo0;
+			.blurTexs[i] = fbo1;
+		}
+
+		// lens flare
+		local lensFlareWidth = 32;
+		.fboLensFlare  = Fbo( lensFlareWidth, lensFlareWidth );
+		.fboLensFlare.GenerateRenderTargetTex( 0, Gfx.FORMAT_INTERNAL_RGB16F, Gfx.FORMAT_RGBA, Gfx.DATATYPE_HALF_FLOAT );
+		.lensFlareBlurHelper = Texture( v2(lensFlareWidth), Gfx.FORMAT_INTERNAL_RGB16F, Gfx.FORMAT_RGBA, Gfx.DATATYPE_HALF_FLOAT );
+	};
+
+	HDR.Gui = function()
+	{
+		Gui.Begin("HDR", g_core.screenDimen.x.Int()-250, g_core.screenDimen.y.Int() - 100);
+
+		Gui.Print("Num Mip-Maps: " + .numMipMaps );
+		Gui.Separator();
+		.showDebug = Gui.CheckBox("Show Debug MipMaps", .showDebug );
+		.enable = Gui.CheckBox("Enable HDR", .enable);
+
+		Gui.Header("Bloom");
+		.luminThreshold = Gui.SliderFloat("Lumin Threshold", .luminThreshold, 0.0f, 3.0f );
+		.bloomCoeff = Gui.SliderFloat("Bloom Coeff", .bloomCoeff, 0.0f, 10.0f );
+		.blurRadius = Gui.SliderFloat("Blur Radius", .blurRadius, 0.0f, 3.0f );
+		.numBlurPasses = Gui.SliderInt("Blur Passes", .numBlurPasses, 0, 5 );
+
+		Gui.Header("Lens Flare");
+		.lensFlareCoeff = Gui.SliderFloat("Ammount", .lensFlareCoeff, 0.0f, 10.0f );
+		.lensFlarePower = Gui.SliderFloat("Power", .lensFlarePower, 0.01f, 5.0f );
+		.lensFlareRadius = Gui.SliderFloat("Radius", .lensFlareRadius, 0.0f, 3.0f );
+		.lensAspectRatio = Gui.SliderFloat("Aspect Ratio", .lensAspectRatio, 1.0f, 3.0f );
+		.lensFlareNumPasses = Gui.SliderInt("Num Passes", .lensFlareNumPasses, 0, 5 );
+
+		Gui.Header("HDR");
+		.hdrExposure = Gui.SliderFloat("HDR Exposure", .hdrExposure, 0.1f, 5.0f );
+		.hdrWhiteLevel = Gui.SliderFloat("HDR White Level", .hdrWhiteLevel, 0.1f, 5.0f );
+		
+		Gui.End();
+	};
+
+	HDR.InitShaders = function()
+	{
+		.shaderGaussian = CreateShaderProgramFromFilename("common/shader/fboDefault.vp", "common/shader/gaussianBlur.fp" );
+		.shaderLensFlareBlur = CreateShaderProgramFromFilename("common/shader/fboDefault.vp", "common/shader/lensFlareBlur.fp" );
+		.shaderThreshold = CreateShaderProgramFromFilename("common/shader/fboDefault.vp", "common/shader/bloomThreshold.fp" );
+		.shaderHDR = CreateShaderProgramFromFilename("common/shader/fboDefault.vp", "common/shader/bloomFinal.fp" );
+	};
+	
+	HDR.Init = function()
+	{
+		.InitFbos();
+		.InitShaders();
+
+		fork id
+		{
+			while(true)
+			{
+				RegisterGui( .Gui, this );
+
+				if ( .enable )
+				{
+					RegisterDraw( DrawLayers.Offscreen_Begin, .BeginDraw, this );
+					RegisterDraw( DrawLayers.Offscreen_End, .EndDraw, this );
+					RegisterDraw( DrawLayers.Offscreen_Bloom, .DrawHDR, this );
+				}
+
+				yield();
+			}
+		}
+
+		.drawThreadId = id;
+	};
+
+	HDR.BeginDraw = function()
+	{
+		.rawFbo.Begin();
+
+		Gfx.Clear( Gfx.COLOR_BUFFER_BIT | Gfx.DEPTH_BUFFER_BIT );
+		Gfx.Disable(Gfx.TEXTURE_2D);
+	};
+
+	HDR.DrawMipMaps = function()
+	{
+		Gfx.DefaultFboShader.Begin();
+		Gfx.DefaultFboShader.Uniform("tex",0);
+
+		// first mipmap render
+		local firstMipMap = .mipMaps[0];
+		local rawTex = .rawFbo.GetTex();
+		firstMipMap.Begin();
+		rawTex.Bind(0);
+		Gfx.DrawScreenUV();
+		rawTex.Unbind();
+		firstMipMap.End();
+
+		// draw mipMaps
+		for( i = 1; i < .mipMaps.Size(); i+=1 )
+		{
+			local prevMipTex = .mipMaps[i-1].GetTex();
+			local currMip = .mipMaps[i];
+
+			currMip.Begin();
+
+			prevMipTex.Bind(0);
+			Gfx.DrawScreenUV();
+			prevMipTex.Unbind();
+
+			currMip.End();
+		}
+
+		Gfx.DefaultFboShader.End();
+	};
+
+	HDR._BlurTex = function(texBlurred, texHelper)
+	{
+		local width  = texBlurred.Width();
+		local height = texBlurred.Height();
+		local deltaU = .blurRadius / width;
+		local deltaV = .blurRadius / height;
+
+		// Vert blur
+		texHelper.Begin();
+		texBlurred.GetTex().Bind(0);
+		.shaderGaussian.Uniform( "uvDelta", 0.0f, deltaV, 0.0f, 0.0f );
+		Gfx.DrawScreenUV();
+		texBlurred.GetTex().Unbind(0);
+		texHelper.End();
+
+		// Horiz blur
+		texBlurred.Begin();
+		texHelper.GetTex().Bind(0);
+		.shaderGaussian.Uniform( "uvDelta", deltaU, 0.0f, 0.0f, 0.0f );
+		Gfx.DrawScreenUV();
+		texHelper.GetTex().Unbind(0);
+		texBlurred.End();
+	};
+
+	HDR.DrawBlur = function()
+	{
+		// shader
+		.shaderGaussian.Begin();
+		.shaderGaussian.Uniform( "tex", 0 );
+
+		for ( mipIndex = 0; mipIndex < .numMipMaps; mipIndex+= 1 )
+		{
+			local texDest = .blurTexs[mipIndex];
+			local texHelper = .mipMaps[mipIndex];
+
+			for ( i = 0; i < .numBlurPasses; i += 1 )
+			{
+				._BlurTex( texDest, texHelper );
+			}
+		}
+		
+		.shaderGaussian.End();
+	};
+
+	HDR.DrawLensBlur = function()
+	{
+		local tex0 = .fboLensFlare.GetTex();
+		local tex1 = .lensFlareBlurHelper;
+		local startTex = .mipMaps[.numMipMaps-1].GetTex();
+
+		local width  = tex0.Width();
+		local height = tex0.Height();
+		local deltaU = .lensFlareRadius / width;
+		local deltaV = .lensFlareRadius / height;
+
+		local shader = .shaderLensFlareBlur;
+		shader.Begin();
+		shader.Uniform( "uvDelta", deltaU*.lensAspectRatio, 0.0f, 0.0f, 0.0f );
+
+		// horizontal -> draw to tex0
+		.fboLensFlare.Begin();
+		startTex.Bind(0);
+		
+		Gfx.DrawScreenUV();
+		startTex.Unbind(0);
+		.fboLensFlare.End();
+
+		for( i = 0; i < .lensFlareNumPasses; i += 1 )
+		{
+			// vertical. tex0->tex1
+			.fboLensFlare.SetRenderTargetTex(tex1);
+			.fboLensFlare.Begin();
+			tex0.Bind(0);
+			shader.Uniform( "uvDelta", 0.0f, deltaV, 0.0f, 0.0f );
+			Gfx.DrawScreenUV();
+			tex0.Unbind(0);
+			.fboLensFlare.End();
+
+			// horizontal: tex1->tex0
+			.fboLensFlare.SetRenderTargetTex(tex0);
+			.fboLensFlare.Begin();
+			tex1.Bind(0);
+			shader.Uniform( "uvDelta", deltaU*.lensAspectRatio, 0.0f, 0.0f, 0.0f );
+			Gfx.DrawScreenUV();
+			tex1.Unbind(0);
+			.fboLensFlare.End();
+		}
+
+		shader.End();
+	};
+
+	HDR._ThresholdTex = function( texFrom, texTo )
+	{
+		texTo.Begin();
+		texFrom.GetTex().Bind(0);
+		Gfx.DrawScreenUV();
+		texFrom.GetTex().Unbind();
+		texTo.End();
+	};
+
+	HDR.DrawThreshold = function()
+	{
+		// shader
+		.shaderThreshold.Begin();
+		.shaderThreshold.Uniform("tex",0);
+		.shaderThreshold.Uniform( "thresholdLumin", .luminThreshold, 0.0f, 0.0f, 0.0f );
+
+		// threshold mip chain
+		for ( mipIndex = 0; mipIndex < .numMipMaps; mipIndex+= 1 )
+		{
+			local texFrom = .mipMaps[mipIndex];
+			local texTo = .blurTexs[mipIndex];
+
+			._ThresholdTex(texFrom,texTo);
+		}
+
+		.shaderThreshold.End();
+	};
+
+	HDR.DrawFinal = function()
+	{
+		.shaderHDR.Begin();
+		.shaderHDR.Uniform("texRaw",0);
+		.shaderHDR.Uniform("texBlur0",1);
+		.shaderHDR.Uniform("texBlur1",2);
+		.shaderHDR.Uniform("texBlur2",3);
+		.shaderHDR.Uniform("texBlur3",4);
+		.shaderHDR.Uniform("texLensBlur",5);
+		.shaderHDR.Uniform("data", .bloomCoeff, .hdrExposure, .hdrWhiteLevel, g_game.time);
+		.shaderHDR.Uniform("lensFlareData", .lensFlareCoeff, .lensFlarePower, .hdrWhiteLevel, .lensFlareCoeff);
+		.shaderHDR.Uniform("randData", randfloat(0.0f,1.0f), randfloat(0.0f,1.0f), randfloat(0.0f,1.0f), randfloat(0.0f,1.0f) );
+		
+		// bind tex
+		.rawFbo.GetTex().Bind(0);
+
+		for ( mipIndex = 0; mipIndex < .numMipMaps; mipIndex += 1 )
+		{
+			.blurTexs[mipIndex].GetTex().Bind(1+mipIndex);
+		}
+
+		.fboLensFlare.GetTex().Bind(5);
+
+		Gfx.DrawScreenUV();
+
+		.fboLensFlare.GetTex().Unbind();
+	
+		// unbind tex
+		.rawFbo.GetTex().Unbind();
+		for ( mipIndex = 0; mipIndex < .numMipMaps; mipIndex += 1 )
+		{
+			.blurTexs[mipIndex].GetTex().Unbind();
+		}
+
+		.shaderHDR.End();
+	};
+
+	HDR.DrawRaw = function()
+	{
+		Gfx.DefaultFboShader.Begin();
+		Gfx.DefaultFboShader.Uniform("tex",0);
+
+		.rawFbo.GetTex().Bind(0);
+		Gfx.DrawScreenUV(v2(0.0, 0.2), v2(0.2f) );
+		//Gfx.DrawScreenUV();
+		.rawFbo.GetTex().Unbind();
+
+		Gfx.DefaultFboShader.End();
+	};
+
+	HDR.DrawDebug = function()
+	{
+		Gfx.DefaultFboShader.Begin();
+		Gfx.DefaultFboShader.Uniform("tex",0);
+
+		local debugSizeUV = v2(0.15f);
+
+		for ( mipIndex = 0; mipIndex < .numMipMaps; mipIndex += 1 )
+		{
+			local blurredTex = .blurTexs[mipIndex];
+			local topLeftUV = v2(0.0f, debugSizeUV.y*mipIndex);
+
+			blurredTex.GetTex().Bind(0);
+			Gfx.DrawScreenUV( topLeftUV, debugSizeUV );
+			blurredTex.GetTex().Unbind();
+		}
+
+		// draw lens flare
+		local topLeftUV = v2(0.0f, debugSizeUV.y*.numMipMaps);
+		local glareTex = .fboLensFlare.GetTex();
+		glareTex.Bind(0);
+		Gfx.DrawScreenUV( topLeftUV, debugSizeUV );
+		glareTex.Unbind();
+
+		Gfx.DefaultFboShader.End();
+	};
+
+	HDR.EndDraw = function()
+	{
+		.rawFbo.End();
+	};
+
+	HDR.DrawHDR = function()
+	{
+		.DrawMipMaps();
+		.DrawThreshold();
+		.DrawLensBlur();
+		.DrawBlur();
+		.DrawFinal();
+
+		// debugging
+		if ( .showDebug )
+		{
+			.DrawDebug();
+		}
+		//.DrawRaw();
+	};
+
+	HDR.Release = function()
+	{
+		.mipMaps = null;
+		.blurTexs = null;
+
+		threadKill(.drawThreadId);
+	};
+
+	HDR.Init();	
+	return HDR;
+};
