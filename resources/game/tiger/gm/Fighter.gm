@@ -8,11 +8,18 @@ global FighterConfig =
         Animations = "player",
     },
 
-    Thug = 
+    Enemy0 = 
     {
-        MaxHealth = 20.0f,
+        MaxHealth = 12.0f,
         MaxEnergy = 0.0f,
         Animations = "enemy0",
+    },
+
+    Enemy1 = 
+    {
+        MaxHealth = 40.0f,
+        MaxEnergy = 0.0f,
+        Animations = "enemy1",
     },
 };
 
@@ -74,14 +81,12 @@ global MakeFighter = function(world, coord, config_name)
 
     Fighter.StartActionThread = function(name, f, a, b, c, d, e)
     {
-        print("action:", name);
         assert(!threadIsAlive(.action_thread));
         .action_thread = this:thread(f, a, b, c, d, e);
     };
 
     Fighter.StartActionThreadThis = function(this_, name, f, a, b, c, d, e)
     {
-        print("actionthis:", name);
         assert(!threadIsAlive(.action_thread));
         .action_thread = this_:thread(f, a, b, c, d, e);
     };
@@ -426,6 +431,12 @@ global MakeFighter = function(world, coord, config_name)
 
                 // double stun = knockdown
                 if (.stun > 2 && stun)
+                {
+                    knockdown = true;
+                }
+
+                // sometimes fall over
+                if (randint(0, 100) < 5)
                 {
                     knockdown = true;
                 }

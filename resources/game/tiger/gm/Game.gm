@@ -269,10 +269,10 @@ local CreateGame = function()
 
 		.state = null;
 
-		.GotoState("title");
+		//.GotoState("title");
 		//.GotoState("intro");
 		//.GotoState("highway");
-		//.GotoState("game");
+		.GotoState("game");
 	};
 
 	Game._InitSounds = function()

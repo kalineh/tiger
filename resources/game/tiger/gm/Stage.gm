@@ -29,12 +29,21 @@ global StageConfig =
     },
     Street =
     {
-        { time = 0, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -120.0f, } },
-        { time = 400, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -200.0f, } },
-        { time = 400, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -140.0f, } },
-        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -210.0f, } },
-        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -150.0f, } },
-        { time = 1000, type = "SpawnEnemy", args = { type = "Thug", ai = "Thug", y = -250.0f, } },
+        { time = 0, type = "SpawnEnemy", args = { type = "Enemy0", y = -120.0f, } },
+        { time = 400, type = "SpawnEnemy", args = { type = "Enemy0", y = -200.0f, } },
+        { time = 400, type = "SpawnEnemy", args = { type = "Enemy0", y = -140.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Enemy0", y = -210.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Enemy1", y = -150.0f, } },
+        { time = 1000, type = "SpawnEnemy", args = { type = "Enemy0", y = -250.0f, } },
+        { time = 1400, type = "SpawnEnemy", args = { type = "Enemy0", y = -210.0f, } },
+        { time = 1400, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 1400, type = "SpawnEnemy", args = { type = "Enemy0", y = -250.0f, } },
+        { time = 1600, type = "SpawnEnemy", args = { type = "Enemy0", y = -210.0f, } },
+        { time = 1600, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 2000, type = "SpawnEnemy", args = { type = "Enemy1", y = -210.0f, } },
+        { time = 2000, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 2000, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 2000, type = "SpawnEnemy", args = { type = "Enemy1", y = -250.0f, } },
     },
 };
 

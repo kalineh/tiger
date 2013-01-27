@@ -71,7 +71,20 @@ global MakeFighterAI = function(owner, name)
             {
                 local player = .owner.world.FindNearestPlayer();
 
-                .MoveToEntity(player);
+                if (randint(0, 100) < 33)
+                {
+                    local ofs = .owner.pos - player.pos;
+                    local p = v3(
+                        player.pos.x + sign(ofs.x) * randfloat(80.0f, 120.0f) * -1.0f,
+                        player.pos.y + sign(ofs.y) * randfloat(40.0f, 90.0f),
+                        player.pos.z);
+
+                    .MoveToPosition(p);
+                    sleep(1.0f);
+                    return;
+                }
+
+                .MoveToEntity(player, 32.0f + randfloat(16.0f, 48.0f));
                 .TryAttack(player);
             });
 
@@ -84,7 +97,7 @@ global MakeFighterAI = function(owner, name)
         }
     };
 
-    AI.MoveToEntity = function(entity)
+    AI.MoveToEntity = function(entity, minrangex)
     {
         local limit = 60 * 6;
 
@@ -92,13 +105,22 @@ global MakeFighterAI = function(owner, name)
         {
             local target = entity.pos;
             local ofs = target - .owner.pos;
+
+            // target is actually next to the entity
+            target = v3(target.x + sign(ofs.x) * minrangex * -1.0f, target.y, target.z);
+            ofs = target - .owner.pos;
+
+            g_dump.target = target;
+
             local len = safe_length(ofs);
             local dir = safe_normalize(ofs);
-            local speed = 0.1f + len * 0.005f;
+            local speed = len * 0.005f;
+
+            speed = max(0.5f, speed);
 
             .owner.move_input = v2(dir * speed);
 
-            if (abs(ofs.x) < 64.0f && abs(ofs.y) < 8.0f)
+            if (abs(ofs.x) < 24.0f && abs(ofs.y) < 8.0f)
             {
                 break;
             }
@@ -108,6 +130,11 @@ global MakeFighterAI = function(owner, name)
                 break;
             }
 
+            limit -= 1;
+            if (limit <= 0)
+            {
+                break;
+            }
             .WaitActionThread();
 
             yield();
@@ -116,18 +143,26 @@ global MakeFighterAI = function(owner, name)
 
     AI.MoveToPosition = function(position)
     {
-        local limit = 60 * 6;
+        local limit = 60 * 3;
 
         while (true)
         {
             local ofs = position - .owner.pos;
             local len = safe_length(ofs);
             local dir = safe_normalize(ofs);
-            local speed = 0.1f + len * 0.1f;
+            local speed = len * 0.1f;
+
+            speed = max(0.5f, speed);
 
             .owner.move_input = v2(dir * speed);
 
             if (len < 64.0f)
+            {
+                break;
+            }
+
+            limit -= 1;
+            if (limit <= 0)
             {
                 break;
             }
@@ -156,20 +191,62 @@ global MakeFighterAI = function(owner, name)
             return;
         }
 
-        sleep(0.2f);
-        .WaitActionThread();
-        local combo_data = PlayerGroundAttacks["PunchL"];
-        .owner.Combo(combo_data);
-        .WaitActionThread();
-        local combo_data = PlayerGroundAttacks["PunchR"];
-        .owner.Combo(combo_data);
-        .WaitActionThread();
-        sleep(0.2f);
-        .WaitActionThread();
-        local combo_data = PlayerGroundAttacks["Uppercut"];
-        .owner.Combo(combo_data);
-        .WaitActionThread();
-        sleep(0.2f);
+        local punch_lr = function()
+        {
+            sleep(0.2f);
+            local combo_data = PlayerGroundAttacks["PunchL"];
+            .owner.Combo(combo_data);
+            .WaitActionThread();
+            local combo_data = PlayerGroundAttacks["PunchR"];
+            .owner.Combo(combo_data);
+            .WaitActionThread();
+            sleep(0.2f);
+        };
+
+        local uppercut = function()
+        {
+            sleep(0.2f);
+            local combo_data = PlayerGroundAttacks["Uppercut"];
+            .owner.Combo(combo_data);
+            .WaitActionThread();
+            sleep(0.2f);
+        };
+
+        local kick = function()
+        {
+            sleep(0.2f);
+            local combo_data = PlayerGroundAttacks["Kick"];
+            .owner.Combo(combo_data);
+            .WaitActionThread();
+            sleep(0.2f);
+        };
+
+        if (.name == "Enemy0")
+        {
+            if (randint(0, 100) < 75)
+            {
+                this:punch_lr();
+            }
+
+            if (randint(0, 100) < 25)
+            {
+                this:kick();
+            }
+        }
+        else
+        {
+            if (randint(0, 100) < 75)
+            {
+                this:punch_lr();
+                this:uppercut();
+            }
+
+            if (randint(0, 100) < 25)
+            {
+                this:kick();
+                this:punch_lr();
+            }
+        }
     };
 
     AI.update_thread = AI:thread(AI.Update);

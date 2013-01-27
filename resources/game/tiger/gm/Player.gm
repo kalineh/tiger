@@ -188,12 +188,13 @@ global PlayerGroundComboChains =
     PunchR = {
         { name = "AfroPick", action = ComboActions.Throw, },
         { name = "Uppercut", action = ComboActions.Punch | ComboActions.Forward, },
+        { name = "PunchL", action = ComboActions.Punch, },
         { name = "SpinKick", action = ComboActions.Kick, },
     },
 
     Kick = {
         { name = "AfroPick", action = ComboActions.Throw, },
-        { name = "SweepKick", action = ComboActions.Kick | ComboActions.Down, },
+        { name = "SweepKick", action = ComboActions.Kick | ComboActions.Forward, },
         { name = "PunchL", action = ComboActions.Punch, },
         { name = "Kick", action = ComboActions.Kick, },
     },
