@@ -1,3 +1,0 @@
-global PI = 3.14159265f;
-global TWICE_PI = 3.14159265f*2.0f;
-global EXP = 2.71828182846f;

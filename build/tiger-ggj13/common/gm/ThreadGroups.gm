@@ -1,6 +1,0 @@
-global ThreadGroups =
-{
-	MAIN = 0, // undeletable
-
-	TIGER_STATE = 1,
-};
