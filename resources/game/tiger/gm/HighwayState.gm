@@ -66,7 +66,7 @@ global MakeHighwayState = function()
         .spawner.Release();
 
         local speedaway = 0.0f;
-        for (i = 0; i < 120; i += 1)
+        for (i = 0; i < 180; i += 1)
         {
             speedaway += 0.2f;
             .world.player.pos += v3(speedaway, 0.0f, 0.0f);

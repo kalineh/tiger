@@ -50,6 +50,8 @@ global MakeIntroState = function()
             {
                 break;
             }
+
+            yield();
         }
     };
 
@@ -76,37 +78,42 @@ global MakeIntroState = function()
         .currentText = .texts[0];
 		//g_game.soundBanks["cutscene"].Play("dooropen");
         fade_in();
-        //sleep(0.5f);
-        .WaitKeyOrTime(1.5f);
+        g_game.voicePlayer.Play("intro_quote_0");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[1];
         .currentText = .texts[1];
         fade_in();
 		//g_game.soundBanks["cutscene"].Play("suprise");
-        //sleep(0.5f);
+        sleep(0.5f);
+        g_game.voicePlayer.Play("intro_quote_1");
 		//g_game.soundBanks["quotes"].Play("wtf");
         //sleep(0.5f);
-        .WaitKeyOrTime(1.0f);
+        .WaitKeyOrTime(3.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[2];
         .currentText = .texts[2];
         fade_in();
 		//g_game.soundBanks["cutscene"].Play("suprise");
-        //sleep(0.5f);
+        g_game.voicePlayer.Play("intro_quote_2");
+        sleep(0.5f);
 		//g_game.soundBanks["quotes"].Play("bastards");
-        //sleep(0.5f);
-        .WaitKeyOrTime(1.0f);
+        g_game.voicePlayer.Play("intro_quote_3");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[3];
         .currentText = .texts[3];
         fade_in();
-        //sleep(0.5f);
+        sleep(0.5f);
 		//g_game.soundBanks["quotes"].Play("ill_save_you_lil_t");
-        //sleep(0.5f);
-        .WaitKeyOrTime(1.0f);
+        g_game.voicePlayer.Play("intro_quote_4");
+        sleep(0.5f);
+        .WaitKeyOrTime(3.0f);
         fade_out();
 
         .currentCutscene = .cutscenes[4];
@@ -118,10 +125,11 @@ global MakeIntroState = function()
         //sleep(0.5f);
 		//g_game.soundBanks["cutscene"].Play("screeching");
         sleep(0.0f);
-        .WaitKeyOrTime(1.0f);
+        .WaitKeyOrTime(3.0f);
 
 		g_game.musicPlayer.FadeOut(2.0f);
         fade_out(3.0f);
+        g_game.voicePlayer.Play("intro_quote_5");
 
         threadKill(.threadId);
         g_game.GotoState("highway");

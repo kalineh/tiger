@@ -44,8 +44,9 @@ global MakeCarSpawner = function(world)
     {
         while (true)
         {
-            .spawn_adjust = max(0.0f, .spawn_adjust - 0.075f);
+            .spawn_extra_delay = max(0.0f, .spawn_extra_delay - 0.020f);
             sleep(.spawn_extra_delay);
+            print(.spawn_extra_delay);
             sleep(randfloat(0.10f, 0.45f));
             .Spawn();
 

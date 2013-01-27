@@ -38,13 +38,15 @@ global MakeTitleState = function()
 	{
 		g_game.musicPlayer.Play(g_game.songs.title, 0.25f);
 
+        local frame_count = 0;
+
 		while( true )
 		{		
 			RegisterDraw( DrawLayers.Scene, .Draw, this);
 
-			if (!?.transitionThread)
+			if (!?.transitionThread && frame_count > 60 * 8)
 			{
-				if (Input.DidMouseJustGoDown(0) ||
+                if (Input.DidMouseJustGoDown(0) ||
 					Input.DidMouseJustGoDown(1) ||
 					Input.DidKeyJustGoDown("C") ||
 					Input.DidKeyJustGoDown("X") ||
@@ -66,6 +68,8 @@ global MakeTitleState = function()
 					.transitionThread = id;
 				}
 			}
+
+            frame_count += 1;
 
 			yield();
 		}
