@@ -46,7 +46,9 @@ global MakeIntroState = function()
         {
 			if (Input.DidKeyJustGoDown("SPACE") ||
 				Input.DidKeyJustGoDown("RETURN") ||
-				Input.DidKeyJustGoDown("KP_ENTER"))
+				Input.DidKeyJustGoDown("KP_ENTER") ||
+				Input.IsPadPress("START") ||
+				Input.IsPadPress("A"))
             {
                 break;
             }

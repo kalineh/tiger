@@ -44,7 +44,7 @@ global MakeTitleState = function()
 		{		
 			RegisterDraw( DrawLayers.Scene, .Draw, this);
 
-			if (!?.transitionThread && frame_count > 60 * 8)
+			if (!?.transitionThread && frame_count > 60 * 5)
 			{
                 if (Input.DidMouseJustGoDown(0) ||
 					Input.DidMouseJustGoDown(1) ||
@@ -54,7 +54,8 @@ global MakeTitleState = function()
 					Input.DidKeyJustGoDown("V") ||
 					Input.DidKeyJustGoDown("SPACE") ||
 					Input.DidKeyJustGoDown("RETURN") ||
-					Input.DidKeyJustGoDown("KP_ENTER"))
+					Input.DidKeyJustGoDown("KP_ENTER") ||
+					Input.IsPadDown("START"))
 				{
 					fork id
 					{

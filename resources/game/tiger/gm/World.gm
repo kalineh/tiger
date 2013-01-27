@@ -160,7 +160,20 @@ global MakeWorld = function(stage_config)
         local cam = g_game.state.cam;
         cam.DrawBegin();
 
-		foreach (e in .entities)
+        if (!?.sorted_drawlist) { .sorted_drawlist = table(); }
+        tableClear(.sorted_drawlist);
+        
+        local i = 0;
+        foreach (e in .entities)
+        {
+            .sorted_drawlist[i] = e;
+            i += 1;
+        }
+
+        local sorter = function(a, b) { return a.pos.y > b.pos.y; };
+        BubbleSortTable(.sorted_drawlist, null, sorter);
+
+		foreach (e in .sorted_drawlist)
 		{
 			e.Draw();
 		}
