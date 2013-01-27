@@ -44,6 +44,14 @@ global StageConfig =
         { time = 2000, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
         { time = 2000, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
         { time = 2000, type = "SpawnEnemy", args = { type = "Enemy1", y = -250.0f, } },
+        { time = 2200, type = "SpawnEnemy", args = { type = "Enemy1", y = -210.0f, } },
+        { time = 2300, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 2300, type = "SpawnEnemy", args = { type = "Enemy0", y = -150.0f, } },
+        { time = 2300, type = "SpawnEnemy", args = { type = "Enemy1", y = -250.0f, } },
+        { time = 2700, type = "SpawnEnemy", args = { type = "Enemy1", y = -210.0f, } },
+        { time = 2700, type = "SpawnEnemy", args = { type = "Enemy1", y = -150.0f, } },
+        { time = 2700, type = "SpawnEnemy", args = { type = "Enemy1", y = -250.0f, } },
+        { time = 3400, type = "StageEnd", args = { } },
     },
 };
 
@@ -121,6 +129,11 @@ global MakeStage = function(world, name)
         .world.AddLifeRow(enemy);
     };
 
+    Stage.ProcessStageEnd = function(args)
+    {
+        .stageEnd = MakeStageEnd(.world);
+    };
+
     Stage.ProcessSpawnCar = function(args)
     {
         local base = g_game.state.cam.pos + v2(700.0f, 0.0f);
@@ -132,4 +145,46 @@ global MakeStage = function(world, name)
     };
 
     return Stage;
+};
+
+global MakeStageEnd = function(world)
+{
+    local StageEnd = table();
+    StageEnd.world = world;
+
+    StageEnd.Update = function()
+    {
+        while (true)
+        {
+            local finished = true;
+            foreach (e in .world.entities)
+            {
+                if (e.type == "Enemy")
+                {
+                    finished = false;
+                    break;
+                }
+            }
+            if (finished)
+            {
+                sleep(1.0f);
+                .End();
+            }
+
+            sleep(1.0f);
+        }
+    };
+
+    StageEnd.Release = function()
+    {
+        threadKill(.threadId);
+    };
+
+    StageEnd.End = function()
+    {
+        g_game.state.End();
+    };
+
+    StageEnd.threadId = StageEnd:thread(StageEnd.Update);
+    return StageEnd;
 };
