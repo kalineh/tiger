@@ -57,6 +57,13 @@ global g_fileData =
         stream = 0,
         volume = 1.00000,
     },
+    throw = 
+    {
+        filename = "game/tiger/snd/throw.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
     screech = 
     {
         filename = "game/tiger/snd/screech.ogg",

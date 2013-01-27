@@ -51,7 +51,7 @@ global MakeCarSpawner = function(world)
             sleep(randfloat(0.10f, 0.45f));
             .Spawn();
 
-            if (randint(0, 100) < 195)
+            if (randint(0, 100) < 18)
             {
                 .SpawnOil();
             }
