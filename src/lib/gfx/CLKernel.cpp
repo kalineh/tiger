@@ -43,7 +43,7 @@ void CLKernel::Init()
 	while (true)
 	{
 		int numBytes;          // Byte size of kernel code
-		const char * cSourceCL = TextFileRead( m_filename.c_str(), &numBytes );
+		const char * cSourceCL = ::TextFileRead( m_filename.c_str(), &numBytes );
 
 		// Create the program
 		size_t programSize = numBytes;

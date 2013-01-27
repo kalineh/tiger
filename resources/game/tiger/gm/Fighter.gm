@@ -436,7 +436,13 @@ global MakeFighter = function(world, coord, config_name)
                 }
 
                 // sometimes fall over
-                if (randint(0, 100) < 5)
+                local fall_chance = 2;
+                if (damage > 0.0f)
+                {
+                    fall_chance = 5;
+                }
+
+                if (randint(0, 100) <= fall_chance)
                 {
                     knockdown = true;
                 }

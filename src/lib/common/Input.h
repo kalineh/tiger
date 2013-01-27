@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <math/v2.h>
 #include <math/v2i.h>
 
 #include <common/Singleton.h>
@@ -40,6 +41,16 @@ namespace funk
 		inline char GetKeyDown() const { return m_keyDown; }
 		inline char GetKeyUp() const { return m_keyUp; }
 
+		// Pad
+		inline bool IsPadDown(const char* key) const;
+		inline bool IsPadPress(const char* key) const;
+		inline bool IsPadRelease(const char* key) const;
+		inline unsigned char GetPadLeftTrigger() const { return m_padLeftTrigger; }
+		inline unsigned char GetPadRightTrigger() const { return m_padRightTrigger; }
+		funk::v2 GetPadLeftStick() const { return m_padLeftStick; }
+		funk::v2 GetPadRightStick() const { return m_padRightStick; }
+
+
 	private:
 		friend Singleton<Input>;
 		Input();
@@ -47,6 +58,8 @@ namespace funk
 
 		void BuildMapStringKey();
 		inline bool IsKeyDownInState( int iState, unsigned int key ) const;
+		inline bool IsMouseDownInState( int iState, int mouseKey ) const;
+		inline bool IsPadDownInState(int iState, unsigned int key) const;
 
 		void DetectDoubleClick();
 		bool m_doubleClicked;
@@ -65,8 +78,13 @@ namespace funk
 		v2i m_mousePos;
 		v2i m_mouseRel;
 
-		inline bool IsMouseDownInState( int iState, int mouseKey ) const;
-
+		// pad
+		std::map< std::string, unsigned int > m_padMapStringKey;
+		int m_padButtonState[2];
+		unsigned char m_padLeftTrigger;
+		unsigned char m_padRightTrigger;
+		funk::v2 m_padLeftStick;
+		funk::v2 m_padRightStick;
 	};
 
 #include "Input.inl"

@@ -45,3 +45,26 @@ bool Input::DidMouseWheelHit( int btn ) const
 {
 	return m_mouseWheelHit[btn];
 }
+
+bool Input::IsPadDownInState(int iState, unsigned int padKey) const
+{
+	return (m_padButtonState[iState] & padKey) != 0;
+}
+
+bool Input::IsPadDown(const char* key) const
+{
+	unsigned int rawKey = m_padMapStringKey.find(key)->second;
+	return IsPadDownInState(m_iCurrentState ^ 1, rawKey);
+}
+
+bool Input::IsPadPress(const char* key) const
+{
+	unsigned int rawKey = m_padMapStringKey.find(key)->second;
+	return IsPadDownInState(m_iCurrentState ^ 1, rawKey) && !IsPadDownInState(m_iCurrentState, rawKey);
+}
+
+bool Input::IsPadRelease(const char* key) const
+{
+	unsigned int rawKey = m_padMapStringKey.find(key)->second;
+	return !IsPadDownInState(m_iCurrentState ^ 1, rawKey) && IsPadDownInState(m_iCurrentState, rawKey);
+}

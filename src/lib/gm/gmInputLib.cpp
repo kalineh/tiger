@@ -134,6 +134,65 @@ struct gmfInputLib
 
 		return GM_OK;
 	}
+
+	static int GM_CDECL gmfIsPadDown(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_STRING_PARAM(key, 0);
+		a_thread->PushInt(Input::Get()->IsPadDown(key) ? 1:0);
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfIsPadPress(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_STRING_PARAM(key, 0);
+		a_thread->PushInt(Input::Get()->IsPadPress(key) ? 1:0);
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfIsPadRelease(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_STRING_PARAM(key, 0);
+		a_thread->PushInt(Input::Get()->IsPadRelease(key) ? 1:0);
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfGetPadLeftStick(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(0);
+		a_thread->PushVec2(Input::Get()->GetPadLeftStick());
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfGetPadRightStick(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(0);
+		a_thread->PushVec2(Input::Get()->GetPadRightStick());
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfGetPadLeftTrigger(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(0);
+		a_thread->PushInt((int)Input::Get()->GetPadLeftTrigger());
+
+		return GM_OK;
+	}
+
+	static int GM_CDECL gmfGetPadRightTrigger(gmThread * a_thread)
+	{
+		GM_CHECK_NUM_PARAMS(0);
+		a_thread->PushInt((int)Input::Get()->GetPadRightTrigger());
+
+		return GM_OK;
+	}
 };
 
 static gmFunctionEntry s_gmInputLib[] = 
@@ -154,6 +213,14 @@ static gmFunctionEntry s_gmInputLib[] =
 	GM_LIBFUNC_ENTRY(DidKeyJustGoDown, Input)
 	GM_LIBFUNC_ENTRY(DidKeyJustGoUp, Input)
 
+	// Pad
+	GM_LIBFUNC_ENTRY(IsPadDown, Input)
+	GM_LIBFUNC_ENTRY(IsPadPress, Input)
+	GM_LIBFUNC_ENTRY(IsPadRelease, Input)
+	GM_LIBFUNC_ENTRY(GetPadLeftStick, Input)
+	GM_LIBFUNC_ENTRY(GetPadRightStick, Input)
+	GM_LIBFUNC_ENTRY(GetPadLeftTrigger, Input)
+	GM_LIBFUNC_ENTRY(GetPadRightTrigger, Input)
 };
 
 void gmBindInputLib( gmMachine * a_machine )

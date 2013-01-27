@@ -5,10 +5,24 @@
 #include <common/Window.h>
 #include <common/Timer.h>
 
+#include <Windows.h>
+#include <XInput.h>
+//#pragma comment(lib, "XInput.lib")
+#pragma comment(lib, "XINPUT9_1_0.LIB")
+
 namespace funk
 {
-	Input::Input() : m_iCurrentState(0), m_mousePos(0,0), m_mouseRel(0,0), m_doubleClicked(false)
+	Input::Input()
+        : m_iCurrentState(0)
+        , m_mousePos(0,0)
+        , m_mouseRel(0,0)
+        , m_doubleClicked(false)
+		, m_padLeftTrigger(0)
+		, m_padRightTrigger(0)
+		, m_padLeftStick(0.0f, 0.0f)
+		, m_padRightStick(0.0f, 0.0f)
 	{
+		memset(m_padButtonState, 0, sizeof(m_padButtonState));
 		BuildMapStringKey();
 
 		Update();
@@ -35,6 +49,16 @@ namespace funk
 
 		m_mouseRel = mousePos - m_mousePos;
 		m_mousePos = mousePos;		
+
+		// Pad state
+		XINPUT_STATE state = { 0 };
+		DWORD result = XInputGetState(0, &state);
+
+		m_padButtonState[m_iCurrentState] = (int)state.Gamepad.wButtons;
+		m_padLeftTrigger = state.Gamepad.bLeftTrigger;
+		m_padRightTrigger = state.Gamepad.bRightTrigger;
+		m_padLeftStick = v2(state.Gamepad.sThumbLX, state.Gamepad.sThumbLY) / 32768.0f;
+		m_padRightStick = v2(state.Gamepad.sThumbRX, state.Gamepad.sThumbRY) / 32768.0f;
 
 		m_iCurrentState ^= 1;
 
@@ -291,6 +315,21 @@ namespace funk
 		m_mapStringKey["POWER"]=320;
 		m_mapStringKey["EURO"]=321;
 		m_mapStringKey["UNDO"]=322;
+
+		m_padMapStringKey["DPAD_UP"] = XINPUT_GAMEPAD_DPAD_UP;
+		m_padMapStringKey["DPAD_DOWN"] = XINPUT_GAMEPAD_DPAD_DOWN;
+		m_padMapStringKey["DPAD_LEFT"] = XINPUT_GAMEPAD_DPAD_LEFT;
+		m_padMapStringKey["DPAD_RIGHT"] = XINPUT_GAMEPAD_DPAD_RIGHT;
+		m_padMapStringKey["START"] = XINPUT_GAMEPAD_START;
+		m_padMapStringKey["BACK"] = XINPUT_GAMEPAD_BACK;
+		m_padMapStringKey["LEFT_THUMB"] = XINPUT_GAMEPAD_LEFT_THUMB;
+		m_padMapStringKey["RIGHT_THUMB"] = XINPUT_GAMEPAD_RIGHT_THUMB;
+		m_padMapStringKey["LEFT_SHOULDER"] = XINPUT_GAMEPAD_LEFT_SHOULDER;
+		m_padMapStringKey["RIGHT_SHOULDER"] = XINPUT_GAMEPAD_RIGHT_SHOULDER;
+		m_padMapStringKey["A"] = XINPUT_GAMEPAD_A;
+		m_padMapStringKey["B"] = XINPUT_GAMEPAD_B;
+		m_padMapStringKey["X"] = XINPUT_GAMEPAD_X;
+		m_padMapStringKey["Y"] = XINPUT_GAMEPAD_Y;
 	}
 
 	int Input::ShowMouseCursor(bool show)

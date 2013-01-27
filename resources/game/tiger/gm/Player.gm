@@ -44,12 +44,34 @@ global PlayerControlsKeyboard =
 	Jump = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "X"),
 	Punch = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "C"),
 	Kick = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "Z"),
-	Block = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
+	//Block = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "D"),
 	Throw = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "V"),
 	Up = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "UP"),
 	Down = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "DOWN"),
 	Left = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "LEFT"),
 	Right = MakeInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
+};
+
+global PlayerControlsGamePad =
+{
+	MoveFunction = MakeInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsPadDown("DPAD_UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsPadDown("DPAD_DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsPadDown("DPAD_LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsPadDown("DPAD_RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+    }, function() { return null; }, {}),
+
+	Jump = MakeInput(Input.IsPadPress, Input.IsPadDown, "A"),
+	Punch = MakeInput(Input.IsPadPress, Input.IsPadDown, "X"),
+	Kick = MakeInput(Input.IsPadPress, Input.IsPadDown, "B"),
+	//Block = MakeInput(Input.IsPadPress, Input.IsPadDown, "Y"),
+	Throw = MakeInput(Input.IsPadPress, Input.IsPadDown, "Y"),
+	Up = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_UP"),
+	Down = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_DOWN"),
+	Left = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_LEFT"),
+	Right = MakeInput(Input.IsPadPress, Input.IsPadDown, "DPAD_RIGHT"),
 };
 
 global PlayerGroundAttacks =
@@ -393,6 +415,20 @@ global MakePlayerController = function(fighter)
             {
                 yield();
                 continue;
+            }
+
+            if (Input.IsPadPress("START"))
+            {
+                if (.controls == PlayerControlsKeyboard)
+                {
+                    g_dump.pad = true;
+                    .controls = PlayerControlsGamePad;
+                }
+                else
+                {
+                    g_dump.pad = false;
+                    .controls = PlayerControlsKeyboard;
+                }
             }
 
             f.move_input = .controls.MoveFunction.Press();
