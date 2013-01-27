@@ -116,12 +116,12 @@ global g_fileData =
 
                 spinkick =
 				{
-                    tileIndex = { 20,24,25,26,27,28,20,8 },
-					times = { 0.1f,0.1f,0.1f,0.1f,0.1f,0.1f },
+                    tileIndex = { 20,24,25,25,26,27,28,28,20,8,8 },
+					times = { 0.1f,0.1f,0.01f,0.1f,0.1f,0.01f,0.1f,0.1f,0.01f },
 					looping = false,
                     tags = {
-                        hit = { 0,2,4,7 },
-                        knockdown = { 7 },
+                        hit = { 0,2,5,8 },
+                        knockdown = { 8 },
                     },
 				},
 
@@ -306,14 +306,15 @@ global g_fileData =
 
                 spinkick =
 				{
-                    tileIndex = { 20,24,25,26,27,28,20,8 },
-					times = { 0.1f,0.1f,0.1f,0.1f,0.1f,0.1f },
+                    tileIndex = { 20,24,25,25,26,27,28,28,20,8,8 },
+					times = { 0.1f,0.1f,0.01f,0.1f,0.1f,0.01f,0.1f,0.1f,0.01f },
 					looping = false,
                     tags = {
-                        hit = { 0,2,4,7 },
-                        knockdown = { 7 },
+                        hit = { 0,2,5,8 },
+                        knockdown = { 8 },
                     },
 				},
+
 
                 sweepkick =
 				{
@@ -496,14 +497,15 @@ global g_fileData =
 
                 spinkick =
 				{
-                    tileIndex = { 20,24,25,26,27,28,20,8 },
-					times = { 0.1f,0.1f,0.1f,0.1f,0.1f,0.1f },
+                    tileIndex = { 20,24,25,25,26,27,28,28,20,8,8 },
+					times = { 0.1f,0.1f,0.01f,0.1f,0.1f,0.01f,0.1f,0.1f,0.01f },
 					looping = false,
                     tags = {
-                        hit = { 0,2,4,7 },
-                        knockdown = { 7 },
+                        hit = { 0,2,5,8 },
+                        knockdown = { 8 },
                     },
 				},
+
 
                 sweepkick =
 				{

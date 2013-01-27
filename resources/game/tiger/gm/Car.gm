@@ -24,6 +24,7 @@ global MakeCarExplosion = function(car)
         }
     };
 
+	g_game.soundBanks["shared"].Play("explode");
     return Explosion;
 };
 
@@ -50,7 +51,7 @@ global MakeCarSpawner = function(world)
             sleep(randfloat(0.10f, 0.45f));
             .Spawn();
 
-            if (randint(0, 100) < 15)
+            if (randint(0, 100) < 195)
             {
                 .SpawnOil();
             }
@@ -355,12 +356,23 @@ global MakeCar = function(world, coord, car_type, lane)
 
     Car.SpinOut = function(frames)
     {
+        // hack hack time
+        if (.type != "PlayerCar")
+        {
+            return;
+        }
+
         threadKill(.action_thread);
 
         fork id {
             local base = sign(.vel.y) + randfloat(-0.1f, 0.1f);
             for (i = 0; i < frames; i += 1)
             {
+                if (i == 2)
+                {
+            		g_game.soundBanks["shared"].Play("screech");
+                }
+
                 .spinout = base;
                 yield();
             }

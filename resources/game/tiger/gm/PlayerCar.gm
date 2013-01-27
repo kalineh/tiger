@@ -164,7 +164,7 @@ global MakePlayerCar = function(world, coord)
     PlayerCar.type = "PlayerCar";
 	PlayerCar.mass = 1.2f;
 	PlayerCar.anim.ChangeTo("player");
-    PlayerCar.max_health = 15.0f;
+    PlayerCar.max_health = 20.0f;
     PlayerCar.health = PlayerCar.max_health;
     PlayerCar.stun = 0;
 
@@ -218,6 +218,8 @@ global MakePlayerCar = function(world, coord)
         {
             g_game.voicePlayer.Play("highway_collide_" + randint(0, 5));
         }
+
+		g_game.soundBanks["shared"].Play("crash");
     };
 
 	return PlayerCar;

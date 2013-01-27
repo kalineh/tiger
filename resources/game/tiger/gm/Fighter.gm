@@ -317,6 +317,8 @@ global MakeFighter = function(world, coord, config_name)
         local vel = .GetFacingDir() * -20.0f;
         local projectile = MakeProjectile(.world, type, pos, vel);
 
+		g_game.soundBanks["shared"].Play("throw");
+
         .world.AddLifeRow(projectile);
     };
 
@@ -376,6 +378,7 @@ global MakeFighter = function(world, coord, config_name)
                 yield();
             }
 
+    		g_game.soundBanks["shared"].Play("fall");
             .anim.ChangeToNoReset("prone");
             .collision_body.SetEnabled(false);
             sleep(randfloat(1.5f, 2.5f));
@@ -445,6 +448,11 @@ global MakeFighter = function(world, coord, config_name)
                 if (randint(0, 100) <= fall_chance)
                 {
                     knockdown = true;
+                }
+
+                if (damage > 0.0f || knockdown)
+                {
+    				g_game.soundBanks["shared"].Play("hit"+randint(0,3));
                 }
 
                 .TakeDamage(damage);

@@ -22,4 +22,53 @@ global g_fileData =
         stream = 0,
         volume = 1.00000,
     },
+    hit0 = 
+    {
+        filename = "game/tiger/snd/hit0.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    hit1 = 
+    {
+        filename = "game/tiger/snd/hit1.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    hit2 = 
+    {
+        filename = "game/tiger/snd/hit2.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    fall = 
+    {
+        filename = "game/tiger/snd/fall.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    crash = 
+    {
+        filename = "game/tiger/snd/crash.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    screech = 
+    {
+        filename = "game/tiger/snd/screech.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
+    explode = 
+    {
+        filename = "game/tiger/snd/explode.ogg",
+        loop = 0,
+        stream = 0,
+        volume = 1.00000,
+    },
 };
