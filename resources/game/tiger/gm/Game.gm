@@ -42,6 +42,8 @@ global MakeVoicePlayer = function()
         g_game.BeginScreenSpace();
 		Gfx.BeginDefaultShader();
 		Gfx.Enable(Gfx.BLEND);
+		Gfx.Color( Gfx.BLACK, 0.8f );
+		font.Print( "'" + text + "'", base + center + v2(-1.2f, -1.2f) );
 		Gfx.Color( Gfx.WHITE, 0.8f );
 		font.Print( "'" + text + "'", base + center );
 		Gfx.EndDefaultShader();
@@ -78,6 +80,8 @@ local CreateGame = function()
 		playMusic = true,
 
 		levelsCompleted = 0,
+
+        gamepad = false,
 	};
 
 	Log("Tiger version: " + Game.version + " - " + Game.versionNotes );
@@ -237,6 +241,34 @@ local CreateGame = function()
 
 			if ( .showAnimationGui ) { RegisterGui( .animBank.Gui, .animBank ); }			
 			if ( .showShaderGui ) {	RegisterGui( .shaderBank.Gui, .shaderBank ); }
+
+            // swap to whatever input is used last
+            if (Input.IsPadDown("DPAD_UP") ||
+                Input.IsPadDown("DPAD_DOWN") ||
+                Input.IsPadDown("DPAD_LEFT") ||
+                Input.IsPadDown("DPAD_RIGHT") ||
+                Input.IsPadDown("A") ||
+                Input.IsPadDown("B") ||
+                Input.IsPadDown("X") ||
+                Input.IsPadDown("Y") ||
+                Input.IsPadDown("START") ||
+                Input.IsPadDown("BACK"))
+            {
+                .gamepad = true;
+            }
+            else if (Input.IsKeyDown("UP") ||
+                Input.IsKeyDown("DOWN") ||
+                Input.IsKeyDown("LEFT") ||
+                Input.IsKeyDown("RIGHT") ||
+                Input.IsKeyDown("Z") ||
+                Input.IsKeyDown("X") ||
+                Input.IsKeyDown("C") ||
+                Input.IsKeyDown("V") ||
+                Input.IsKeyDown("SPACE") ||
+                Input.IsKeyDown("RETURN"))
+            {
+                .gamepad = false;
+            }
 
 			yield();
 		}

@@ -417,19 +417,15 @@ global MakePlayerController = function(fighter)
                 continue;
             }
 
-            if (Input.IsPadPress("START"))
+            if (g_game.gamepad)
             {
-                if (.controls == PlayerControlsKeyboard)
-                {
-                    g_dump.pad = true;
-                    .controls = PlayerControlsGamePad;
-                }
-                else
-                {
-                    g_dump.pad = false;
-                    .controls = PlayerControlsKeyboard;
-                }
+                .controls = PlayerControlsGamePad;
             }
+            else
+            {
+                .controls = PlayerControlsKeyboard;
+            }
+
 
             f.move_input = .controls.MoveFunction.Press();
 

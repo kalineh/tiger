@@ -71,6 +71,28 @@ global PlayerCarControlsKeyboard =
 	Right = MakeCarInput(Input.DidKeyJustGoDown, Input.IsKeyDown, "RIGHT"),
 };
 
+global PlayerCarControlsGamePad =
+{
+	MoveFunction = MakeCarInput(function() {
+		local result = v2(0.0f, 0.0f);
+		if (Input.IsPadDown("DPAD_UP")) { result += v2(0.0f, +1.0f); }
+		if (Input.IsPadDown("DPAD_DOWN")) { result += v2(0.0f, -1.0f); }
+		if (Input.IsPadDown("DPAD_LEFT")) { result += v2(-1.0f, 0.0f); }
+		if (Input.IsPadDown("DPAD_RIGHT")) { result += v2(+1.0f, 0.0f); }
+		return result;
+    }, function() { return null; }, {}),
+
+	Jump = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "X"),
+	Punch = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "C"),
+	Kick = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "Z"),
+	Block = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "D"),
+	Throw = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "V"),
+	Up = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "UP"),
+	Down = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "DOWN"),
+	Left = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "LEFT"),
+	Right = MakeCarInput(Input.IsPadPress, Input.IsPadDown, "RIGHT"),
+};
+
 global MakePlayerCarController = function(car)
 {
     assert(?car);
@@ -90,6 +112,15 @@ global MakePlayerCarController = function(car)
             {
                 yield();
                 continue;
+            }
+
+            if (g_game.gamepad)
+            {
+                .controls = PlayerControlsGamePad;
+            }
+            else
+            {
+                .controls = PlayerControlsKeyboard;
             }
 
             if (c.stun <= 0)
